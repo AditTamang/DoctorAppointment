@@ -23,7 +23,6 @@
     <servlet-mapping>
         <servlet-name>AboutUsServlet</servlet-name>
         <url-pattern>/about-us</url-pattern>
-        <url-pattern>/aboutus</url-pattern>
     </servlet-mapping>
 
     <servlet>
@@ -89,17 +88,7 @@
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
 
-    <!-- Direct JSP Mappings -->
-    <servlet>
-        <servlet-name>AboutUsJSP</servlet-name>
-        <jsp-file>/about-us.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>AboutUsJSP</servlet-name>
-        <url-pattern>/about-us.jsp</url-pattern>
-        <url-pattern>/about-us</url-pattern>
-        <url-pattern>/aboutus</url-pattern>
-    </servlet-mapping>
+
 
     <!-- Error Pages -->
     <error-page>

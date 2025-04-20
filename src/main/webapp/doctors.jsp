@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
-<%@ page import="model.Doctor" %>
+<%@ page import="com.doctorapp.model.Doctor" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -161,7 +161,12 @@
 
             <!-- Doctor Count -->
             <%
-            List<Doctor> doctors = (List<Doctor>) request.getAttribute("doctors");
+            List<Doctor> doctors = null;
+            try {
+                doctors = (List<Doctor>) request.getAttribute("doctors");
+            } catch (Exception e) {
+                // Handle the exception silently
+            }
             String specialization = (String) request.getAttribute("specialization");
             int doctorCount = doctors != null ? doctors.size() : 0;
             %>
@@ -189,7 +194,8 @@
             <div class="doctors-grid">
                 <%
                 if(doctors != null && !doctors.isEmpty()) {
-                    for(Doctor doctor : doctors) {
+                    for(int i = 0; i < doctors.size(); i++) {
+                        Doctor doctor = doctors.get(i);
                 %>
                 <div class="doctor-card">
                     <div class="doctor-status">Available Today</div>
