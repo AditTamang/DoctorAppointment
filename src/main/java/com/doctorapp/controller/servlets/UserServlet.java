@@ -50,28 +50,41 @@ public class UserServlet extends HttpServlet {
 
 
     private void showProfile(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        if (session != null && session.getAttribute("user") != null) {
-            User user = (User) session.getAttribute("user");
-            request.setAttribute("user", user);
+        System.out.println("UserServlet: showProfile method called");
+        try {
+            HttpSession session = request.getSession(false);
+            if (session != null && session.getAttribute("user") != null) {
+                User user = (User) session.getAttribute("user");
+                request.setAttribute("user", user);
+                System.out.println("UserServlet: User role = " + user.getRole());
 
-            // Forward to appropriate profile page based on role
-            switch (user.getRole()) {
-                case "ADMIN":
-                    request.getRequestDispatcher("/admin/profile.jsp").forward(request, response);
-                    break;
-                case "DOCTOR":
-                    request.getRequestDispatcher("/doctor/profile.jsp").forward(request, response);
-                    break;
-                case "PATIENT":
-                    request.getRequestDispatcher("/patient/profile.jsp").forward(request, response);
-                    break;
-                default:
-                    response.sendRedirect("index.jsp");
-                    break;
+                // Forward to appropriate profile page based on role
+                switch (user.getRole()) {
+                    case "ADMIN":
+                        System.out.println("UserServlet: Forwarding to admin profile");
+                        request.getRequestDispatcher("/admin/profile.jsp").forward(request, response);
+                        break;
+                    case "DOCTOR":
+                        System.out.println("UserServlet: Forwarding to doctor profile");
+                        request.getRequestDispatcher("/doctor/profile.jsp").forward(request, response);
+                        break;
+                    case "PATIENT":
+                        System.out.println("UserServlet: Forwarding to patient profile at " + request.getContextPath() + "/patient/profile.jsp");
+                        request.getRequestDispatcher("/patient/profile.jsp").forward(request, response);
+                        break;
+                    default:
+                        System.out.println("UserServlet: Invalid role, redirecting to index");
+                        response.sendRedirect("index.jsp");
+                        break;
+                }
+            } else {
+                System.out.println("UserServlet: No user in session, redirecting to login");
+                response.sendRedirect("login");
             }
-        } else {
-            response.sendRedirect("login");
+        } catch (Exception e) {
+            System.err.println("Error in UserServlet.showProfile: " + e.getMessage());
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/error.jsp");
         }
     }
 

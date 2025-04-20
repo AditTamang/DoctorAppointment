@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+         version="5.0">
+
+    <display-name>Doctor Appointment System</display-name>
+
+    <!-- Servlets -->
+    <servlet>
+        <servlet-name>HomeServlet</servlet-name>
+        <servlet-class>com.doctorapp.controller.servlets.HomeServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>HomeServlet</servlet-name>
+        <url-pattern>/home</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AboutUsServlet</servlet-name>
+        <servlet-class>com.doctorapp.controller.servlets.AboutUsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AboutUsServlet</servlet-name>
+        <url-pattern>/about-us</url-pattern>
+        <url-pattern>/aboutus</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>DoctorServlet</servlet-name>
+        <servlet-class>com.doctorapp.controller.servlets.DoctorServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DoctorServlet</servlet-name>
+        <url-pattern>/doctors</url-pattern>
+        <url-pattern>/doctor/details</url-pattern>
+        <url-pattern>/admin/doctors</url-pattern>
+        <url-pattern>/admin/doctor/add</url-pattern>
+        <url-pattern>/admin/doctor/edit</url-pattern>
+        <url-pattern>/admin/doctor/delete</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AppointmentServlet</servlet-name>
+        <servlet-class>com.doctorapp.controller.servlets.AppointmentServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AppointmentServlet</servlet-name>
+        <url-pattern>/appointments</url-pattern>
+        <url-pattern>/appointment/book</url-pattern>
+        <url-pattern>/appointment/details</url-pattern>
+        <url-pattern>/appointment/cancel</url-pattern>
+        <url-pattern>/doctor/appointments</url-pattern>
+        <url-pattern>/doctor/appointment/update</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>UserServlet</servlet-name>
+        <servlet-class>com.doctorapp.controller.servlets.UserServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UserServlet</servlet-name>
+        <url-pattern>/profile</url-pattern>
+        <url-pattern>/updateProfile</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AuthServlet</servlet-name>
+        <servlet-class>com.doctorapp.controller.auth.AuthServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AuthServlet</servlet-name>
+        <url-pattern>/register</url-pattern>
+        <url-pattern>/login</url-pattern>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>DashboardServlet</servlet-name>
+        <servlet-class>com.doctorapp.controller.servlets.DashboardServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DashboardServlet</servlet-name>
+        <url-pattern>/dashboard</url-pattern>
+    </servlet-mapping>
+
+    <!-- Welcome File List -->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+    <!-- Direct JSP Mappings -->
+    <servlet>
+        <servlet-name>AboutUsJSP</servlet-name>
+        <jsp-file>/about-us.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AboutUsJSP</servlet-name>
+        <url-pattern>/about-us.jsp</url-pattern>
+        <url-pattern>/about-us</url-pattern>
+        <url-pattern>/aboutus</url-pattern>
+    </servlet-mapping>
+
+    <!-- Error Pages -->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error.jsp</location>
+    </error-page>
+
+    <error-page>
+        <error-code>500</error-code>
+        <location>/error.jsp</location>
+    </error-page>
+
+    <error-page>
+        <exception-type>java.lang.Exception</exception-type>
+        <location>/error.jsp</location>
+    </error-page>
+
+</web-app>

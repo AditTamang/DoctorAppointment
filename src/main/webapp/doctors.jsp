@@ -19,6 +19,7 @@
                 <a href="index.jsp" class="logo">Med<span>Doc</span></a>
                 <ul class="nav-links">
                     <li><a href="index.jsp">Home</a></li>
+                    <li><a href="about-us">About Us</a></li>
                     <li><a href="doctors" class="active">Find Doctors</a></li>
                     <li><a href="index.jsp#services">Services</a></li>
                     <li><a href="index.jsp#contact">Contact</a></li>
@@ -293,6 +294,7 @@
                     <h3>Quick Links</h3>
                     <ul class="footer-links">
                         <li><a href="index.jsp"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="about-us"><i class="fas fa-chevron-right"></i> About Us</a></li>
                         <li><a href="index.jsp#services"><i class="fas fa-chevron-right"></i> Services</a></li>
                         <li><a href="doctors"><i class="fas fa-chevron-right"></i> Doctors</a></li>
                         <li><a href="index.jsp#contact"><i class="fas fa-chevron-right"></i> Contact</a></li>

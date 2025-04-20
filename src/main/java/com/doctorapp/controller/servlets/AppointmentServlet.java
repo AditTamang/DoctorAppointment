@@ -100,7 +100,7 @@ public class AppointmentServlet extends HttpServlet {
             }
 
             // Get patient appointments
-            List<Appointment> appointments = appointmentService.getAppointmentsByPatientId(patientId);
+            List<Appointment> appointments = appointmentService.getAppointmentsByPatient(patientId);
             request.setAttribute("appointments", appointments);
             request.getRequestDispatcher("/patient/appointments.jsp").forward(request, response);
         } else if ("ADMIN".equals(user.getRole())) {

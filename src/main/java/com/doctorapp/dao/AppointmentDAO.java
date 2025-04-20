@@ -2,7 +2,6 @@ package com.doctorapp.dao;
 
 import com.doctorapp.model.Appointment;
 import com.doctorapp.util.DBConnection;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -560,4 +559,47 @@ public class AppointmentDAO {
 
         return appointments;
     }
+
+    // Get appointments by patient
+    public List<Appointment> getAppointmentsByPatient(int patientId) {
+        List<Appointment> appointments = new ArrayList<>();
+        String query = "SELECT a.*, d.first_name as doctor_first_name, d.last_name as doctor_last_name, " +
+                      "d.specialization " +
+                      "FROM appointments a " +
+                      "JOIN doctors d ON a.doctor_id = d.id " +
+                      "WHERE a.patient_id = ? " +
+                      "ORDER BY a.appointment_date DESC, a.appointment_time DESC";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, patientId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Appointment appointment = new Appointment();
+                    appointment.setId(rs.getInt("id"));
+                    appointment.setPatientId(rs.getInt("patient_id"));
+                    appointment.setDoctorId(rs.getInt("doctor_id"));
+                    appointment.setAppointmentDate(rs.getDate("appointment_date"));
+                    appointment.setAppointmentTime(rs.getString("appointment_time"));
+                    appointment.setStatus(rs.getString("status"));
+                    appointment.setReason(rs.getString("reason"));
+                    appointment.setNotes(rs.getString("notes"));
+                    appointment.setFee(rs.getDouble("fee"));
+                    appointment.setDoctorName(rs.getString("doctor_first_name") + " " + rs.getString("doctor_last_name"));
+                    appointment.setDoctorSpecialization(rs.getString("specialization"));
+
+                    appointments.add(appointment);
+                }
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return appointments;
+    }
+
+
 }
