@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
-<%@ page import="model.Doctor" %>
+<%@ page import="com.doctorapp.model.Doctor" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +9,9 @@
     <title>Find Doctors - MedDoc</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
+    <style>
+        <%@include file="./assets/css/style.css"%>
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -20,6 +22,7 @@
                 <ul class="nav-links">
                     <li><a href="index.jsp">Home</a></li>
                     <li><a href="doctors" class="active">Find Doctors</a></li>
+					<li><a href="about-us">About Us</a></li>
                     <li><a href="index.jsp#services">Services</a></li>
                     <li><a href="index.jsp#contact">Contact</a></li>
                     <% if(session.getAttribute("user") != null) { %>
@@ -160,7 +163,12 @@
 
             <!-- Doctor Count -->
             <%
-            List<Doctor> doctors = (List<Doctor>) request.getAttribute("doctors");
+            List<Doctor> doctors = null;
+            try {
+                doctors = (List<Doctor>) request.getAttribute("doctors");
+            } catch (Exception e) {
+                // Handle the exception silently
+            }
             String specialization = (String) request.getAttribute("specialization");
             int doctorCount = doctors != null ? doctors.size() : 0;
             %>
@@ -188,7 +196,8 @@
             <div class="doctors-grid">
                 <%
                 if(doctors != null && !doctors.isEmpty()) {
-                    for(Doctor doctor : doctors) {
+                    for(int i = 0; i < doctors.size(); i++) {
+                        Doctor doctor = doctors.get(i);
                 %>
                 <div class="doctor-card">
                     <div class="doctor-status">Available Today</div>
@@ -293,6 +302,7 @@
                     <h3>Quick Links</h3>
                     <ul class="footer-links">
                         <li><a href="index.jsp"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="about-us"><i class="fas fa-chevron-right"></i> About Us</a></li>
                         <li><a href="index.jsp#services"><i class="fas fa-chevron-right"></i> Services</a></li>
                         <li><a href="doctors"><i class="fas fa-chevron-right"></i> Doctors</a></li>
                         <li><a href="index.jsp#contact"><i class="fas fa-chevron-right"></i> Contact</a></li>

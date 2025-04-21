@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Error - Doctor Appointment System</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
+    <style>
+        <%@include file="./assets/css/style.css"%>
+    </style>
     <style>
         .error-container {
             max-width: 800px;
