@@ -11,10 +11,10 @@
     <title>Doctor Dashboard - Doctor Appointment System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-   <style>
+    <style>
         <%@include file="./assets/css/style.css"%>
     </style>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/dashboard.css">
+    <link rel="stylesheet" href="<c:url value='/assets/css/dashboard.css'/>">
 </head>
 <body>
     <div class="dashboard-container">
@@ -32,7 +32,7 @@
 
             <div class="sidebar-user">
                 <div class="user-image">
-                    <img src="${pageContext.request.contextPath}/assets/images/doctors/d1.png" alt="Doctor">
+                    <img src="<c:url value='/assets/images/doctors/d1.png'/>" alt="Doctor">
                 </div>
                 <div class="user-details">
                     <h4>${doctor != null ? 'Dr. ' + doctor.name : 'Doctor'}</h4>
@@ -96,7 +96,7 @@
                         <span class="badge">3</span>
                     </div>
                     <div class="user-profile">
-                        <img src="${pageContext.request.contextPath}/assets/images/doctors/d1.png" alt="Doctor">
+                        <img src="${pageContext.request.contextPath}/assets/images/doctors/d1.png" alt="Doctor">
                         <span>${user != null ? user.username : 'Doctor'}</span>
                         <i class="fas fa-chevron-down"></i>
                     </div>
@@ -155,7 +155,7 @@
                                     <div class="appointment-card completed">
                                         <div class="appointment-time">8:30 - 9:00 AM</div>
                                         <div class="appointment-patient">
-                                            <img src="${pageContext.request.contextPath}/assets/images/patients/p1.png" alt="Patient">
+                                            <img src="<c:url value='/assets/images/patients/p1.png'/>" alt="Patient">
                                             <div>
                                                 <h4>John Doe</h4>
                                                 <p>Regular Checkup</p>
@@ -168,7 +168,7 @@
                                     <div class="appointment-card active">
                                         <div class="appointment-time">10:00 - 10:30 AM</div>
                                         <div class="appointment-patient">
-                                            <img src="${pageContext.request.contextPath}/assets/images/patients/p2.png" alt="Patient">
+                                            <img src="<c:url value='/assets/images/patients/p2.png'/>" alt="Patient">
                                             <div>
                                                 <h4>Emily Parker</h4>
                                                 <p>Heart Consultation</p>
@@ -181,7 +181,7 @@
                                     <div class="appointment-card">
                                         <div class="appointment-time">12:00 - 12:30 PM</div>
                                         <div class="appointment-patient">
-                                            <img src="${pageContext.request.contextPath}/assets/images/patients/p3.png" alt="Patient">
+                                            <img src="<c:url value='/assets/images/patients/p3.png'/>" alt="Patient">
                                             <div>
                                                 <h4>David Thompson</h4>
                                                 <p>Follow-up</p>
@@ -194,7 +194,7 @@
                                     <div class="appointment-card">
                                         <div class="appointment-time">2:30 - 3:00 PM</div>
                                         <div class="appointment-patient">
-                                            <img src="${pageContext.request.contextPath}/assets/images/patients/p1.png" alt="Patient">
+                                            <img src="<c:url value='/assets/images/patients/p1.png'/>" alt="Patient">
                                             <div>
                                                 <h4>Sarah Wilson</h4>
                                                 <p>New Patient</p>
@@ -285,7 +285,7 @@
                             <div class="patient-list">
                                 <div class="patient-item">
                                     <div class="patient-avatar">
-                                        <img src="${pageContext.request.contextPath}/assets/images/patients/p1.png" alt="Patient">
+                                        <img src="<c:url value='/assets/images/patients/p1.png'/>" alt="Patient">
                                     </div>
                                     <div class="patient-info">
                                         <h4>John Doe</h4>
@@ -304,7 +304,7 @@
 
                                 <div class="patient-item">
                                     <div class="patient-avatar">
-                                        <img src="${pageContext.request.contextPath}/assets/images/patients/p2.png" alt="Patient">
+                                        <img src="<c:url value='/assets/images/patients/p2.png'/>" alt="Patient">
                                     </div>
                                     <div class="patient-info">
                                         <h4>Emily Parker</h4>
@@ -323,7 +323,7 @@
 
                                 <div class="patient-item">
                                     <div class="patient-avatar">
-                                        <img src="${pageContext.request.contextPath}/assets/images/patients/p3.png" alt="Patient">
+                                        <img src="<c:url value='/assets/images/patients/p3.png'/>" alt="Patient">
                                     </div>
                                     <div class="patient-info">
                                         <h4>David Thompson</h4>
@@ -342,7 +342,7 @@
 
                                 <div class="patient-item">
                                     <div class="patient-avatar">
-                                        <img src="${pageContext.request.contextPath}/assets/images/patients/p1.png" alt="Patient">
+                                        <img src="<c:url value='/assets/images/patients/p1.png'/>" alt="Patient">
                                     </div>
                                     <div class="patient-info">
                                         <h4>Sarah Wilson</h4>
@@ -379,7 +379,7 @@
                                     </div>
                                     <div class="appointment-details">
                                         <div class="patient-info">
-                                            <img src="${pageContext.request.contextPath}/assets/images/patients/p2.png" alt="Patient">
+                                            <img src="<c:url value='/assets/images/patients/p2.png'/>" alt="Patient">
                                             <div>
                                                 <h4>Emily Parker</h4>
                                                 <p>Heart Consultation</p>
@@ -402,7 +402,7 @@
                                     </div>
                                     <div class="appointment-details">
                                         <div class="patient-info">
-                                            <img src="${pageContext.request.contextPath}/assets/images/patients/p3.png" alt="Patient">
+                                            <img src="<c:url value='/assets/images/patients/p3.png'/>" alt="Patient">
                                             <div>
                                                 <h4>David Thompson</h4>
                                                 <p>Follow-up</p>
@@ -425,7 +425,7 @@
                                     </div>
                                     <div class="appointment-details">
                                         <div class="patient-info">
-                                            <img src="${pageContext.request.contextPath}/assets/images/patients/p1.png" alt="Patient">
+                                            <img src="<c:url value='/assets/images/patients/p1.png'/>" alt="Patient">
                                             <div>
                                                 <h4>Sarah Wilson</h4>
                                                 <p>New Patient</p>
@@ -448,7 +448,7 @@
                                     </div>
                                     <div class="appointment-details">
                                         <div class="patient-info">
-                                            <img src="${pageContext.request.contextPath}/assets/images/patients/p2.png" alt="Patient">
+                                            <img src="<c:url value='/assets/images/patients/p2.png'/>" alt="Patient">
                                             <div>
                                                 <h4>Robert Johnson</h4>
                                                 <p>Heart Checkup</p>
@@ -533,45 +533,11 @@
                                 <div class="chart-legend">
                                     <div class="legend-item">
                                         <span class="legend-color primary"></span>
-                                        <span class="legend-label">Appointments</span>
+                                        <span>Appointments</span>
                                     </div>
                                     <div class="legend-item">
                                         <span class="legend-color secondary"></span>
-                                        <span class="legend-label">Completed</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="performance-stats">
-                                <div class="stat-item">
-                                    <h4>182</h4>
-                                    <p>Total Appointments</p>
-                                    <div class="stat-trend up">
-                                        <i class="fas fa-arrow-up"></i>
-                                        <span>12% from last month</span>
-                                    </div>
-                                </div>
-                                <div class="stat-item">
-                                    <h4>138</h4>
-                                    <p>Completed</p>
-                                    <div class="stat-trend up">
-                                        <i class="fas fa-arrow-up"></i>
-                                        <span>8% from last month</span>
-                                    </div>
-                                </div>
-                                <div class="stat-item">
-                                    <h4>24</h4>
-                                    <p>Cancelled</p>
-                                    <div class="stat-trend down">
-                                        <i class="fas fa-arrow-down"></i>
-                                        <span>3% from last month</span>
-                                    </div>
-                                </div>
-                                <div class="stat-item">
-                                    <h4>20</h4>
-                                    <p>No-shows</p>
-                                    <div class="stat-trend down">
-                                        <i class="fas fa-arrow-down"></i>
-                                        <span>5% from last month</span>
+                                        <span>Completed</span>
                                     </div>
                                 </div>
                             </div>
@@ -587,7 +553,7 @@
                             <div class="message-list">
                                 <div class="message-item unread">
                                     <div class="message-avatar">
-                                        <img src="${pageContext.request.contextPath}/assets/images/patients/p2.png" alt="Patient">
+                                        <img src="<c:url value='/assets/images/patients/p2.png'/>" alt="Patient">
                                     </div>
                                     <div class="message-content">
                                         <div class="message-header">
@@ -600,7 +566,7 @@
 
                                 <div class="message-item">
                                     <div class="message-avatar">
-                                        <img src="${pageContext.request.contextPath}/assets/images/patients/p1.png" alt="Patient">
+                                        <img src="<c:url value='/assets/images/patients/p1.png'/>" alt="Patient">
                                     </div>
                                     <div class="message-content">
                                         <div class="message-header">
@@ -613,7 +579,7 @@
 
                                 <div class="message-item">
                                     <div class="message-avatar">
-                                        <img src="${pageContext.request.contextPath}/assets/images/doctors/d2.png" alt="Staff">
+                                        <img src="<c:url value='/assets/images/doctors/d2.png'/>" alt="Staff">
                                     </div>
                                     <div class="message-content">
                                         <div class="message-header">
@@ -626,7 +592,7 @@
 
                                 <div class="message-item">
                                     <div class="message-avatar">
-                                        <img src="${pageContext.request.contextPath}/assets/images/patients/p3.png" alt="Patient">
+                                        <img src="<c:url value='/assets/images/patients/p3.png'/>" alt="Patient">
                                     </div>
                                     <div class="message-content">
                                         <div class="message-header">
@@ -651,7 +617,7 @@
         </main>
     </div>
 
-    <script src="${pageContext.request.contextPath}/assets/js/script.js"></script>
-    <script src="${pageContext.request.contextPath}/assets/js/dashboard.js"></script>
+    <script src="<c:url value='/assets/js/script.js'/>"></script>
+    <script src="<c:url value='/assets/js/dashboard.js'/>"></script>
 </body>
 </html>

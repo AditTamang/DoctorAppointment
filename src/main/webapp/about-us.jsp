@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -314,9 +315,9 @@
             <nav class="navbar">
                 <a href="index.jsp" class="logo">Med<span>Doc</span></a>
                 <ul class="nav-links">
-                   <li><a href="index.jsp">Home</a></li>
-                    <li><a href="doctors" class="active">Find Doctors</a></li>
-					<li><a href="about-us">About Us</a></li>
+                    <li><a href="index.jsp">Home</a></li>
+                    <li><a href="about-us.jsp" class="active">About Us</a></li>
+                    <li><a href="doctors">Find Doctors</a></li>
                     <li><a href="index.jsp#services">Services</a></li>
                     <li><a href="index.jsp#contact">Contact</a></li>
                     <% if(session.getAttribute("user") != null) { %>
