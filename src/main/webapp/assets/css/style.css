@@ -756,7 +756,7 @@ section {
 .form-control {
     width: 100%;
     padding: 12px 15px;
-    border: 9px solid var(--border-color);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     font-family: inherit;
     font-size: 1rem;

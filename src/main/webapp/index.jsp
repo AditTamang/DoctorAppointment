@@ -7,7 +7,10 @@
     <title>MedDoc - Doctor Appointment System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
+    <style>
+    <%@include file="./assets/css/style.css"%>
+    </style>
+
 </head>
 <body>
     <!-- Header -->
@@ -18,6 +21,7 @@
                 <ul class="nav-links">
                     <li><a href="index.jsp" class="active">Home</a></li>
                     <li><a href="doctors">Find Doctors</a></li>
+                    <li><a href="about-us.jsp">About Us</a></li>
                     <li><a href="#services">Services</a></li>
                     <li><a href="#contact">Contact</a></li>
                     <% if(session.getAttribute("user") != null) { %>

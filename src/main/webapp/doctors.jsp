@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
-<%@ page import="model.Doctor" %>
+<%@ page import="com.doctorapp.model.Doctor" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +10,9 @@
     <title>Find Doctors - MedDoc</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
+    <style>
+        <%@include file="./assets/css/style.css"%>
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -20,6 +23,7 @@
                 <ul class="nav-links">
                     <li><a href="index.jsp">Home</a></li>
                     <li><a href="doctors" class="active">Find Doctors</a></li>
+                    <li><a href="about-us.jsp">About Us</a></li>
                     <li><a href="index.jsp#services">Services</a></li>
                     <li><a href="index.jsp#contact">Contact</a></li>
                     <% if(session.getAttribute("user") != null) { %>
@@ -160,7 +164,11 @@
 
             <!-- Doctor Count -->
             <%
-            List<Doctor> doctors = (List<Doctor>) request.getAttribute("doctors");
+            List<Doctor> doctors = null;
+            try {
+                doctors = (List<Doctor>) request.getAttribute("doctors");
+            } catch (Exception e) {
+            }
             String specialization = (String) request.getAttribute("specialization");
             int doctorCount = doctors != null ? doctors.size() : 0;
             %>
@@ -188,12 +196,13 @@
             <div class="doctors-grid">
                 <%
                 if(doctors != null && !doctors.isEmpty()) {
-                    for(Doctor doctor : doctors) {
+                    for(int i = 0; i < doctors.size(); i++) {
+                        Doctor doctor = doctors.get(i);
                 %>
                 <div class="doctor-card">
                     <div class="doctor-status">Available Today</div>
                     <div class="doctor-img">
-                        <img src="<%= doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty() ? doctor.getImageUrl() : "images/doctors/doctor-placeholder.jpg" %>" alt="<%= doctor.getName() %>">
+                        <img src="${pageContext.request.contextPath}${doctor.imageUrl != null && !doctor.imageUrl.isEmpty() ? (doctor.imageUrl.startsWith('/') ? doctor.imageUrl : '/assets/images/doctors/'.concat(doctor.imageUrl)) : '/assets/images/doctors/d1.png'}" alt="${doctor.name}">
                         <div class="doctor-rating">
                             <i class="fas fa-star"></i>
                             <span>4.8</span>
@@ -262,7 +271,7 @@
             <div class="footer-container">
                 <div class="footer-col">
                     <div class="footer-logo">
-                        <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="MedDoc Logo">
+                        <img src="${pageContext.request.contextPath}/assets/images/logO.png" alt="MedDoc Logo">
                         <div class="footer-logo-text">Med<span>Doc</span></div>
                     </div>
                     <p>We are dedicated to providing you with the best medical services. Your health is our priority.</p>
@@ -293,6 +302,7 @@
                     <h3>Quick Links</h3>
                     <ul class="footer-links">
                         <li><a href="index.jsp"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="about-us"><i class="fas fa-chevron-right"></i> About Us</a></li>
                         <li><a href="index.jsp#services"><i class="fas fa-chevron-right"></i> Services</a></li>
                         <li><a href="doctors"><i class="fas fa-chevron-right"></i> Doctors</a></li>
                         <li><a href="index.jsp#contact"><i class="fas fa-chevron-right"></i> Contact</a></li>

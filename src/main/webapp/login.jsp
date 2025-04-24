@@ -7,8 +7,10 @@
     <title>Login - HealthCare</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/auth.css">
+    <style>
+        <%@include file="./assets/css/style.css"%>
+    </style>
 </head>
 <body>
     <!-- Login Form Container -->
@@ -50,6 +52,9 @@
             <% } %>
 
             <form action="login" method="post">
+                <% if(request.getParameter("redirect") != null) { %>
+                    <input type="hidden" name="redirect" value="<%= request.getParameter("redirect") %>">
+                <% } %>
                 <div class="form-group">
                     <label for="email" class="form-label">Email Address</label>
                     <div style="position: relative;">
