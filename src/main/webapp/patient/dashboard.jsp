@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="model.User" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
     // Check if user is logged in and is a patient
     User user = (User) session.getAttribute("user");
@@ -16,7 +17,7 @@
     <title>Patient Dashboard - Doctor Appointment System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 </head>
 <body>
     <!-- Header -->
@@ -47,7 +48,7 @@
                     <a href="../doctors" class="btn btn-primary">Find a Doctor</a>
                 </div>
             </div>
-            
+
             <div class="dashboard-container">
                 <div class="dashboard-sidebar">
                     <ul class="dashboard-menu">
@@ -57,7 +58,7 @@
                         <li><a href="../logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="dashboard-content">
                     <div class="stats-container">
                         <div class="stat-card">
@@ -82,7 +83,7 @@
                             <div class="stat-label">Completed Appointments</div>
                         </div>
                     </div>
-                    
+
                     <div class="card">
                         <div class="card-header">
                             <h3>Recent Appointments</h3>
@@ -152,6 +153,6 @@
         </div>
     </footer>
 
-    <script src="../js/script.js"></script>
+    <script src="${pageContext.request.contextPath}/js/script.js"></script>
 </body>
 </html>

@@ -7,22 +7,35 @@ public class User {
     private String password;
     private String phone;
     private String role; // "ADMIN", "PATIENT", "DOCTOR"
+    private String firstName;
+    private String lastName;
+    private String dateOfBirth;
+    private String gender;
+    private String address;
 
     public User() {
     }
 
-    public User(int id, String username, String email, String password, String phone, String role) {
+    public User(int id, String username, String email, String password, String phone, String role,
+                String firstName, String lastName) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.phone = phone;
         this.role = role;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    // Constructor without firstName and lastName for backward compatibility
+    public User(int id, String username, String email, String password, String phone, String role) {
+        this(id, username, email, password, phone, role, "", "");
     }
 
     // Constructor without phone for backward compatibility
     public User(int id, String username, String email, String password, String role) {
-        this(id, username, email, password, "", role);
+        this(id, username, email, password, "", role, "", "");
     }
 
     // Getters and Setters
@@ -81,5 +94,45 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(String dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

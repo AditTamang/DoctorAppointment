@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="model.User" %>
-<%@ page import="model.Doctor" %>
+<%@ page import="com.doctorapp.model.User" %>
+<%@ page import="com.doctorapp.model.Doctor" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
     // Check if user is logged in and is a patient
     User user = (User) session.getAttribute("user");
@@ -8,7 +9,7 @@
         response.sendRedirect("../login");
         return;
     }
-    
+
     Doctor doctor = (Doctor) request.getAttribute("doctor");
     if (doctor == null) {
         response.sendRedirect("../doctors");
@@ -58,7 +59,7 @@
                             <%= request.getAttribute("error") %>
                         </div>
                     <% } %>
-                    
+
                     <div class="doctor-info mb-4">
                         <div class="doctor-meta-item">
                             <div class="doctor-meta-label">Doctor:</div>
@@ -81,15 +82,15 @@
                             <div class="doctor-meta-value"><%= doctor.getAvailableTime() %></div>
                         </div>
                     </div>
-                    
+
                     <form action="../appointment/book" method="post">
                         <input type="hidden" name="doctorId" value="<%= doctor.getId() %>">
-                        
+
                         <div class="form-group">
                             <label for="appointmentDate">Appointment Date</label>
                             <input type="date" id="appointmentDate" name="appointmentDate" class="form-control" required>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="appointmentTime">Appointment Time</label>
                             <select id="appointmentTime" name="appointmentTime" class="form-control" required>
@@ -112,12 +113,12 @@
                                 <option value="05:30 PM">05:30 PM</option>
                             </select>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="symptoms">Symptoms/Reason for Visit</label>
                             <textarea id="symptoms" name="symptoms" class="form-control" rows="5" required></textarea>
                         </div>
-                        
+
                         <div class="form-group">
                             <button type="submit" class="btn btn-primary">Book Appointment</button>
                             <a href="../doctor/details?id=<%= doctor.getId() %>" class="btn btn-outline">Cancel</a>

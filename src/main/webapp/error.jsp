@@ -85,7 +85,24 @@
         <h1 class="error-title">Oops! Something went wrong</h1>
         <p class="error-message">We're sorry, but an error occurred while processing your request.</p>
 
-        <% if (exception != null) { %>
+        <%
+        // Get status code
+        Integer statusCode = (Integer)request.getAttribute("javax.servlet.error.status_code");
+        String errorMessage = (String)request.getAttribute("javax.servlet.error.message");
+
+        if (statusCode != null) {
+        %>
+            <div class="error-details">
+                <h3>Error Details:</h3>
+                <p><strong>Status Code:</strong> <%= statusCode %></p>
+                <% if (statusCode == 503) { %>
+                    <p><strong>Message:</strong> The server is temporarily unavailable, possibly due to database initialization. Please try again in a moment.</p>
+                    <p>This might happen during the first run when the database is being set up.</p>
+                <% } else if (errorMessage != null && !errorMessage.isEmpty()) { %>
+                    <p><strong>Message:</strong> <%= errorMessage %></p>
+                <% } %>
+            </div>
+        <% } else if (exception != null) { %>
             <div class="error-details">
                 <h3>Error Details:</h3>
                 <p><strong>Type:</strong> <%= exception.getClass().getName() %></p>
@@ -96,6 +113,9 @@
         <div class="error-actions">
             <a href="${pageContext.request.contextPath}/" class="btn">Go to Home</a>
             <a href="javascript:history.back()" class="btn btn-outline">Go Back</a>
+            <% if (statusCode != null && statusCode == 503) { %>
+                <a href="javascript:window.location.reload()" class="btn" style="background-color: #2196F3;">Retry</a>
+            <% } %>
         </div>
     </div>
 

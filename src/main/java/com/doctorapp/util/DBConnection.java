@@ -5,9 +5,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBConnection {
-    private static final String URL = "jdbc:mysql://localhost:3306/doctor_appointment";
+    private static final String URL = "jdbc:mysql://localhost:3306/doctor_appointment?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "";  
+    private static final String PASSWORD = "";
 
     public static Connection getConnection() throws SQLException, ClassNotFoundException {
         try {
@@ -17,19 +17,50 @@ public class DBConnection {
             return DriverManager.getConnection(URL, USERNAME, PASSWORD);
         } catch (ClassNotFoundException e) {
             System.err.println("MySQL JDBC Driver not found: " + e.getMessage());
-            // Try to load the driver from the lib directory
+            // Try to load the driver from the lib directory using class loader
             try {
-                java.io.File file = new java.io.File("src/main/webapp/WEB-INF/lib/mysql-connector-java-8.0.28.jar");
-                if (file.exists()) {
-                    java.net.URL url = file.toURI().toURL();
-                    java.net.URLClassLoader classLoader = (java.net.URLClassLoader) ClassLoader.getSystemClassLoader();
+                // Try to find the JAR file using the class loader
+                ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+                if (classLoader == null) {
+                    classLoader = DBConnection.class.getClassLoader();
+                }
+
+                // Try to load the driver directly
+                try {
+                    Class.forName("com.mysql.cj.jdbc.Driver", true, classLoader);
+                    return DriverManager.getConnection(URL, USERNAME, PASSWORD);
+                } catch (ClassNotFoundException ex) {
+                    System.err.println("Still couldn't find driver with context class loader: " + ex.getMessage());
+                }
+
+                // If that fails, try to find the JAR file in various locations
+                String[] possiblePaths = {
+                    "WEB-INF/lib/mysql-connector-j-9.2.0.jar",
+                    "src/main/webapp/WEB-INF/lib/mysql-connector-j-9.2.0.jar",
+                    "../lib/mysql-connector-j-9.2.0.jar",
+                    "lib/mysql-connector-j-9.2.0.jar"
+                };
+
+                java.io.File jarFile = null;
+                for (String path : possiblePaths) {
+                    java.io.File file = new java.io.File(path);
+                    if (file.exists()) {
+                        jarFile = file;
+                        System.out.println("Found MySQL connector at: " + file.getAbsolutePath());
+                        break;
+                    }
+                }
+
+                if (jarFile != null) {
+                    java.net.URL url = jarFile.toURI().toURL();
+                    java.net.URLClassLoader urlClassLoader = (java.net.URLClassLoader) ClassLoader.getSystemClassLoader();
                     java.lang.reflect.Method method = java.net.URLClassLoader.class.getDeclaredMethod("addURL", java.net.URL.class);
                     method.setAccessible(true);
-                    method.invoke(classLoader, url);
+                    method.invoke(urlClassLoader, url);
                     Class.forName("com.mysql.cj.jdbc.Driver");
                     return DriverManager.getConnection(URL, USERNAME, PASSWORD);
                 } else {
-                    throw new ClassNotFoundException("MySQL JDBC driver not found in the lib directory");
+                    throw new ClassNotFoundException("MySQL JDBC driver not found in any of the expected locations");
                 }
             } catch (Exception ex) {
                 throw new ClassNotFoundException("Failed to load MySQL JDBC driver: " + ex.getMessage(), ex);

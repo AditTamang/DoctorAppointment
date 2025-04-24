@@ -1,7 +1,9 @@
+
 package com.doctorapp.controller.auth;
 
 import com.doctorapp.model.User;
 import com.doctorapp.service.UserService;
+import com.doctorapp.util.SessionUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -38,45 +40,40 @@ public class LoginServlet extends HttpServlet {
     private void loginUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+        boolean rememberMe = "on".equals(request.getParameter("rememberMe"));
 
         try {
             User user = userService.login(email, password);
 
             if (user != null) {
-                HttpSession session = request.getSession();
-                session.setAttribute("user", user);
-
-                // Generate unique token
-                String token = UUID.randomUUID().toString();
-
-                // Create login cookie
-                Cookie loginCookie = new Cookie("loginToken", token);
-                loginCookie.setHttpOnly(true);  // Prevent JS access to the cookie
-                loginCookie.setPath("/");  // Make it available across the entire application
-                loginCookie.setMaxAge(60 * 60); // 1 hour expiration
-
-                // Add cookie to response
-                response.addCookie(loginCookie);
+                // Create user session using SessionUtil
+                SessionUtil.createUserSession(request, response, user, rememberMe);
 
                 // Check if there's a redirect parameter
                 String redirect = request.getParameter("redirect");
+
                 if (redirect != null && !redirect.isEmpty()) {
                     // Redirect to the requested page
                     response.sendRedirect(redirect);
                 } else {
-                    // Redirect to the Dashboard page after successful login
+                    // Redirect to the dashboard servlet which will handle role-based redirection
                     response.sendRedirect(request.getContextPath() + "/dashboard");
                 }
-
             } else {
-                response.setContentType("application/json");
-                response.setStatus(401); // Unauthorized
-                response.getWriter().write("{\"error\": \"Invalid email or password\"}");
+                // Set error message in request attribute
+                request.setAttribute("error", "Invalid email or password");
+                // Forward back to login page
+                request.getRequestDispatcher("/login.jsp").forward(request, response);
             }
         } catch (Exception e) {
-            response.setContentType("application/json");
-            response.setStatus(500); // Internal Server Error
-            response.getWriter().write("{\"error\": \"Login failed: " + e.getMessage() + "\"}");
+            // Log the error
+            System.err.println("Login error: " + e.getMessage());
+            e.printStackTrace();
+
+            // Set error message in request attribute
+            request.setAttribute("error", "Login failed: " + e.getMessage());
+            // Forward back to login page
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
         }
     }
 }

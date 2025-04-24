@@ -316,10 +316,10 @@
                 <a href="index.jsp" class="logo">Med<span>Doc</span></a>
                 <ul class="nav-links">
                     <li><a href="index.jsp">Home</a></li>
-                    <li><a href="about-us.jsp" class="active">About Us</a></li>
                     <li><a href="doctors">Find Doctors</a></li>
+                    <li><a href="about-us.jsp" class="active">About Us</a></li>
                     <li><a href="index.jsp#services">Services</a></li>
-                    <li><a href="index.jsp#contact">Contact</a></li>
+                    <li><a href="contact-us">Contact</a></li>
                     <% if(session.getAttribute("user") != null) { %>
                         <li><a href="appointments">Appointments</a></li>
                         <li><a href="profile">Profile</a></li>
@@ -358,7 +358,7 @@
                         </div>
                     </div>
                     <div class="mission-image">
-                        <img src="${pageContext.request.contextPath}/assets/images/doctors/Hospital.jpg" alt="Hospital Team">
+                        <img src="${pageContext.request.contextPath}/assets/images/specialties/hospital.png" alt="Hospital Team">
                     </div>
                 </div>
             </div>

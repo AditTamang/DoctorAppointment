@@ -1,8 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
-<%@ page import="model.Doctor" %>
-<%@ page import="model.Patient" %>
-<%@ page import="model.Appointment" %>
+<%@ page import="com.doctorapp.model.Doctor" %>
+<%@ page import="com.doctorapp.model.Patient" %>
+<%@ page import="com.doctorapp.model.Appointment" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,7 +28,7 @@
                     <i class="fas fa-times"></i>
                 </div>
             </div>
-            
+
             <div class="sidebar-menu">
                 <ul>
                     <li class="active">
@@ -81,7 +82,7 @@
                 </ul>
             </div>
         </div>
-        
+
         <!-- Main Content -->
         <div class="dashboard-main">
             <!-- Top Navigation -->
@@ -89,20 +90,20 @@
                 <div class="menu-toggle" id="menuToggle">
                     <i class="fas fa-bars"></i>
                 </div>
-                
+
                 <div class="nav-right">
                     <div class="search-box">
                         <i class="fas fa-search"></i>
                         <input type="text" placeholder="Search...">
                     </div>
-                    
+
                     <div class="nav-notifications">
                         <div class="icon-badge">
                             <i class="fas fa-bell"></i>
                             <span class="badge">5</span>
                         </div>
                     </div>
-                    
+
                     <div class="nav-user">
                         <img src="../images/admin-avatar.jpg" alt="Admin">
                         <div class="user-info">
@@ -112,14 +113,14 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Dashboard Content -->
             <div class="dashboard-content">
                 <div class="page-header">
                     <h1>Dashboard</h1>
                     <p>Welcome to the admin dashboard</p>
                 </div>
-                
+
                 <!-- Stats Cards -->
                 <div class="stats-container">
                     <div class="stat-card">
@@ -132,7 +133,7 @@
                             <p><span class="positive"><i class="fas fa-arrow-up"></i> 12%</span> from last month</p>
                         </div>
                     </div>
-                    
+
                     <div class="stat-card">
                         <div class="stat-card-icon green">
                             <i class="fas fa-users"></i>
@@ -143,7 +144,7 @@
                             <p><span class="positive"><i class="fas fa-arrow-up"></i> 8%</span> from last month</p>
                         </div>
                     </div>
-                    
+
                     <div class="stat-card">
                         <div class="stat-card-icon purple">
                             <i class="fas fa-calendar-check"></i>
@@ -154,7 +155,7 @@
                             <p><span class="positive"><i class="fas fa-arrow-up"></i> 5%</span> from last month</p>
                         </div>
                     </div>
-                    
+
                     <div class="stat-card">
                         <div class="stat-card-icon orange">
                             <i class="fas fa-money-bill-wave"></i>
@@ -166,7 +167,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Charts Section -->
                 <div class="charts-container">
                     <div class="chart-card">
@@ -184,7 +185,7 @@
                             <canvas id="appointmentChart"></canvas>
                         </div>
                     </div>
-                    
+
                     <div class="chart-card">
                         <div class="chart-header">
                             <h3>Revenue Overview</h3>
@@ -201,14 +202,14 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Recent Activity -->
                 <div class="recent-activity">
                     <div class="section-header">
                         <h3>Recent Activity</h3>
                         <a href="#" class="view-all">View All</a>
                     </div>
-                    
+
                     <div class="activity-list">
                         <div class="activity-item">
                             <div class="activity-icon green">
@@ -220,7 +221,7 @@
                                 <span class="activity-time">2 hours ago</span>
                             </div>
                         </div>
-                        
+
                         <div class="activity-item">
                             <div class="activity-icon blue">
                                 <i class="fas fa-calendar-plus"></i>
@@ -231,7 +232,7 @@
                                 <span class="activity-time">3 hours ago</span>
                             </div>
                         </div>
-                        
+
                         <div class="activity-item">
                             <div class="activity-icon orange">
                                 <i class="fas fa-star"></i>
@@ -242,7 +243,7 @@
                                 <span class="activity-time">5 hours ago</span>
                             </div>
                         </div>
-                        
+
                         <div class="activity-item">
                             <div class="activity-icon purple">
                                 <i class="fas fa-calendar-times"></i>
@@ -253,7 +254,7 @@
                                 <span class="activity-time">Yesterday</span>
                             </div>
                         </div>
-                        
+
                         <div class="activity-item">
                             <div class="activity-icon red">
                                 <i class="fas fa-exclamation-circle"></i>
@@ -266,7 +267,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Recent Doctors and Patients -->
                 <div class="tables-container">
                     <div class="table-card">
@@ -349,7 +350,7 @@
                             </table>
                         </div>
                     </div>
-                    
+
                     <div class="table-card">
                         <div class="table-header">
                             <h3>Recent Patients</h3>
@@ -432,7 +433,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Footer -->
             <div class="dashboard-footer">
                 <p>&copy; 2023 HealthCare. All Rights Reserved.</p>
@@ -440,18 +441,18 @@
             </div>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Toggle sidebar on mobile
         document.getElementById('menuToggle').addEventListener('click', function() {
             document.querySelector('.dashboard-sidebar').classList.toggle('active');
         });
-        
+
         document.getElementById('sidebarClose').addEventListener('click', function() {
             document.querySelector('.dashboard-sidebar').classList.remove('active');
         });
-        
+
         // Charts
         const appointmentCtx = document.getElementById('appointmentChart').getContext('2d');
         const appointmentChart = new Chart(appointmentCtx, {
@@ -492,7 +493,7 @@
                 }
             }
         });
-        
+
         const revenueCtx = document.getElementById('revenueChart').getContext('2d');
         const revenueChart = new Chart(revenueCtx, {
             type: 'bar',

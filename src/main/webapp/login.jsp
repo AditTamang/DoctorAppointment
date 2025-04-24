@@ -7,9 +7,9 @@
     <title>Login - HealthCare</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/auth.css">
     <style>
         <%@include file="./assets/css/style.css"%>
+        <%@include file="./assets/css/auth.css"%>
     </style>
 </head>
 <body>
@@ -71,8 +71,8 @@
                 </div>
                 <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                        <input type="checkbox" id="remember" name="remember">
-                        <label for="remember" style="margin-left: 5px; cursor: pointer;">Remember me</label>
+                        <input type="checkbox" id="rememberMe" name="rememberMe">
+                        <label for="rememberMe" style="margin-left: 5px; cursor: pointer;">Remember me</label>
                     </div>
                     <a href="#" style="color: var(--primary-color); font-size: 0.9rem;">Forgot Password?</a>
                 </div>

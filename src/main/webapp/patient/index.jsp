@@ -1,7 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
-<%@ page import="model.Doctor" %>
-<%@ page import="model.Appointment" %>
+<%@ page import="com.doctorapp.model.Doctor" %>
+<%@ page import="com.doctorapp.model.Appointment" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,7 +27,7 @@
                     <i class="fas fa-times"></i>
                 </div>
             </div>
-            
+
             <div class="sidebar-menu">
                 <ul>
                     <li class="active">
@@ -87,7 +88,7 @@
                 </ul>
             </div>
         </div>
-        
+
         <!-- Main Content -->
         <div class="dashboard-main">
             <!-- Top Navigation -->
@@ -95,27 +96,27 @@
                 <div class="menu-toggle" id="menuToggle">
                     <i class="fas fa-bars"></i>
                 </div>
-                
+
                 <div class="nav-right">
                     <div class="search-box">
                         <i class="fas fa-search"></i>
                         <input type="text" placeholder="Search doctors...">
                     </div>
-                    
+
                     <div class="nav-notifications">
                         <div class="icon-badge">
                             <i class="fas fa-bell"></i>
                             <span class="badge">3</span>
                         </div>
                     </div>
-                    
+
                     <div class="nav-messages">
                         <div class="icon-badge">
                             <i class="fas fa-envelope"></i>
                             <span class="badge">2</span>
                         </div>
                     </div>
-                    
+
                     <div class="nav-user">
                         <img src="../images/patients/patient1.jpg" alt="Patient">
                         <div class="user-info">
@@ -125,14 +126,14 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Dashboard Content -->
             <div class="dashboard-content">
                 <div class="page-header">
                     <h1>Patient Dashboard</h1>
                     <p>Welcome back, Robert Wilson</p>
                 </div>
-                
+
                 <!-- Quick Actions -->
                 <div class="quick-actions">
                     <a href="book-appointment.jsp" class="quick-action-card">
@@ -142,7 +143,7 @@
                         <h3>Book Appointment</h3>
                         <p>Schedule a new appointment with a doctor</p>
                     </a>
-                    
+
                     <a href="medical-records.jsp" class="quick-action-card">
                         <div class="quick-action-icon green">
                             <i class="fas fa-file-medical"></i>
@@ -150,7 +151,7 @@
                         <h3>Medical Records</h3>
                         <p>View your medical history and reports</p>
                     </a>
-                    
+
                     <a href="prescriptions.jsp" class="quick-action-card">
                         <div class="quick-action-icon purple">
                             <i class="fas fa-prescription"></i>
@@ -158,7 +159,7 @@
                         <h3>Prescriptions</h3>
                         <p>Access your current and past prescriptions</p>
                     </a>
-                    
+
                     <a href="messages.jsp" class="quick-action-card">
                         <div class="quick-action-icon orange">
                             <i class="fas fa-comment-medical"></i>
@@ -167,14 +168,14 @@
                         <p>Communicate with your healthcare providers</p>
                     </a>
                 </div>
-                
+
                 <!-- Health Summary -->
                 <div class="health-summary">
                     <div class="section-header">
                         <h3>Health Summary</h3>
                         <a href="medical-records.jsp" class="view-all">View Details</a>
                     </div>
-                    
+
                     <div class="health-stats">
                         <div class="health-stat-card">
                             <div class="health-stat-icon">
@@ -190,7 +191,7 @@
                                 <div class="health-stat-date">Last updated: Apr 15, 2023</div>
                             </div>
                         </div>
-                        
+
                         <div class="health-stat-card">
                             <div class="health-stat-icon">
                                 <i class="fas fa-weight"></i>
@@ -205,7 +206,7 @@
                                 <div class="health-stat-date">Last updated: Apr 10, 2023</div>
                             </div>
                         </div>
-                        
+
                         <div class="health-stat-card">
                             <div class="health-stat-icon">
                                 <i class="fas fa-tint"></i>
@@ -220,7 +221,7 @@
                                 <div class="health-stat-date">Last updated: Apr 15, 2023</div>
                             </div>
                         </div>
-                        
+
                         <div class="health-stat-card">
                             <div class="health-stat-icon">
                                 <i class="fas fa-burn"></i>
@@ -237,14 +238,14 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Upcoming Appointments -->
                 <div class="upcoming-appointments">
                     <div class="section-header">
                         <h3>Upcoming Appointments</h3>
                         <a href="appointments.jsp" class="view-all">View All</a>
                     </div>
-                    
+
                     <div class="appointment-cards">
                         <div class="appointment-card">
                             <div class="appointment-date">
@@ -278,7 +279,7 @@
                                 <button class="btn btn-outline danger"><i class="fas fa-times"></i> Cancel</button>
                             </div>
                         </div>
-                        
+
                         <div class="appointment-card">
                             <div class="appointment-date">
                                 <div class="date-box">
@@ -312,14 +313,14 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Recent Prescriptions -->
                 <div class="recent-prescriptions">
                     <div class="section-header">
                         <h3>Recent Prescriptions</h3>
                         <a href="prescriptions.jsp" class="view-all">View All</a>
                     </div>
-                    
+
                     <div class="table-responsive">
                         <table>
                             <thead>
@@ -432,13 +433,13 @@
                         </table>
                     </div>
                 </div>
-                
+
                 <!-- Health Tips -->
                 <div class="health-tips">
                     <div class="section-header">
                         <h3>Health Tips For You</h3>
                     </div>
-                    
+
                     <div class="tips-container">
                         <div class="tip-card">
                             <div class="tip-icon">
@@ -448,7 +449,7 @@
                             <p>Regular exercise, a balanced diet, and stress management can significantly improve your heart health.</p>
                             <a href="#" class="read-more">Read More</a>
                         </div>
-                        
+
                         <div class="tip-card">
                             <div class="tip-icon">
                                 <i class="fas fa-apple-alt"></i>
@@ -457,7 +458,7 @@
                             <p>Include more fruits, vegetables, and whole grains in your diet to maintain optimal health.</p>
                             <a href="#" class="read-more">Read More</a>
                         </div>
-                        
+
                         <div class="tip-card">
                             <div class="tip-icon">
                                 <i class="fas fa-running"></i>
@@ -466,7 +467,7 @@
                             <p>Aim for at least 30 minutes of moderate exercise most days of the week.</p>
                             <a href="#" class="read-more">Read More</a>
                         </div>
-                        
+
                         <div class="tip-card">
                             <div class="tip-icon">
                                 <i class="fas fa-bed"></i>
@@ -478,7 +479,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Footer -->
             <div class="dashboard-footer">
                 <p>&copy; 2023 HealthCare. All Rights Reserved.</p>
@@ -486,13 +487,13 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         // Toggle sidebar on mobile
         document.getElementById('menuToggle').addEventListener('click', function() {
             document.querySelector('.dashboard-sidebar').classList.toggle('active');
         });
-        
+
         document.getElementById('sidebarClose').addEventListener('click', function() {
             document.querySelector('.dashboard-sidebar').classList.remove('active');
         });

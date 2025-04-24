@@ -10,11 +10,20 @@ import java.util.List;
  */
 public class UserService {
     private UserDAO userDAO;
-    
+
     public UserService() {
         this.userDAO = new UserDAO();
     }
-    
+
+    /**
+     * Check if an email already exists in the database
+     * @param email The email to check
+     * @return true if the email exists, false otherwise
+     */
+    public boolean emailExists(String email) {
+        return userDAO.emailExists(email);
+    }
+
     /**
      * Register a new user
      * @param user The user to register
@@ -23,7 +32,7 @@ public class UserService {
     public boolean registerUser(User user) {
         return userDAO.registerUser(user);
     }
-    
+
     /**
      * Authenticate a user
      * @param email User's email
@@ -33,7 +42,7 @@ public class UserService {
     public User login(String email, String password) {
         return userDAO.login(email, password);
     }
-    
+
     /**
      * Get a user by email
      * @param email User's email
@@ -42,7 +51,7 @@ public class UserService {
     public User getUserByEmail(String email) {
         return userDAO.getUserByEmail(email);
     }
-    
+
     /**
      * Get a user by ID
      * @param id User's ID
@@ -51,7 +60,7 @@ public class UserService {
     public User getUserById(int id) {
         return userDAO.getUserById(id);
     }
-    
+
     /**
      * Get all users
      * @return List of all users
@@ -59,7 +68,7 @@ public class UserService {
     public List<User> getAllUsers() {
         return userDAO.getAllUsers();
     }
-    
+
     /**
      * Update a user
      * @param user The user to update
@@ -68,7 +77,7 @@ public class UserService {
     public boolean updateUser(User user) {
         return userDAO.updateUser(user);
     }
-    
+
     /**
      * Save patient details for a user
      * @param userId User ID
@@ -82,7 +91,7 @@ public class UserService {
     public boolean savePatientDetails(int userId, String dateOfBirth, String gender, String address, String bloodGroup, String allergies) {
         return userDAO.savePatientDetails(userId, dateOfBirth, gender, address, bloodGroup, allergies);
     }
-    
+
     /**
      * Save doctor details for a user
      * @param userId User ID
@@ -96,7 +105,7 @@ public class UserService {
     public boolean saveDoctorDetails(int userId, String specialization, String qualification, String experience, String address, String bio) {
         return userDAO.saveDoctorDetails(userId, specialization, qualification, experience, address, bio);
     }
-    
+
     /**
      * Delete a user
      * @param id User ID

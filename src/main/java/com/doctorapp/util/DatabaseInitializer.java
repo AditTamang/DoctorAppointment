@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,6 +21,46 @@ public class DatabaseInitializer {
     private static final Logger LOGGER = Logger.getLogger(DatabaseInitializer.class.getName());
 
     /**
+     * Execute a list of SQL statements
+     * @param conn Database connection
+     * @param statements List of SQL statements to execute
+     */
+    private static void executeStatements(Connection conn, List<String> statements) {
+        try {
+            // Disable auto-commit for batch operations
+            conn.setAutoCommit(false);
+
+            try (Statement stmt = conn.createStatement()) {
+                for (String statement : statements) {
+                    try {
+                        LOGGER.info("Executing SQL: " + statement);
+                        stmt.execute(statement);
+                    } catch (SQLException e) {
+                        LOGGER.log(Level.WARNING, "Error executing SQL statement: " + statement, e);
+                        // Continue with other statements
+                    }
+                }
+
+                // Commit the transaction
+                conn.commit();
+            } catch (SQLException e) {
+                // Rollback on error
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    LOGGER.log(Level.SEVERE, "Error rolling back transaction", rollbackEx);
+                }
+                LOGGER.log(Level.SEVERE, "Error executing SQL statements", e);
+            } finally {
+                // Restore auto-commit
+                conn.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error managing transaction", e);
+        }
+    }
+
+    /**
      * Initialize the database by executing SQL scripts
      */
     public static void initialize() {
@@ -26,108 +68,13 @@ public class DatabaseInitializer {
 
         try {
             // Load the SQL script
-            InputStream is = DatabaseInitializer.class.getClassLoader().getResourceAsStream("db/doctor_appointment_schema.sql");
+            InputStream is = DatabaseInitializer.class.getClassLoader().getResourceAsStream("schema.sql");
 
-            // If still not found, create a default SQL script
+            // If still not found, log an error
             if (is == null) {
-                LOGGER.warning("SQL script not found in any location. Creating a default script.");
-                String defaultScript = """
-                -- Default SQL script
-                CREATE TABLE IF NOT EXISTS users (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    username VARCHAR(50) NOT NULL UNIQUE,
-                    email VARCHAR(100) NOT NULL UNIQUE,
-                    password VARCHAR(100) NOT NULL,
-                    role VARCHAR(20) NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                );
-                CREATE TABLE IF NOT EXISTS doctors (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    user_id INT,
-                    name VARCHAR(100) NOT NULL,
-                    first_name VARCHAR(50),
-                    last_name VARCHAR(50),
-                    specialization VARCHAR(100) NOT NULL,
-                    qualification VARCHAR(100) NOT NULL,
-                    experience VARCHAR(50) NOT NULL,
-                    email VARCHAR(100) NOT NULL,
-                    phone VARCHAR(20) NOT NULL,
-                    address TEXT NOT NULL,
-                    consultation_fee VARCHAR(20) NOT NULL,
-                    available_days VARCHAR(100) NOT NULL,
-                    available_time VARCHAR(100) NOT NULL,
-                    image_url VARCHAR(255),
-                    profile_image VARCHAR(255),
-                    bio TEXT
-                );
-                CREATE TABLE IF NOT EXISTS patients (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    user_id INT NOT NULL,
-                    first_name VARCHAR(100),
-                    last_name VARCHAR(100),
-                    date_of_birth DATE,
-                    gender VARCHAR(10),
-                    phone VARCHAR(20),
-                    address TEXT,
-                    blood_group VARCHAR(5),
-                    allergies TEXT,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                );
-                CREATE TABLE IF NOT EXISTS appointments (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    patient_id INT NOT NULL,
-                    doctor_id INT NOT NULL,
-                    patient_name VARCHAR(100) NOT NULL,
-                    doctor_name VARCHAR(100) NOT NULL,
-                    appointment_date DATE NOT NULL,
-                    appointment_time VARCHAR(20) NOT NULL,
-                    status VARCHAR(20) NOT NULL,
-                    symptoms TEXT,
-                    prescription TEXT,
-                    reason VARCHAR(255),
-                    notes TEXT,
-                    fee DECIMAL(10, 2) DEFAULT 0.0,
-                    medical_report TEXT
-                );
-                -- Add test users for each role
-                INSERT IGNORE INTO users (username, email, password, role)
-                VALUES
-                ('Admin User', 'admin@example.com', 'YWRtaW4xMjM=', 'ADMIN'),
-                ('Doctor User', 'doctor@example.com', 'ZG9jdG9yMTIz', 'DOCTOR'),
-                ('Patient User', 'patient@example.com', 'cGF0aWVudDEyMw==', 'PATIENT');
-                -- Add test doctor
-                INSERT IGNORE INTO doctors (user_id, name, first_name, last_name, specialization, qualification, experience, email, phone, address, consultation_fee, available_days, available_time, image_url)
-                SELECT
-                    (SELECT id FROM users WHERE email = 'doctor@example.com'),
-                    'Dr. Doctor User',
-                    'Doctor',
-                    'User',
-                    'Cardiology',
-                    'MD, MBBS',
-                    '10 years',
-                    'doctor@example.com',
-                    '1234567890',
-                    '123 Doctor St',
-                    '100',
-                    'Monday,Wednesday,Friday',
-                    '9:00 AM - 5:00 PM',
-                    'doctor1.jpg';
-                -- Add test patient
-                INSERT IGNORE INTO patients (user_id, first_name, last_name, date_of_birth, gender, phone, address, blood_group, allergies)
-                SELECT
-                    (SELECT id FROM users WHERE email = 'patient@example.com'),
-                    'Patient',
-                    'User',
-                    '1990-01-01',
-                    'Male',
-                    '9876543210',
-                    '456 Patient Ave',
-                    'O+',
-                    'None';
-                """;
-                is = new java.io.ByteArrayInputStream(defaultScript.getBytes());
+                LOGGER.severe("ERROR: schema.sql not found in classpath. Database initialization will fail.");
+                throw new IOException("schema.sql not found in classpath");
             }
-            // We should have a script by now, either from file or default
 
             // Read the SQL script
             StringBuilder sqlScript = new StringBuilder();
@@ -147,28 +94,51 @@ public class DatabaseInitializer {
                 }
             }
 
-            // Split the script into individual statements
-            String[] statements = sqlScript.toString().split(";\\s*\n");
+            // Process the script to separate DDL (table creation) and DML (data insertion) statements
+            List<String> ddlStatements = new ArrayList<>();
+            List<String> dmlStatements = new ArrayList<>();
 
-            // Execute each statement
-            try (Connection conn = DBConnection.getConnection()) {
-                try (Statement stmt = conn.createStatement()) {
-                    for (String statement : statements) {
-                        if (!statement.trim().isEmpty()) {
-                            try {
-                                stmt.execute(statement);
-                            } catch (SQLException e) {
-                                LOGGER.log(Level.WARNING, "Error executing SQL statement: " + statement, e);
-                            }
-                        }
-                    }
+            // Split the script into individual statements
+            String[] allStatements = sqlScript.toString().split(";\\s*\n");
+
+            // Categorize statements
+            for (String statement : allStatements) {
+                statement = statement.trim();
+                if (statement.isEmpty()) {
+                    continue;
                 }
+
+                // Skip CREATE DATABASE and USE statements
+                if (statement.toUpperCase().startsWith("CREATE DATABASE") ||
+                    statement.toUpperCase().startsWith("USE ")) {
+                    LOGGER.info("Skipping database statement: " + statement);
+                    continue;
+                }
+
+                // Add to appropriate list
+                if (statement.toUpperCase().startsWith("CREATE TABLE") ||
+                    statement.toUpperCase().startsWith("DROP TABLE") ||
+                    statement.toUpperCase().startsWith("ALTER TABLE")) {
+                    ddlStatements.add(statement);
+                } else {
+                    dmlStatements.add(statement);
+                }
+            }
+
+            // Execute statements in proper order
+            try (Connection conn = DBConnection.getConnection()) {
+                // First execute all DDL statements to create tables
+                LOGGER.info("Executing DDL statements to create tables...");
+                executeStatements(conn, ddlStatements);
+
+                // Then execute all DML statements to insert data
+                LOGGER.info("Executing DML statements to insert data...");
+                executeStatements(conn, dmlStatements);
+
+                LOGGER.info("Database initialization completed successfully.");
             } catch (SQLException | ClassNotFoundException e) {
                 LOGGER.log(Level.SEVERE, "Database connection error", e);
             }
-
-            LOGGER.info("Database initialization completed successfully.");
-
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error reading SQL script", e);
         }

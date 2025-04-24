@@ -1,0 +1,340 @@
+/* Appointment Styles */
+.appointment-container {
+    padding: 2rem 0;
+}
+
+.appointment-form-container {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.form-section {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.form-section:last-child {
+    border-bottom: none;
+}
+
+.form-section h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+}
+
+.form-section h3 i {
+    margin-right: 0.75rem;
+    color: var(--primary-color);
+}
+
+.doctor-details {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background-color: #f8f9fc;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.doctor-card {
+    display: flex;
+    align-items: center;
+}
+
+.doctor-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 1.5rem;
+    flex-shrink: 0;
+}
+
+.doctor-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.doctor-info {
+    flex: 1;
+}
+
+.doctor-info h4 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.doctor-info p {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+}
+
+.doctor-info p i {
+    width: 20px;
+    margin-right: 0.5rem;
+    color: var(--primary-color);
+}
+
+.doctor-rating {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.doctor-rating i {
+    color: var(--warning-color);
+    font-size: 0.9rem;
+    margin-right: 0.25rem;
+}
+
+.doctor-rating span {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-left: 0.5rem;
+}
+
+.consultation-fee {
+    font-weight: 600;
+    color: var(--primary-color) !important;
+}
+
+.availability-message {
+    margin-top: 1rem;
+}
+
+.available {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: rgba(28, 200, 138, 0.1);
+    border-radius: 0.25rem;
+    color: var(--success-color);
+}
+
+.unavailable {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: rgba(231, 74, 59, 0.1);
+    border-radius: 0.25rem;
+    color: var(--danger-color);
+}
+
+.available i, .unavailable i {
+    margin-right: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.5rem;
+    background-color: #f8f9fc;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Appointment List */
+.appointment-list {
+    margin-top: 2rem;
+}
+
+.appointment-card {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.appointment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.appointment-header h4 {
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+.appointment-body {
+    padding: 1.5rem;
+}
+
+.appointment-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+}
+
+.info-value {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.appointment-doctor {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.appointment-doctor img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 1rem;
+}
+
+.appointment-doctor h5 {
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.appointment-doctor p {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.appointment-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background-color: #f8f9fc;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Appointment Details */
+.appointment-details-container {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.appointment-details-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background-color: #f8f9fc;
+}
+
+.appointment-details-header h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.appointment-details-header p {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.appointment-details-body {
+    padding: 1.5rem;
+}
+
+.appointment-details-section {
+    margin-bottom: 2rem;
+}
+
+.appointment-details-section h4 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.appointment-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.appointment-details-item {
+    margin-bottom: 1rem;
+}
+
+.appointment-details-label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+}
+
+.appointment-details-value {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.appointment-details-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.5rem;
+    background-color: #f8f9fc;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .doctor-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .doctor-image {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .doctor-info p {
+        justify-content: center;
+    }
+    
+    .doctor-rating {
+        justify-content: center;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .appointment-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .appointment-details-grid {
+        grid-template-columns: 1fr;
+    }
+}
