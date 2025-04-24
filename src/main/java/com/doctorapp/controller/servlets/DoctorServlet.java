@@ -49,6 +49,12 @@ public class DoctorServlet extends HttpServlet {
             case "/admin/doctor/edit":
                 showEditDoctorForm(request, response);
                 break;
+            case "/admin/doctor/view":
+                viewDoctorDetails(request, response);
+                break;
+            case "/admin/doctor/delete":
+                deleteDoctor(request, response);
+                break;
             default:
                 response.sendRedirect(request.getContextPath() + "/index.jsp");
                 break;
@@ -266,6 +272,32 @@ public class DoctorServlet extends HttpServlet {
         // Forward back to the form
         request.setAttribute("doctor", doctor);
         request.getRequestDispatcher("/admin/edit-doctor.jsp").forward(request, response);
+    }
+
+    private void viewDoctorDetails(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Check if user is admin
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        User user = (User) session.getAttribute("user");
+        if (!"ADMIN".equals(user.getRole())) {
+            response.sendRedirect(request.getContextPath() + "/dashboard");
+            return;
+        }
+
+        // Get doctor ID
+        int id = Integer.parseInt(request.getParameter("id"));
+        Doctor doctor = doctorService.getDoctorById(id);
+
+        if (doctor != null) {
+            request.setAttribute("doctor", doctor);
+            request.getRequestDispatcher("/admin/view-doctor.jsp").forward(request, response);
+        } else {
+            response.sendRedirect(request.getContextPath() + "/admin/doctors");
+        }
     }
 
     private void deleteDoctor(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

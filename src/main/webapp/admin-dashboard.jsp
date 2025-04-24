@@ -43,26 +43,26 @@
             <nav class="sidebar-nav">
                 <ul>
                     <li class="active">
-                        <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                        <a href="${pageContext.request.contextPath}/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
                     </li>
                     <li>
-                        <a href="#"><i class="fas fa-user-md"></i> Doctors</a>
+                        <a href="${pageContext.request.contextPath}/admin/doctors"><i class="fas fa-user-md"></i> Doctors</a>
                     </li>
                     <li>
-                        <a href="#"><i class="fas fa-users"></i> Patients</a>
+                        <a href="${pageContext.request.contextPath}/admin/patients"><i class="fas fa-users"></i> Patients</a>
                     </li>
                     <li>
-                        <a href="#"><i class="fas fa-calendar-check"></i> Appointments</a>
+                        <a href="${pageContext.request.contextPath}/admin/appointments"><i class="fas fa-calendar-check"></i> Appointments</a>
                     </li>
                     <li>
-                        <a href="#"><i class="fas fa-chart-bar"></i> Reports</a>
+                        <a href="${pageContext.request.contextPath}/admin/reports"><i class="fas fa-chart-bar"></i> Reports</a>
                     </li>
                     <li>
-                        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="${pageContext.request.contextPath}/admin/settings"><i class="fas fa-cog"></i> Settings</a>
                     </li>
                     <li class="sidebar-divider"></li>
                     <li>
-                        <a href="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        <a href="${pageContext.request.contextPath}/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </li>
                 </ul>
             </nav>
@@ -94,7 +94,7 @@
                     </div>
                     <div class="user-profile">
                         <img src="${pageContext.request.contextPath}/assets/images/doctors/d1.png" alt="Admin">
-                        <span>Admin</span>
+                        <span>${sessionScope.user.username}</span>
                         <i class="fas fa-chevron-down"></i>
                     </div>
                 </div>
@@ -124,7 +124,7 @@
                             <div class="progress-bar" style="width: 75%"></div>
                         </div>
                         <div class="stat-card-link">
-                            <a href="#">View All <i class="fas fa-arrow-right"></i></a>
+                            <a href="${pageContext.request.contextPath}/admin/doctors">View All <i class="fas fa-arrow-right"></i></a>
                         </div>
                     </div>
 
