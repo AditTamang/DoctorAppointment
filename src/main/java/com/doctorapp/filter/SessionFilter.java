@@ -22,7 +22,7 @@ import jakarta.servlet.http.HttpSession;
  * Filter to manage sessions and cookies for the application.
  * This filter handles session validation, cookie management, and security.
  */
-@WebFilter(urlPatterns = {"/*"})
+@WebFilter(filterName = "SessionFilter", urlPatterns = {"/dashboard/*", "/profile/*", "/appointment/*", "/admin/*", "/doctor/*", "/patient/*"})
 public class SessionFilter implements Filter {
 
     // List of paths that don't require authentication
