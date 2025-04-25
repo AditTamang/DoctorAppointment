@@ -16,27 +16,33 @@
         <%@ include file="../css/adminDashboard.css" %>
     </style>
     <style>
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
+        /* No status badges needed as we only show pending requests */
+
+        /* Card header styling */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Improved alert styles */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
             border-radius: 4px;
-            font-size: 12px;
             font-weight: 500;
         }
 
-        .pending {
-            background-color: #fff8e1;
-            color: #ff8f00;
-        }
-
-        .approved {
+        .alert-success {
             background-color: #e8f5e9;
             color: #2e7d32;
+            border-left: 4px solid #2e7d32;
         }
 
-        .rejected {
+        .alert-danger {
             background-color: #ffebee;
             color: #c62828;
+            border-left: 4px solid #c62828;
         }
 
         .request-table {
@@ -262,7 +268,7 @@
 
                 <div class="card">
                     <div class="card-header">
-                        <h3>All Requests</h3>
+                        <h3>Pending Doctor Requests</h3>
                     </div>
                     <div class="card-body">
                         <%
@@ -277,7 +283,6 @@
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Specialization</th>
-                                        <th>Status</th>
                                         <th>Date</th>
                                         <th>Actions</th>
                                     </tr>
@@ -289,25 +294,18 @@
                                         <td><%= req.getFirstName() + " " + req.getLastName() %></td>
                                         <td><%= req.getEmail() %></td>
                                         <td><%= req.getSpecialization() %></td>
-                                        <td>
-                                            <span class="status-badge <%= req.getStatus().toLowerCase() %>">
-                                                <%= req.getStatus() %>
-                                            </span>
-                                        </td>
                                         <td><%= req.getCreatedAt() %></td>
                                         <td>
                                             <div class="action-buttons">
                                                 <a href="${pageContext.request.contextPath}/admin/doctor-request/view?id=<%= req.getId() %>" class="btn-icon btn-view" title="View Details">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                                <% if ("PENDING".equals(req.getStatus())) { %>
                                                 <a href="#" class="btn-icon btn-approve" title="Approve" onclick="approveRequest(<%= req.getId() %>)">
                                                     <i class="fas fa-check"></i>
                                                 </a>
                                                 <a href="#" class="btn-icon btn-reject" title="Reject" onclick="rejectRequest(<%= req.getId() %>)">
                                                     <i class="fas fa-times"></i>
                                                 </a>
-                                                <% } %>
                                             </div>
                                         </td>
                                     </tr>
@@ -448,6 +446,8 @@
                 event.target.style.display = 'none';
             }
         };
+
+        // No filter function needed as we only show pending requests
     </script>
 </body>
 </html>

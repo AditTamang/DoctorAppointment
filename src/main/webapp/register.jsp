@@ -158,7 +158,10 @@
                             <input type="password" id="patient-password" name="password" class="form-control" style="padding-left: 45px; padding-right: 45px;"
                                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
                                    title="Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character" required>
-                            <i class="fas fa-eye password-toggle-patient" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #666; cursor: pointer;" onclick="togglePasswordVisibility('patient-password', 'password-toggle-patient')"></i>
+                            <span class="password-toggle" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer;" onclick="togglePasswordVisibility('patient-password')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-off"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye" style="display: none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </span>
                         </div>
                         <small class="password-hint">Password must be at least 8 characters long and include uppercase, lowercase, number, and special character</small>
                     </div>
@@ -168,7 +171,10 @@
                         <div style="position: relative;">
                             <i class="fas fa-lock" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #666;"></i>
                             <input type="password" id="patient-confirm-password" name="confirmPassword" class="form-control" style="padding-left: 45px; padding-right: 45px;" required>
-                            <i class="fas fa-eye password-toggle-patient-confirm" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #666; cursor: pointer;" onclick="togglePasswordVisibility('patient-confirm-password', 'password-toggle-patient-confirm')"></i>
+                            <span class="password-toggle" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer;" onclick="togglePasswordVisibility('patient-confirm-password')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-off"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye" style="display: none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -283,7 +289,10 @@
                             <input type="password" id="doctor-password" name="password" class="form-control" style="padding-left: 45px; padding-right: 45px;"
                                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
                                    title="Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character" required>
-                            <i class="fas fa-eye password-toggle-doctor" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #666; cursor: pointer;" onclick="togglePasswordVisibility('doctor-password', 'password-toggle-doctor')"></i>
+                            <span class="password-toggle" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer;" onclick="togglePasswordVisibility('doctor-password')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-off"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye" style="display: none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </span>
                         </div>
                         <small class="password-hint">Password must be at least 8 characters long and include uppercase, lowercase, number, and special character</small>
                     </div>
@@ -293,7 +302,10 @@
                         <div style="position: relative;">
                             <i class="fas fa-lock" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #666;"></i>
                             <input type="password" id="doctor-confirm-password" name="confirmPassword" class="form-control" style="padding-left: 45px; padding-right: 45px;" required>
-                            <i class="fas fa-eye password-toggle-doctor-confirm" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #666; cursor: pointer;" onclick="togglePasswordVisibility('doctor-confirm-password', 'password-toggle-doctor-confirm')"></i>
+                            <span class="password-toggle" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer;" onclick="togglePasswordVisibility('doctor-confirm-password')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-off"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye" style="display: none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -402,18 +414,19 @@
         });
 
         // Function to toggle password visibility
-        function togglePasswordVisibility(inputId, toggleIconClass) {
+        function togglePasswordVisibility(inputId) {
             const passwordInput = document.getElementById(inputId);
-            const toggleIcon = document.querySelector('.' + toggleIconClass);
+            const eyeOffIcon = document.querySelector(`#${inputId} ~ .password-toggle .eye-off`);
+            const eyeIcon = document.querySelector(`#${inputId} ~ .password-toggle .eye`);
 
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
+                eyeOffIcon.style.display = 'none';
+                eyeIcon.style.display = 'inline-block';
             } else {
                 passwordInput.type = 'password';
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
+                eyeOffIcon.style.display = 'inline-block';
+                eyeIcon.style.display = 'none';
             }
         }
     </script>

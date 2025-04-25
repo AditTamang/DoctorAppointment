@@ -119,31 +119,87 @@ public class DoctorDAO {
 
     // Get doctor by ID
     public Doctor getDoctorById(int id) {
-        String query = "SELECT * FROM doctors WHERE id = ?";
+        // Join with users table to get more information about the doctor
+        String query = "SELECT d.*, u.first_name, u.last_name, u.email AS user_email, u.phone AS user_phone, u.address AS user_address " +
+                      "FROM doctors d " +
+                      "JOIN users u ON d.user_id = u.id " +
+                      "WHERE d.id = ? AND u.role = 'DOCTOR'";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setInt(1, id);
 
-            ResultSet rs = pstmt.executeQuery();
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Doctor doctor = new Doctor();
+                    doctor.setId(rs.getInt("id"));
 
-            if (rs.next()) {
-                Doctor doctor = new Doctor();
-                doctor.setId(rs.getInt("id"));
-                doctor.setName(rs.getString("name"));
-                doctor.setSpecialization(rs.getString("specialization"));
-                doctor.setQualification(rs.getString("qualification"));
-                doctor.setExperience(rs.getString("experience"));
-                doctor.setEmail(rs.getString("email"));
-                doctor.setPhone(rs.getString("phone"));
-                doctor.setAddress(rs.getString("address"));
-                doctor.setConsultationFee(rs.getString("consultation_fee"));
-                doctor.setAvailableDays(rs.getString("available_days"));
-                doctor.setAvailableTime(rs.getString("available_time"));
-                doctor.setImageUrl(rs.getString("image_url"));
+                    // Use name from doctors table, or construct from first_name and last_name if null
+                    String name = rs.getString("name");
+                    if (name == null || name.isEmpty()) {
+                        String firstName = rs.getString("first_name");
+                        String lastName = rs.getString("last_name");
+                        name = "Dr. " + (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                        name = name.trim();
+                    }
+                    doctor.setName(name);
 
-                return doctor;
+                    doctor.setSpecialization(rs.getString("specialization"));
+                    doctor.setQualification(rs.getString("qualification"));
+                    doctor.setExperience(rs.getString("experience"));
+
+                    // Get email from doctors table or users table
+                    String email = rs.getString("email");
+                    if (email == null || email.isEmpty()) {
+                        email = rs.getString("user_email");
+                    }
+                    doctor.setEmail(email);
+
+                    // Get phone from doctors table or users table
+                    String phone = rs.getString("phone");
+                    if (phone == null || phone.isEmpty()) {
+                        phone = rs.getString("user_phone");
+                    }
+                    doctor.setPhone(phone);
+
+                    // Get address from doctors table or users table
+                    String address = rs.getString("address");
+                    if (address == null || address.isEmpty()) {
+                        address = rs.getString("user_address");
+                    }
+                    doctor.setAddress(address);
+
+                    // Get consultation fee, set default if null
+                    String consultationFee = rs.getString("consultation_fee");
+                    if (consultationFee == null || consultationFee.isEmpty()) {
+                        consultationFee = "1000";
+                    }
+                    doctor.setConsultationFee(consultationFee);
+
+                    // Get available days, set default if null
+                    String availableDays = rs.getString("available_days");
+                    if (availableDays == null || availableDays.isEmpty()) {
+                        availableDays = "Monday,Tuesday,Wednesday,Thursday,Friday";
+                    }
+                    doctor.setAvailableDays(availableDays);
+
+                    // Get available time, set default if null
+                    String availableTime = rs.getString("available_time");
+                    if (availableTime == null || availableTime.isEmpty()) {
+                        availableTime = "09:00 AM - 05:00 PM";
+                    }
+                    doctor.setAvailableTime(availableTime);
+
+                    // Get image URL, set default if null
+                    String imageUrl = rs.getString("image_url");
+                    if (imageUrl == null || imageUrl.isEmpty()) {
+                        imageUrl = "/assets/images/doctors/default-doctor.png";
+                    }
+                    doctor.setImageUrl(imageUrl);
+
+                    return doctor;
+                }
             }
 
         } catch (SQLException | ClassNotFoundException e) {
@@ -156,7 +212,12 @@ public class DoctorDAO {
     // Get all doctors
     public List<Doctor> getAllDoctors() {
         List<Doctor> doctors = new ArrayList<>();
-        String query = "SELECT * FROM doctors";
+
+        // Simplified query to get all doctors with their information
+        String query = "SELECT d.*, u.first_name, u.last_name, u.email AS user_email, u.phone AS user_phone, u.address AS user_address " +
+                      "FROM doctors d " +
+                      "JOIN users u ON d.user_id = u.id " +
+                      "WHERE u.role = 'DOCTOR'";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query);
@@ -165,19 +226,75 @@ public class DoctorDAO {
             while (rs.next()) {
                 Doctor doctor = new Doctor();
                 doctor.setId(rs.getInt("id"));
-                doctor.setName(rs.getString("name"));
+
+                // Use name from doctors table, or construct from first_name and last_name if null
+                String name = rs.getString("name");
+                if (name == null || name.isEmpty()) {
+                    String firstName = rs.getString("first_name");
+                    String lastName = rs.getString("last_name");
+                    name = "Dr. " + (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                    name = name.trim();
+                }
+                doctor.setName(name);
+
                 doctor.setSpecialization(rs.getString("specialization"));
                 doctor.setQualification(rs.getString("qualification"));
                 doctor.setExperience(rs.getString("experience"));
-                doctor.setEmail(rs.getString("email"));
-                doctor.setPhone(rs.getString("phone"));
-                doctor.setAddress(rs.getString("address"));
-                doctor.setConsultationFee(rs.getString("consultation_fee"));
-                doctor.setAvailableDays(rs.getString("available_days"));
-                doctor.setAvailableTime(rs.getString("available_time"));
-                doctor.setImageUrl(rs.getString("image_url"));
 
-                doctors.add(doctor);
+                // Get email from doctors table or users table
+                String email = rs.getString("email");
+                if (email == null || email.isEmpty()) {
+                    email = rs.getString("user_email");
+                }
+                doctor.setEmail(email);
+
+                // Get phone from doctors table or users table
+                String phone = rs.getString("phone");
+                if (phone == null || phone.isEmpty()) {
+                    phone = rs.getString("user_phone");
+                }
+                doctor.setPhone(phone);
+
+                // Get address from doctors table or users table
+                String address = rs.getString("address");
+                if (address == null || address.isEmpty()) {
+                    address = rs.getString("user_address");
+                }
+                doctor.setAddress(address);
+
+                // Get consultation fee, set default if null
+                String consultationFee = rs.getString("consultation_fee");
+                if (consultationFee == null || consultationFee.isEmpty()) {
+                    consultationFee = "1000";
+                }
+                doctor.setConsultationFee(consultationFee);
+
+                // Get available days, set default if null
+                String availableDays = rs.getString("available_days");
+                if (availableDays == null || availableDays.isEmpty()) {
+                    availableDays = "Monday,Tuesday,Wednesday,Thursday,Friday";
+                }
+                doctor.setAvailableDays(availableDays);
+
+                // Get available time, set default if null
+                String availableTime = rs.getString("available_time");
+                if (availableTime == null || availableTime.isEmpty()) {
+                    availableTime = "09:00 AM - 05:00 PM";
+                }
+                doctor.setAvailableTime(availableTime);
+
+                // Get image URL, set default if null
+                String imageUrl = rs.getString("image_url");
+                if (imageUrl == null || imageUrl.isEmpty()) {
+                    imageUrl = "/assets/images/doctors/default-doctor.png";
+                }
+                doctor.setImageUrl(imageUrl);
+
+                // Only add doctors with valid information
+                if (name != null && !name.isEmpty() &&
+                    doctor.getSpecialization() != null && !doctor.getSpecialization().isEmpty()) {
+                    doctors.add(doctor);
+                }
             }
 
         } catch (SQLException | ClassNotFoundException e) {
@@ -190,7 +307,13 @@ public class DoctorDAO {
     // Search doctors by name or email
     public List<Doctor> searchDoctors(String searchTerm) {
         List<Doctor> doctors = new ArrayList<>();
-        String query = "SELECT * FROM doctors WHERE name LIKE ? OR email LIKE ?";
+
+        // Join with users table to get more information about the doctor
+        String query = "SELECT d.*, u.first_name, u.last_name, u.email AS user_email, u.phone AS user_phone, u.address AS user_address " +
+                      "FROM doctors d " +
+                      "JOIN users u ON d.user_id = u.id " +
+                      "WHERE (d.name LIKE ? OR d.email LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ?) " +
+                      "AND u.role = 'DOCTOR'";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -198,25 +321,83 @@ public class DoctorDAO {
             String searchPattern = "%" + searchTerm + "%";
             pstmt.setString(1, searchPattern);
             pstmt.setString(2, searchPattern);
+            pstmt.setString(3, searchPattern);
+            pstmt.setString(4, searchPattern);
 
-            ResultSet rs = pstmt.executeQuery();
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Doctor doctor = new Doctor();
+                    doctor.setId(rs.getInt("id"));
 
-            while (rs.next()) {
-                Doctor doctor = new Doctor();
-                doctor.setId(rs.getInt("id"));
-                doctor.setName(rs.getString("name"));
-                doctor.setSpecialization(rs.getString("specialization"));
-                doctor.setQualification(rs.getString("qualification"));
-                doctor.setExperience(rs.getString("experience"));
-                doctor.setEmail(rs.getString("email"));
-                doctor.setPhone(rs.getString("phone"));
-                doctor.setAddress(rs.getString("address"));
-                doctor.setConsultationFee(rs.getString("consultation_fee"));
-                doctor.setAvailableDays(rs.getString("available_days"));
-                doctor.setAvailableTime(rs.getString("available_time"));
-                doctor.setImageUrl(rs.getString("image_url"));
+                    // Use name from doctors table, or construct from first_name and last_name if null
+                    String name = rs.getString("name");
+                    if (name == null || name.isEmpty()) {
+                        String firstName = rs.getString("first_name");
+                        String lastName = rs.getString("last_name");
+                        name = "Dr. " + (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                        name = name.trim();
+                    }
+                    doctor.setName(name);
 
-                doctors.add(doctor);
+                    doctor.setSpecialization(rs.getString("specialization"));
+                    doctor.setQualification(rs.getString("qualification"));
+                    doctor.setExperience(rs.getString("experience"));
+
+                    // Get email from doctors table or users table
+                    String email = rs.getString("email");
+                    if (email == null || email.isEmpty()) {
+                        email = rs.getString("user_email");
+                    }
+                    doctor.setEmail(email);
+
+                    // Get phone from doctors table or users table
+                    String phone = rs.getString("phone");
+                    if (phone == null || phone.isEmpty()) {
+                        phone = rs.getString("user_phone");
+                    }
+                    doctor.setPhone(phone);
+
+                    // Get address from doctors table or users table
+                    String address = rs.getString("address");
+                    if (address == null || address.isEmpty()) {
+                        address = rs.getString("user_address");
+                    }
+                    doctor.setAddress(address);
+
+                    // Get consultation fee, set default if null
+                    String consultationFee = rs.getString("consultation_fee");
+                    if (consultationFee == null || consultationFee.isEmpty()) {
+                        consultationFee = "1000";
+                    }
+                    doctor.setConsultationFee(consultationFee);
+
+                    // Get available days, set default if null
+                    String availableDays = rs.getString("available_days");
+                    if (availableDays == null || availableDays.isEmpty()) {
+                        availableDays = "Monday,Tuesday,Wednesday,Thursday,Friday";
+                    }
+                    doctor.setAvailableDays(availableDays);
+
+                    // Get available time, set default if null
+                    String availableTime = rs.getString("available_time");
+                    if (availableTime == null || availableTime.isEmpty()) {
+                        availableTime = "09:00 AM - 05:00 PM";
+                    }
+                    doctor.setAvailableTime(availableTime);
+
+                    // Get image URL, set default if null
+                    String imageUrl = rs.getString("image_url");
+                    if (imageUrl == null || imageUrl.isEmpty()) {
+                        imageUrl = "/assets/images/doctors/default-doctor.png";
+                    }
+                    doctor.setImageUrl(imageUrl);
+
+                    // Only add doctors with valid information
+                    if (name != null && !name.isEmpty() &&
+                        doctor.getSpecialization() != null && !doctor.getSpecialization().isEmpty()) {
+                        doctors.add(doctor);
+                    }
+                }
             }
 
         } catch (SQLException | ClassNotFoundException e) {
@@ -229,31 +410,91 @@ public class DoctorDAO {
     // Get doctors by specialization
     public List<Doctor> getDoctorsBySpecialization(String specialization) {
         List<Doctor> doctors = new ArrayList<>();
-        String query = "SELECT * FROM doctors WHERE specialization = ?";
+
+        // Join with users table to get more information about the doctor
+        String query = "SELECT d.*, u.first_name, u.last_name, u.email AS user_email, u.phone AS user_phone, u.address AS user_address FROM doctors d " +
+                      "JOIN users u ON d.user_id = u.id " +
+                      "WHERE d.specialization = ? AND u.role = 'DOCTOR'";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, specialization);
 
-            ResultSet rs = pstmt.executeQuery();
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Doctor doctor = new Doctor();
+                    doctor.setId(rs.getInt("id"));
 
-            while (rs.next()) {
-                Doctor doctor = new Doctor();
-                doctor.setId(rs.getInt("id"));
-                doctor.setName(rs.getString("name"));
-                doctor.setSpecialization(rs.getString("specialization"));
-                doctor.setQualification(rs.getString("qualification"));
-                doctor.setExperience(rs.getString("experience"));
-                doctor.setEmail(rs.getString("email"));
-                doctor.setPhone(rs.getString("phone"));
-                doctor.setAddress(rs.getString("address"));
-                doctor.setConsultationFee(rs.getString("consultation_fee"));
-                doctor.setAvailableDays(rs.getString("available_days"));
-                doctor.setAvailableTime(rs.getString("available_time"));
-                doctor.setImageUrl(rs.getString("image_url"));
+                    // Use name from doctors table, or construct from first_name and last_name if null
+                    String name = rs.getString("name");
+                    if (name == null || name.isEmpty()) {
+                        String firstName = rs.getString("first_name");
+                        String lastName = rs.getString("last_name");
+                        name = "Dr. " + (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                        name = name.trim();
+                    }
+                    doctor.setName(name);
 
-                doctors.add(doctor);
+                    doctor.setSpecialization(rs.getString("specialization"));
+                    doctor.setQualification(rs.getString("qualification"));
+                    doctor.setExperience(rs.getString("experience"));
+
+                    // Get email from doctors table or users table
+                    String email = rs.getString("email");
+                    if (email == null || email.isEmpty()) {
+                        email = rs.getString("user_email");
+                    }
+                    doctor.setEmail(email);
+
+                    // Get phone from doctors table or users table
+                    String phone = rs.getString("phone");
+                    if (phone == null || phone.isEmpty()) {
+                        phone = rs.getString("user_phone");
+                    }
+                    doctor.setPhone(phone);
+
+                    // Get address from doctors table or users table
+                    String address = rs.getString("address");
+                    if (address == null || address.isEmpty()) {
+                        address = rs.getString("user_address");
+                    }
+                    doctor.setAddress(address);
+
+                    // Get consultation fee, set default if null
+                    String consultationFee = rs.getString("consultation_fee");
+                    if (consultationFee == null || consultationFee.isEmpty()) {
+                        consultationFee = "1000";
+                    }
+                    doctor.setConsultationFee(consultationFee);
+
+                    // Get available days, set default if null
+                    String availableDays = rs.getString("available_days");
+                    if (availableDays == null || availableDays.isEmpty()) {
+                        availableDays = "Monday,Tuesday,Wednesday,Thursday,Friday";
+                    }
+                    doctor.setAvailableDays(availableDays);
+
+                    // Get available time, set default if null
+                    String availableTime = rs.getString("available_time");
+                    if (availableTime == null || availableTime.isEmpty()) {
+                        availableTime = "09:00 AM - 05:00 PM";
+                    }
+                    doctor.setAvailableTime(availableTime);
+
+                    // Get image URL, set default if null
+                    String imageUrl = rs.getString("image_url");
+                    if (imageUrl == null || imageUrl.isEmpty()) {
+                        imageUrl = "/assets/images/doctors/default-doctor.png";
+                    }
+                    doctor.setImageUrl(imageUrl);
+
+                    // Only add doctors with valid information
+                    if (name != null && !name.isEmpty() &&
+                        doctor.getSpecialization() != null && !doctor.getSpecialization().isEmpty()) {
+                        doctors.add(doctor);
+                    }
+                }
             }
 
         } catch (SQLException | ClassNotFoundException e) {

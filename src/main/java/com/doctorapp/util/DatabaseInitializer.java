@@ -144,10 +144,5 @@ public class DatabaseInitializer {
         }
     }
 
-    /**
-     * Static initializer to run the database initialization when the class is loaded
-     */
-    static {
-        initialize();
-    }
+    // Database initialization is now handled by AppInitializer
 }

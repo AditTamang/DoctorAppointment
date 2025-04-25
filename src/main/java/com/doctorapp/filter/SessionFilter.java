@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.doctorapp.model.User;
+import com.doctorapp.util.SessionUtil;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -13,23 +14,22 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.annotation.WebFilter;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 /**
- * Filter to manage sessions and cookies for the application.
- * This filter handles session validation, cookie management, and security.
+ * Comprehensive filter to manage sessions, cookies, authentication, and authorization.
+ * This filter handles session validation, cookie management, and role-based access control.
  */
-@WebFilter(filterName = "SessionFilter", urlPatterns = {"/profile/*", "/appointment/*", "/admin/*", "/doctor/*", "/patient/*"})
+@WebFilter(filterName = "SessionFilter", urlPatterns = {"/*"})
 public class SessionFilter implements Filter {
 
     // List of paths that don't require authentication
     private static final List<String> PUBLIC_PATHS = Arrays.asList(
             "/", "/login", "/register", "/logout", "/index.jsp", "/login.jsp", "/register.jsp",
             "/about-us", "/contact-us", "/doctors", "/assets/", "/error.jsp", "/404.jsp",
-            "/index", "/home"
+            "/index", "/home", "/css/", "/js/", "/images/", "/fonts/"
     );
 
     @Override
@@ -62,23 +62,61 @@ public class SessionFilter implements Filter {
 
         // Check if user is authenticated
         HttpSession session = httpRequest.getSession(false);
-        boolean isLoggedIn = (session != null && session.getAttribute("user") != null);
+        boolean isLoggedIn = SessionUtil.isLoggedIn(httpRequest);
 
         if (isLoggedIn) {
-            // User is logged in, update session timeout
-            session.setMaxInactiveInterval(30 * 60); // 30 minutes
+            User user = SessionUtil.getCurrentUser(httpRequest);
 
-            // Refresh the login cookie if it exists
-            refreshLoginCookie(httpRequest, httpResponse);
+            // Refresh the session and cookie
+            SessionUtil.refreshLoginCookie(httpRequest, httpResponse);
+            session.setMaxInactiveInterval(SessionUtil.SESSION_TIMEOUT);
 
             // Check if this is a new login and handle accordingly
             if (session.getAttribute("newLogin") != null && (Boolean) session.getAttribute("newLogin")) {
                 // Remove the new login flag
                 session.removeAttribute("newLogin");
+            }
 
-                // Log the login activity
-                User user = (User) session.getAttribute("user");
-                System.out.println("New login: " + user.getEmail() + " (" + user.getRole() + ")");
+            // Role-based access control
+            if (requestURI.contains("/admin/") || requestURI.startsWith(contextPath + "/admin/")) {
+                if (!"ADMIN".equals(user.getRole())) {
+                    // Redirect to dashboard if not an admin
+                    httpResponse.sendRedirect(contextPath + "/dashboard");
+                    return;
+                }
+            }
+
+            // Doctor area protection
+            if (requestURI.contains("/doctor/") || requestURI.startsWith(contextPath + "/doctor/")) {
+                if (!"DOCTOR".equals(user.getRole()) && !"ADMIN".equals(user.getRole())) {
+                    // Redirect to dashboard if not a doctor or admin
+                    httpResponse.sendRedirect(contextPath + "/dashboard");
+                    return;
+                }
+            }
+
+            // Patient area protection
+            if (requestURI.contains("/patient/") || requestURI.startsWith(contextPath + "/patient/")) {
+                if (!"PATIENT".equals(user.getRole()) && !"ADMIN".equals(user.getRole())) {
+                    // Redirect to dashboard if not a patient or admin
+                    httpResponse.sendRedirect(contextPath + "/dashboard");
+                    return;
+                }
+            }
+
+            // Handle dashboard access based on role
+            if (requestURI.endsWith("/dashboard") || requestURI.equals(contextPath + "/dashboard")) {
+                // Redirect to role-specific dashboard if accessing the general dashboard
+                if ("ADMIN".equals(user.getRole())) {
+                    httpResponse.sendRedirect(contextPath + "/admin/index.jsp");
+                    return;
+                } else if ("DOCTOR".equals(user.getRole())) {
+                    httpResponse.sendRedirect(contextPath + "/doctor/doctorDashboard.jsp");
+                    return;
+                } else if ("PATIENT".equals(user.getRole())) {
+                    httpResponse.sendRedirect(contextPath + "/patient/patientDashboard.jsp");
+                    return;
+                }
             }
 
             // Continue with the request
@@ -136,25 +174,5 @@ public class SessionFilter implements Filter {
         }
 
         return false;
-    }
-
-    /**
-     * Refresh the login cookie to extend its expiration
-     */
-    private void refreshLoginCookie(HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("loginToken".equals(cookie.getName())) {
-                    // Create a new cookie with the same value but updated expiration
-                    Cookie refreshedCookie = new Cookie("loginToken", cookie.getValue());
-                    refreshedCookie.setHttpOnly(true);
-                    refreshedCookie.setPath("/");
-                    refreshedCookie.setMaxAge(60 * 60); // 1 hour
-                    response.addCookie(refreshedCookie);
-                    break;
-                }
-            }
-        }
     }
 }

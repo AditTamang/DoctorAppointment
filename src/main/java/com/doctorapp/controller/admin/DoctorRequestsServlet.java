@@ -129,35 +129,59 @@ public class DoctorRequestsServlet extends HttpServlet {
     private void approveDoctorRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String idParam = request.getParameter("id");
         String adminNotes = request.getParameter("adminNotes");
+        HttpSession session = request.getSession();
 
         if (idParam == null || idParam.isEmpty()) {
+            session.setAttribute("error", "Doctor ID is missing. Please try again.");
             response.sendRedirect(request.getContextPath() + "/admin/doctor-requests");
             return;
         }
 
         try {
             int id = Integer.parseInt(idParam);
+            System.out.println("Processing approval for doctor request ID: " + id);
 
             // Get the request details before approval
             DoctorRegistrationRequest doctorRequest = doctorRegistrationService.getRequestById(id);
 
-            if (doctorRequest != null && "PENDING".equals(doctorRequest.getStatus())) {
-                boolean success = doctorRegistrationService.approveRequest(id, adminNotes);
+            if (doctorRequest == null) {
+                session.setAttribute("error", "Doctor registration request not found with ID: " + id);
+                response.sendRedirect(request.getContextPath() + "/admin/doctor-requests");
+                return;
+            }
 
-                HttpSession session = request.getSession();
-                if (success) {
-                    session.setAttribute("message", "Doctor registration approved and account created successfully! Request has been removed from the system.");
-                } else {
-                    session.setAttribute("error", "Failed to approve doctor registration request. Please try again.");
-                }
+            if (!"PENDING".equals(doctorRequest.getStatus())) {
+                session.setAttribute("error", "Cannot approve request with status: " + doctorRequest.getStatus());
+                response.sendRedirect(request.getContextPath() + "/admin/doctor-requests");
+                return;
+            }
+
+            // Log the request details for debugging
+            System.out.println("Approving doctor request: " + doctorRequest.getFirstName() + " " +
+                              doctorRequest.getLastName() + " (" + doctorRequest.getEmail() + ")");
+
+            // Attempt to approve the request
+            boolean success = doctorRegistrationService.approveRequest(id, adminNotes);
+
+            if (success) {
+                session.setAttribute("message", "Doctor registration approved and account created successfully! Request has been removed from the system.");
+                System.out.println("Doctor registration approved successfully for ID: " + id);
             } else {
-                HttpSession session = request.getSession();
-                session.setAttribute("error", "Invalid request or request is not in PENDING state.");
+                session.setAttribute("error", "Failed to approve doctor registration request. Please check the logs for details and try again.");
+                System.err.println("Failed to approve doctor registration request with ID: " + id);
             }
 
             response.sendRedirect(request.getContextPath() + "/admin/doctor-requests");
 
         } catch (NumberFormatException e) {
+            session.setAttribute("error", "Invalid doctor ID format: " + idParam);
+            System.err.println("Invalid doctor ID format: " + idParam + " - " + e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/admin/doctor-requests");
+        } catch (Exception e) {
+            // Catch any other unexpected exceptions
+            session.setAttribute("error", "An unexpected error occurred while approving the doctor request: " + e.getMessage());
+            System.err.println("Unexpected error in approveDoctorRequest: " + e.getMessage());
+            e.printStackTrace();
             response.sendRedirect(request.getContextPath() + "/admin/doctor-requests");
         }
     }
@@ -168,35 +192,59 @@ public class DoctorRequestsServlet extends HttpServlet {
     private void rejectDoctorRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String idParam = request.getParameter("id");
         String adminNotes = request.getParameter("adminNotes");
+        HttpSession session = request.getSession();
 
         if (idParam == null || idParam.isEmpty()) {
+            session.setAttribute("error", "Doctor ID is missing. Please try again.");
             response.sendRedirect(request.getContextPath() + "/admin/doctor-requests");
             return;
         }
 
         try {
             int id = Integer.parseInt(idParam);
+            System.out.println("Processing rejection for doctor request ID: " + id);
 
             // Get the request details before rejection
             DoctorRegistrationRequest doctorRequest = doctorRegistrationService.getRequestById(id);
 
-            if (doctorRequest != null && "PENDING".equals(doctorRequest.getStatus())) {
-                boolean success = doctorRegistrationService.rejectRequest(id, adminNotes);
+            if (doctorRequest == null) {
+                session.setAttribute("error", "Doctor registration request not found with ID: " + id);
+                response.sendRedirect(request.getContextPath() + "/admin/doctor-requests");
+                return;
+            }
 
-                HttpSession session = request.getSession();
-                if (success) {
-                    session.setAttribute("message", "Doctor registration request rejected and removed from the system successfully!");
-                } else {
-                    session.setAttribute("error", "Failed to reject doctor registration request. Please try again.");
-                }
+            if (!"PENDING".equals(doctorRequest.getStatus())) {
+                session.setAttribute("error", "Cannot reject request with status: " + doctorRequest.getStatus());
+                response.sendRedirect(request.getContextPath() + "/admin/doctor-requests");
+                return;
+            }
+
+            // Log the request details for debugging
+            System.out.println("Rejecting doctor request: " + doctorRequest.getFirstName() + " " +
+                              doctorRequest.getLastName() + " (" + doctorRequest.getEmail() + ")");
+
+            // Attempt to reject the request
+            boolean success = doctorRegistrationService.rejectRequest(id, adminNotes);
+
+            if (success) {
+                session.setAttribute("message", "Doctor registration request rejected and removed from the system successfully!");
+                System.out.println("Doctor registration rejected successfully for ID: " + id);
             } else {
-                HttpSession session = request.getSession();
-                session.setAttribute("error", "Invalid request or request is not in PENDING state.");
+                session.setAttribute("error", "Failed to reject doctor registration request. Please check the logs for details and try again.");
+                System.err.println("Failed to reject doctor registration request with ID: " + id);
             }
 
             response.sendRedirect(request.getContextPath() + "/admin/doctor-requests");
 
         } catch (NumberFormatException e) {
+            session.setAttribute("error", "Invalid doctor ID format: " + idParam);
+            System.err.println("Invalid doctor ID format: " + idParam + " - " + e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/admin/doctor-requests");
+        } catch (Exception e) {
+            // Catch any other unexpected exceptions
+            session.setAttribute("error", "An unexpected error occurred while rejecting the doctor request: " + e.getMessage());
+            System.err.println("Unexpected error in rejectDoctorRequest: " + e.getMessage());
+            e.printStackTrace();
             response.sendRedirect(request.getContextPath() + "/admin/doctor-requests");
         }
     }

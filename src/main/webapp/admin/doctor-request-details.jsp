@@ -22,29 +22,49 @@
             font-size: 12px;
             font-weight: 500;
         }
-        
+
         .pending {
             background-color: #fff8e1;
             color: #ff8f00;
         }
-        
+
         .approved {
             background-color: #e8f5e9;
             color: #2e7d32;
         }
-        
+
         .rejected {
             background-color: #ffebee;
             color: #c62828;
         }
-        
+
+        /* Improved alert styles */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .alert-danger {
+            background-color: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #c62828;
+        }
+
         .detail-card {
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
         }
-        
+
         .detail-header {
             padding: 20px;
             border-bottom: 1px solid #f0f0f0;
@@ -52,36 +72,36 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .detail-header h3 {
             font-size: 18px;
             font-weight: 600;
             margin: 0;
         }
-        
+
         .detail-body {
             padding: 20px;
         }
-        
+
         .detail-row {
             display: flex;
             margin-bottom: 15px;
         }
-        
+
         .detail-label {
             width: 200px;
             font-weight: 500;
             color: #555;
         }
-        
+
         .detail-value {
             flex: 1;
         }
-        
+
         .detail-section {
             margin-bottom: 30px;
         }
-        
+
         .detail-section h4 {
             font-size: 16px;
             font-weight: 600;
@@ -89,13 +109,13 @@
             padding-bottom: 10px;
             border-bottom: 1px solid #f0f0f0;
         }
-        
+
         .action-buttons {
             display: flex;
             gap: 10px;
             margin-top: 20px;
         }
-        
+
         .btn {
             padding: 10px 20px;
             border-radius: 4px;
@@ -107,26 +127,26 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .btn-primary {
             background-color: #4e73df;
             color: white;
         }
-        
+
         .btn-success {
             background-color: #1cc88a;
             color: white;
         }
-        
+
         .btn-danger {
             background-color: #e74a3b;
             color: white;
         }
-        
+
         .btn i {
             font-size: 14px;
         }
-        
+
         .back-link {
             display: inline-flex;
             align-items: center;
@@ -136,18 +156,18 @@
             font-weight: 500;
             margin-bottom: 20px;
         }
-        
+
         .back-link:hover {
             text-decoration: underline;
         }
-        
+
         .admin-notes {
             background-color: #f8f9fc;
             padding: 15px;
             border-radius: 4px;
             margin-top: 10px;
         }
-        
+
         .admin-notes h5 {
             font-size: 14px;
             font-weight: 600;
@@ -168,7 +188,7 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
+
             <div class="sidebar-menu">
                 <ul>
                     <li>
@@ -228,20 +248,20 @@
                 </ul>
             </div>
         </div>
-        
+
         <!-- Main Content -->
         <div class="dashboard-main">
             <div class="dashboard-nav">
                 <button id="menuToggle" class="menu-toggle">
                     <i class="fas fa-bars"></i>
                 </button>
-                
+
                 <div class="nav-right">
                     <div class="search-box">
                         <i class="fas fa-search"></i>
                         <input type="text" placeholder="Search...">
                     </div>
-                    
+
                     <div class="nav-user">
                         <img src="../assets/images/admin-avatar.png" alt="Admin">
                         <div class="user-info">
@@ -251,30 +271,30 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Dashboard Content -->
             <div class="dashboard-content">
                 <a href="${pageContext.request.contextPath}/admin/doctor-requests" class="back-link">
                     <i class="fas fa-arrow-left"></i> Back to Doctor Requests
                 </a>
-                
+
                 <div class="page-header">
                     <h1>Doctor Registration Request Details</h1>
                     <p>Review doctor registration request</p>
                 </div>
-                
+
                 <% if (request.getAttribute("message") != null) { %>
                 <div class="alert alert-success">
                     <%= request.getAttribute("message") %>
                 </div>
                 <% } %>
-                
+
                 <% if (request.getAttribute("error") != null) { %>
                 <div class="alert alert-danger">
                     <%= request.getAttribute("error") %>
                 </div>
                 <% } %>
-                
+
                 <%
                 DoctorRegistrationRequest doctorRequest = (DoctorRegistrationRequest) request.getAttribute("doctorRequest");
                 if (doctorRequest != null) {
@@ -314,7 +334,7 @@
                                 <div class="detail-value"><%= doctorRequest.getAddress() != null ? doctorRequest.getAddress() : "Not provided" %></div>
                             </div>
                         </div>
-                        
+
                         <div class="detail-section">
                             <h4>Professional Information</h4>
                             <div class="detail-row">
@@ -334,7 +354,7 @@
                                 <div class="detail-value"><%= doctorRequest.getBio() != null ? doctorRequest.getBio() : "Not provided" %></div>
                             </div>
                         </div>
-                        
+
                         <div class="detail-section">
                             <h4>Request Information</h4>
                             <div class="detail-row">
@@ -353,7 +373,7 @@
                                     </span>
                                 </div>
                             </div>
-                            
+
                             <% if (doctorRequest.getAdminNotes() != null && !doctorRequest.getAdminNotes().isEmpty()) { %>
                             <div class="detail-row">
                                 <div class="detail-label">Admin Notes</div>
@@ -366,7 +386,7 @@
                             </div>
                             <% } %>
                         </div>
-                        
+
                         <% if ("PENDING".equals(doctorRequest.getStatus())) { %>
                         <div class="action-buttons">
                             <button class="btn btn-success" onclick="approveRequest(<%= doctorRequest.getId() %>)">
@@ -385,7 +405,7 @@
                 </div>
                 <% } %>
             </div>
-            
+
             <!-- Dashboard Footer -->
             <div class="dashboard-footer">
                 <p>&copy; 2023 MedDoc. All rights reserved.</p>
@@ -393,7 +413,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Approve Request Modal -->
     <div id="approveModal" class="modal" style="display: none;">
         <div class="modal-content">
@@ -413,7 +433,7 @@
             </form>
         </div>
     </div>
-    
+
     <!-- Reject Request Modal -->
     <div id="rejectModal" class="modal" style="display: none;">
         <div class="modal-content">
@@ -433,7 +453,7 @@
             </form>
         </div>
     </div>
-    
+
     <style>
         .modal {
             display: none;
@@ -445,7 +465,7 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
         }
-        
+
         .modal-content {
             background-color: #fff;
             margin: 10% auto;
@@ -455,7 +475,7 @@
             max-width: 90%;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        
+
         .close {
             color: #aaa;
             float: right;
@@ -463,11 +483,11 @@
             font-weight: bold;
             cursor: pointer;
         }
-        
+
         .close:hover {
             color: #333;
         }
-        
+
         .form-actions {
             display: flex;
             justify-content: flex-end;
@@ -475,25 +495,25 @@
             margin-top: 20px;
         }
     </style>
-    
+
     <script>
         // Function to show the approve modal
         function approveRequest(id) {
             document.getElementById('approveId').value = id;
             document.getElementById('approveModal').style.display = 'block';
         }
-        
+
         // Function to show the reject modal
         function rejectRequest(id) {
             document.getElementById('rejectId').value = id;
             document.getElementById('rejectModal').style.display = 'block';
         }
-        
+
         // Function to close modals
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
         }
-        
+
         // Close modal when clicking on the X
         var closeButtons = document.getElementsByClassName('close');
         for (var i = 0; i < closeButtons.length; i++) {
@@ -501,7 +521,7 @@
                 this.parentElement.parentElement.style.display = 'none';
             });
         }
-        
+
         // Close modal when clicking outside of it
         window.onclick = function(event) {
             if (event.target.className === 'modal') {
