@@ -5,10 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add New Doctor | Admin Dashboard</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Include CSS files using JSP include directive -->
+    <style>
+        <%@ include file="../css/common.css" %>
+        <%@ include file="../css/adminDashboard.css" %>
+    </style>
     <style>
         .form-container {
             background-color: #fff;
@@ -131,19 +134,12 @@
         <!-- Sidebar -->
         <div class="dashboard-sidebar">
             <div class="sidebar-header">
-                <div class="logo">
-                    <h2>MedDoc</h2>
+                <div class="sidebar-logo">
+                    <img src="../images/logo.png" alt="HealthCare Logo">
+                    <h2>Health<span>Care</span></h2>
                 </div>
-                <button id="sidebarClose" class="sidebar-close">
+                <div class="sidebar-close" id="sidebarClose">
                     <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <div class="sidebar-user">
-                <img src="../images/admin-avatar.png" alt="Admin">
-                <div>
-                    <h3>Administrator</h3>
-                    <p>admin@medoc.com</p>
                 </div>
             </div>
 
@@ -156,9 +152,23 @@
                         </a>
                     </li>
                     <li class="active">
-                        <a href="${pageContext.request.contextPath}/admin/doctors">
+                        <a href="${pageContext.request.contextPath}/admin/doctorDashboard">
                             <i class="fas fa-user-md"></i>
                             <span>Doctors</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/admin/doctor-requests">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Doctor Requests</span>
+                            <%
+                            // Get the count of pending doctor requests
+                            com.doctorapp.service.DoctorRegistrationService doctorRegistrationService = new com.doctorapp.service.DoctorRegistrationService();
+                            int pendingRequestsCount = doctorRegistrationService.getPendingRequests().size();
+                            if (pendingRequestsCount > 0) {
+                            %>
+                            <span class="badge badge-primary"><%= pendingRequestsCount %></span>
+                            <% } %>
                         </a>
                     </li>
                     <li>
@@ -215,24 +225,10 @@
                         <input type="text" placeholder="Search...">
                     </div>
 
-                    <div class="nav-notifications">
-                        <div class="icon-badge">
-                            <i class="fas fa-bell"></i>
-                            <span class="badge">3</span>
-                        </div>
-                    </div>
-
-                    <div class="nav-messages">
-                        <div class="icon-badge">
-                            <i class="fas fa-envelope"></i>
-                            <span class="badge">5</span>
-                        </div>
-                    </div>
-
                     <div class="nav-user">
-                        <img src="../images/admin-avatar.png" alt="Admin">
+                        <img src="../images/admin-avatar.jpg" alt="Admin">
                         <div class="user-info">
-                            <h4>${sessionScope.user.username}</h4>
+                            <h4>Administrator</h4>
                             <p>Admin</p>
                         </div>
                     </div>
@@ -241,7 +237,7 @@
 
             <!-- Dashboard Content -->
             <div class="dashboard-content">
-                <a href="${pageContext.request.contextPath}/admin/doctors" class="back-btn">
+                <a href="${pageContext.request.contextPath}/admin/doctorDashboard" class="back-btn">
                     <i class="fas fa-arrow-left"></i> Back to Doctors
                 </a>
 
@@ -282,7 +278,17 @@
                             <div class="form-col">
                                 <div class="form-group">
                                     <label for="specialization">Specialization</label>
-                                    <input type="text" id="specialization" name="specialization" class="form-control" required>
+                                    <select id="specialization" name="specialization" class="form-control" required>
+                                        <option value="">Select Specialization</option>
+                                        <option value="Child psychiatry">Child psychiatry</option>
+                                        <option value="Accident and emergency">Accident and emergency</option>
+                                        <option value="Cardiology">Cardiology</option>
+                                        <option value="Dermatology">Dermatology</option>
+                                        <option value="Plastic surgery">Plastic surgery</option>
+                                        <option value="Neurology">Neurology</option>
+                                        <option value="Orthopedics">Orthopedics</option>
+                                        <option value="Pediatrics">Pediatrics</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="form-col">
@@ -322,8 +328,8 @@
                             </div>
                             <div class="form-col">
                                 <div class="form-group">
-                                    <label for="imageUrl">Profile Image URL</label>
-                                    <input type="text" id="imageUrl" name="imageUrl" class="form-control">
+                                    <label for="availableDays">Available Days</label>
+                                    <input type="text" id="availableDays" name="availableDays" class="form-control" placeholder="e.g. Monday, Wednesday, Friday" required>
                                 </div>
                             </div>
                         </div>
@@ -331,20 +337,20 @@
                         <div class="form-row">
                             <div class="form-col">
                                 <div class="form-group">
-                                    <label for="availableDays">Available Days</label>
-                                    <input type="text" id="availableDays" name="availableDays" class="form-control" placeholder="e.g. Monday, Wednesday, Friday" required>
+                                    <label for="availableTime">Available Time</label>
+                                    <input type="text" id="availableTime" name="availableTime" class="form-control" placeholder="e.g. 9:00 AM - 5:00 PM" required>
                                 </div>
                             </div>
                             <div class="form-col">
                                 <div class="form-group">
-                                    <label for="availableTime">Available Time</label>
-                                    <input type="text" id="availableTime" name="availableTime" class="form-control" placeholder="e.g. 9:00 AM - 5:00 PM" required>
+                                    <label for="imageUrl">Profile Image URL (Optional)</label>
+                                    <input type="text" id="imageUrl" name="imageUrl" class="form-control">
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-actions">
-                            <a href="${pageContext.request.contextPath}/admin/doctors" class="btn-secondary">Cancel</a>
+                            <a href="${pageContext.request.contextPath}/admin/doctorDashboard" class="btn-secondary">Cancel</a>
                             <button type="submit" class="btn-primary">Add Doctor</button>
                         </div>
                     </form>
@@ -353,7 +359,7 @@
 
             <!-- Footer -->
             <div class="dashboard-footer">
-                <p>&copy; 2023 MedDoc. All Rights Reserved.</p>
+                <p>&copy; 2023 HealthCare. All Rights Reserved.</p>
                 <p>Version 1.0.0</p>
             </div>
         </div>

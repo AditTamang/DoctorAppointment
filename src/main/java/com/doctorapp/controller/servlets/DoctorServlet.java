@@ -3,16 +3,16 @@ package com.doctorapp.controller.servlets;
 import java.io.IOException;
 import java.util.List;
 
+import com.doctorapp.model.Doctor;
+import com.doctorapp.model.User;
+import com.doctorapp.service.DoctorService;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
-import com.doctorapp.model.Doctor;
-import com.doctorapp.model.User;
-import com.doctorapp.service.DoctorService;
 
 @WebServlet(urlPatterns = {
     "/doctors",
@@ -163,7 +163,7 @@ public class DoctorServlet extends HttpServlet {
             request.setAttribute("doctor", doctor);
             request.getRequestDispatcher("/admin/edit-doctor.jsp").forward(request, response);
         } else {
-            response.sendRedirect(request.getContextPath() + "/admin/doctors");
+            response.sendRedirect(request.getContextPath() + "/admin/doctorDashboard");
         }
     }
 
@@ -296,7 +296,7 @@ public class DoctorServlet extends HttpServlet {
             request.setAttribute("doctor", doctor);
             request.getRequestDispatcher("/admin/view-doctor.jsp").forward(request, response);
         } else {
-            response.sendRedirect(request.getContextPath() + "/admin/doctors");
+            response.sendRedirect(request.getContextPath() + "/admin/doctorDashboard");
         }
     }
 
@@ -325,6 +325,6 @@ public class DoctorServlet extends HttpServlet {
         }
 
         // Redirect to doctors list
-        response.sendRedirect(request.getContextPath() + "/admin/doctors");
+        response.sendRedirect(request.getContextPath() + "/admin/doctorDashboard");
     }
 }

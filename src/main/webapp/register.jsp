@@ -10,6 +10,21 @@
    <style>
         <%@include file="./assets/css/style.css"%>
         <%@include file="./assets/css/auth.css"%>
+
+        .password-hint {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+            display: block;
+        }
+
+        input:invalid {
+            border-color: #dc3545;
+        }
+
+        input:valid {
+            border-color: #28a745;
+        }
     </style>
 </head>
 <body>
@@ -140,15 +155,20 @@
                         <label for="patient-password" class="form-label">Password</label>
                         <div style="position: relative;">
                             <i class="fas fa-lock" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #666;"></i>
-                            <input type="password" id="patient-password" name="password" class="form-control" style="padding-left: 45px;" required>
+                            <input type="password" id="patient-password" name="password" class="form-control" style="padding-left: 45px; padding-right: 45px;"
+                                   pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                                   title="Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character" required>
+                            <i class="fas fa-eye password-toggle-patient" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #666; cursor: pointer;" onclick="togglePasswordVisibility('patient-password', 'password-toggle-patient')"></i>
                         </div>
+                        <small class="password-hint">Password must be at least 8 characters long and include uppercase, lowercase, number, and special character</small>
                     </div>
 
                     <div class="form-group">
                         <label for="patient-confirm-password" class="form-label">Confirm Password</label>
                         <div style="position: relative;">
                             <i class="fas fa-lock" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #666;"></i>
-                            <input type="password" id="patient-confirm-password" name="confirmPassword" class="form-control" style="padding-left: 45px;" required>
+                            <input type="password" id="patient-confirm-password" name="confirmPassword" class="form-control" style="padding-left: 45px; padding-right: 45px;" required>
+                            <i class="fas fa-eye password-toggle-patient-confirm" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #666; cursor: pointer;" onclick="togglePasswordVisibility('patient-confirm-password', 'password-toggle-patient-confirm')"></i>
                         </div>
                     </div>
                 </div>
@@ -170,6 +190,11 @@
             <!-- Doctor Registration Form -->
             <form action="register" method="post" id="doctorForm" class="user-type-form">
                 <input type="hidden" name="role" value="DOCTOR">
+
+                <div class="alert alert-info" style="margin-bottom: 20px;">
+                    <i class="fas fa-info-circle"></i>
+                    Doctor registrations require admin approval. Your account will be pending until approved by an administrator.
+                </div>
 
                 <div class="form-group">
                     <label for="doctor-name" class="form-label">Full Name</label>
@@ -255,15 +280,20 @@
                         <label for="doctor-password" class="form-label">Password</label>
                         <div style="position: relative;">
                             <i class="fas fa-lock" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #666;"></i>
-                            <input type="password" id="doctor-password" name="password" class="form-control" style="padding-left: 45px;" required>
+                            <input type="password" id="doctor-password" name="password" class="form-control" style="padding-left: 45px; padding-right: 45px;"
+                                   pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                                   title="Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character" required>
+                            <i class="fas fa-eye password-toggle-doctor" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #666; cursor: pointer;" onclick="togglePasswordVisibility('doctor-password', 'password-toggle-doctor')"></i>
                         </div>
+                        <small class="password-hint">Password must be at least 8 characters long and include uppercase, lowercase, number, and special character</small>
                     </div>
 
                     <div class="form-group">
                         <label for="doctor-confirm-password" class="form-label">Confirm Password</label>
                         <div style="position: relative;">
                             <i class="fas fa-lock" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #666;"></i>
-                            <input type="password" id="doctor-confirm-password" name="confirmPassword" class="form-control" style="padding-left: 45px;" required>
+                            <input type="password" id="doctor-confirm-password" name="confirmPassword" class="form-control" style="padding-left: 45px; padding-right: 45px;" required>
+                            <i class="fas fa-eye password-toggle-doctor-confirm" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #666; cursor: pointer;" onclick="togglePasswordVisibility('doctor-confirm-password', 'password-toggle-doctor-confirm')"></i>
                         </div>
                     </div>
                 </div>
@@ -278,7 +308,7 @@
                 </div>
 
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">Register as Doctor <i class="fas fa-user-md" style="margin-left: 5px;"></i></button>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Doctor Application <i class="fas fa-paper-plane" style="margin-left: 5px;"></i></button>
                 </div>
             </form>
 
@@ -337,6 +367,18 @@
                 const password = form.querySelector('input[name="password"]');
                 const confirmPassword = form.querySelector('input[name="confirmPassword"]');
 
+                // Password complexity validation
+                const passwordValue = password.value;
+                const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+                if (!passwordRegex.test(passwordValue)) {
+                    password.setCustomValidity('Password must be at least 8 characters long and include uppercase, lowercase, number, and special character');
+                    return false;
+                } else {
+                    password.setCustomValidity('');
+                }
+
+                // Password match validation
                 if (password.value !== confirmPassword.value) {
                     confirmPassword.setCustomValidity('Passwords do not match');
                     return false;
@@ -358,6 +400,22 @@
                 }
             });
         });
+
+        // Function to toggle password visibility
+        function togglePasswordVisibility(inputId, toggleIconClass) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleIcon = document.querySelector('.' + toggleIconClass);
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
     </script>
 </body>
 </html>

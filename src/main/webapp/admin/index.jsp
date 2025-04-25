@@ -10,10 +10,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | HealthCare</title>
-    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/dashboard.css">
+    <!-- Include CSS files using JSP include directive -->
+    <style>
+        <%@ include file="../css/common.css" %>
+        <%@ include file="../css/adminDashboard.css" %>
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
@@ -38,9 +41,23 @@
                         </a>
                     </li>
                     <li>
-                        <a href="doctors.jsp">
+                        <a href="${pageContext.request.contextPath}/admin/doctorDashboard">
                             <i class="fas fa-user-md"></i>
                             <span>Doctors</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/admin/doctor-requests">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Doctor Requests</span>
+                            <%
+                            // Get the count of pending doctor requests
+                            com.doctorapp.service.DoctorRegistrationService doctorRegistrationService = new com.doctorapp.service.DoctorRegistrationService();
+                            int pendingRequestsCount = doctorRegistrationService.getPendingRequests().size();
+                            if (pendingRequestsCount > 0) {
+                            %>
+                            <span class="badge badge-primary"><%= pendingRequestsCount %></span>
+                            <% } %>
                         </a>
                     </li>
                     <li>

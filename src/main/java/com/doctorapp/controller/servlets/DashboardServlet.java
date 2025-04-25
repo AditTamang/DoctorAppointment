@@ -1,18 +1,19 @@
 package com.doctorapp.controller.servlets;
 
 import java.io.IOException;
+
+import com.doctorapp.dao.AppointmentDAO;
+import com.doctorapp.dao.DoctorDAO;
+import com.doctorapp.dao.PatientDAO;
+import com.doctorapp.dao.UserDAO;
+import com.doctorapp.model.User;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
-import com.doctorapp.model.User;
-import com.doctorapp.dao.UserDAO;
-import com.doctorapp.dao.DoctorDAO;
-import com.doctorapp.dao.PatientDAO;
-import com.doctorapp.dao.AppointmentDAO;
 
 @WebServlet("/dashboard")
 public class DashboardServlet extends HttpServlet {
@@ -95,9 +96,9 @@ public class DashboardServlet extends HttpServlet {
             request.setAttribute("recentAppointments", appointmentDAO.getRecentAppointments(5));
             request.setAttribute("topDoctors", doctorDAO.getTopDoctors(3));
 
-            System.out.println("Forwarding to admin-dashboard.jsp");
+            System.out.println("Forwarding to admin/index.jsp");
             // Forward to admin dashboard
-            request.getRequestDispatcher("/admin-dashboard.jsp").forward(request, response);
+            request.getRequestDispatcher("/admin/index.jsp").forward(request, response);
         } catch (Exception e) {
             System.err.println("Error loading admin dashboard: " + e.getMessage());
             e.printStackTrace();

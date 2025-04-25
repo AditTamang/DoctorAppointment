@@ -173,7 +173,7 @@
                         </a>
                     </li>
                     <li class="active">
-                        <a href="${pageContext.request.contextPath}/admin/doctors">
+                        <a href="${pageContext.request.contextPath}/admin/doctorDashboard">
                             <i class="fas fa-user-md"></i>
                             <span>Doctors</span>
                         </a>

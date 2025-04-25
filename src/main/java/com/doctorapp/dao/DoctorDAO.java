@@ -1,8 +1,5 @@
 package com.doctorapp.dao;
 
-import com.doctorapp.model.Doctor;
-import com.doctorapp.util.DBConnection;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,35 +7,114 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.doctorapp.model.Doctor;
+import com.doctorapp.util.DBConnection;
+import com.doctorapp.util.PasswordHasher;
+
 public class DoctorDAO {
 
     // Add a new doctor
     public boolean addDoctor(Doctor doctor) {
-        String query = "INSERT INTO doctors (name, specialization, qualification, experience, email, phone, address, " +
-                      "consultation_fee, available_days, available_time, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        Connection conn = null;
+        boolean success = false;
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false); // Start transaction
 
-            pstmt.setString(1, doctor.getName());
-            pstmt.setString(2, doctor.getSpecialization());
-            pstmt.setString(3, doctor.getQualification());
-            pstmt.setString(4, doctor.getExperience());
-            pstmt.setString(5, doctor.getEmail());
-            pstmt.setString(6, doctor.getPhone());
-            pstmt.setString(7, doctor.getAddress());
-            pstmt.setString(8, doctor.getConsultationFee());
-            pstmt.setString(9, doctor.getAvailableDays());
-            pstmt.setString(10, doctor.getAvailableTime());
-            pstmt.setString(11, doctor.getImageUrl());
+            // First, check if email already exists in users table
+            String checkEmailQuery = "SELECT COUNT(*) FROM users WHERE email = ?";
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkEmailQuery)) {
+                checkStmt.setString(1, doctor.getEmail());
+                ResultSet rs = checkStmt.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    // Email already exists
+                    return false;
+                }
+            }
 
-            int rowsAffected = pstmt.executeUpdate();
-            return rowsAffected > 0;
+            // Create user record first
+            String userQuery = "INSERT INTO users (username, email, password, phone, role, first_name, last_name, address) " +
+                              "VALUES (?, ?, ?, ?, 'DOCTOR', ?, ?, ?)";
+
+            int userId;
+            try (PreparedStatement userStmt = conn.prepareStatement(userQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                // Generate username from name (first part of email)
+                String username = doctor.getEmail().split("@")[0];
+                // Generate a random password
+                String password = PasswordHasher.hashPassword("doctor123"); // Default password
+
+                String[] nameParts = doctor.getName().split(" ", 2);
+                String firstName = nameParts[0];
+                String lastName = nameParts.length > 1 ? nameParts[1] : "";
+
+                userStmt.setString(1, username);
+                userStmt.setString(2, doctor.getEmail());
+                userStmt.setString(3, password);
+                userStmt.setString(4, doctor.getPhone());
+                userStmt.setString(5, firstName);
+                userStmt.setString(6, lastName);
+                userStmt.setString(7, doctor.getAddress());
+
+                userStmt.executeUpdate();
+
+                // Get the generated user ID
+                ResultSet generatedKeys = userStmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    userId = generatedKeys.getInt(1);
+                } else {
+                    throw new SQLException("Creating user failed, no ID obtained.");
+                }
+            }
+
+            // Now create the doctor record
+            String doctorQuery = "INSERT INTO doctors (user_id, name, specialization, qualification, experience, email, phone, address, " +
+                               "consultation_fee, available_days, available_time, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            try (PreparedStatement doctorStmt = conn.prepareStatement(doctorQuery)) {
+                doctorStmt.setInt(1, userId);
+                doctorStmt.setString(2, doctor.getName());
+                doctorStmt.setString(3, doctor.getSpecialization());
+                doctorStmt.setString(4, doctor.getQualification());
+                doctorStmt.setString(5, doctor.getExperience());
+                doctorStmt.setString(6, doctor.getEmail());
+                doctorStmt.setString(7, doctor.getPhone());
+                doctorStmt.setString(8, doctor.getAddress());
+                doctorStmt.setString(9, doctor.getConsultationFee());
+                doctorStmt.setString(10, doctor.getAvailableDays());
+                doctorStmt.setString(11, doctor.getAvailableTime());
+                doctorStmt.setString(12, doctor.getImageUrl());
+
+                doctorStmt.executeUpdate();
+            }
+
+            // Commit the transaction
+            conn.commit();
+            success = true;
 
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-            return false;
+            // Rollback the transaction on error
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
+        } finally {
+            // Restore auto-commit
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException closeEx) {
+                    closeEx.printStackTrace();
+                }
+            }
         }
+
+        return success;
     }
 
     // Get doctor by ID
@@ -85,6 +161,45 @@ public class DoctorDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query);
              ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                Doctor doctor = new Doctor();
+                doctor.setId(rs.getInt("id"));
+                doctor.setName(rs.getString("name"));
+                doctor.setSpecialization(rs.getString("specialization"));
+                doctor.setQualification(rs.getString("qualification"));
+                doctor.setExperience(rs.getString("experience"));
+                doctor.setEmail(rs.getString("email"));
+                doctor.setPhone(rs.getString("phone"));
+                doctor.setAddress(rs.getString("address"));
+                doctor.setConsultationFee(rs.getString("consultation_fee"));
+                doctor.setAvailableDays(rs.getString("available_days"));
+                doctor.setAvailableTime(rs.getString("available_time"));
+                doctor.setImageUrl(rs.getString("image_url"));
+
+                doctors.add(doctor);
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return doctors;
+    }
+
+    // Search doctors by name or email
+    public List<Doctor> searchDoctors(String searchTerm) {
+        List<Doctor> doctors = new ArrayList<>();
+        String query = "SELECT * FROM doctors WHERE name LIKE ? OR email LIKE ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            String searchPattern = "%" + searchTerm + "%";
+            pstmt.setString(1, searchPattern);
+            pstmt.setString(2, searchPattern);
+
+            ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
                 Doctor doctor = new Doctor();
@@ -307,12 +422,15 @@ public class DoctorDAO {
     // Get top doctors
     public List<Doctor> getTopDoctors(int limit) {
         List<Doctor> doctors = new ArrayList<>();
-        String query = "SELECT d.*, AVG(dr.rating) as avg_rating, COUNT(DISTINCT a.patient_id) as patient_count " +
+
+        // Modified query to handle the case where doctor_ratings table might not exist yet
+        // or when there are no ratings
+        String query = "SELECT d.id, u.first_name, u.last_name, d.specialization, d.qualification, " +
+                      "d.experience, u.email, u.phone, u.address, d.consultation_fee, " +
+                      "d.profile_image, d.rating, d.patient_count " +
                       "FROM doctors d " +
-                      "LEFT JOIN doctor_ratings dr ON d.id = dr.doctor_id " +
-                      "LEFT JOIN appointments a ON d.id = a.doctor_id " +
-                      "GROUP BY d.id " +
-                      "ORDER BY avg_rating DESC, patient_count DESC " +
+                      "JOIN users u ON d.user_id = u.id " +
+                      "ORDER BY d.rating DESC, d.patient_count DESC " +
                       "LIMIT ?";
 
         try (Connection conn = DBConnection.getConnection();
@@ -324,7 +442,11 @@ public class DoctorDAO {
                 while (rs.next()) {
                     Doctor doctor = new Doctor();
                     doctor.setId(rs.getInt("id"));
-                    doctor.setName(rs.getString("name"));
+
+                    // Combine first and last name from users table
+                    String fullName = rs.getString("first_name") + " " + rs.getString("last_name");
+                    doctor.setName(fullName);
+
                     doctor.setSpecialization(rs.getString("specialization"));
                     doctor.setQualification(rs.getString("qualification"));
                     doctor.setExperience(rs.getString("experience"));
@@ -332,10 +454,8 @@ public class DoctorDAO {
                     doctor.setPhone(rs.getString("phone"));
                     doctor.setAddress(rs.getString("address"));
                     doctor.setConsultationFee(rs.getString("consultation_fee"));
-                    doctor.setAvailableDays(rs.getString("available_days"));
-                    doctor.setAvailableTime(rs.getString("available_time"));
-                    doctor.setImageUrl(rs.getString("image_url"));
-                    doctor.setRating(rs.getDouble("avg_rating"));
+                    doctor.setImageUrl(rs.getString("profile_image"));
+                    doctor.setRating(rs.getDouble("rating"));
                     doctor.setPatientCount(rs.getInt("patient_count"));
                     doctor.setSuccessRate(90); // Default value for now
 

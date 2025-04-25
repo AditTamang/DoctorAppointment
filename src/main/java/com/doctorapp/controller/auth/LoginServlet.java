@@ -1,28 +1,28 @@
 
 package com.doctorapp.controller.auth;
 
+import java.io.IOException;
+
 import com.doctorapp.model.User;
+import com.doctorapp.service.DoctorRegistrationService;
 import com.doctorapp.service.UserService;
 import com.doctorapp.util.SessionUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-
-import java.io.IOException;
-import java.util.UUID;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private UserService userService;
+    private DoctorRegistrationService doctorRegistrationService;
 
     public void init() {
         userService = new UserService();
+        doctorRegistrationService = new DoctorRegistrationService();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -46,6 +46,19 @@ public class LoginServlet extends HttpServlet {
             User user = userService.login(email, password);
 
             if (user != null) {
+                // For doctors, check if there's a pending registration request
+                if ("DOCTOR".equals(user.getRole())) {
+                    // Check if there's a pending doctor registration request for this email
+                    boolean hasPendingRequest = doctorRegistrationService.getPendingRequests().stream()
+                            .anyMatch(req -> req.getEmail().equals(email));
+
+                    if (hasPendingRequest) {
+                        request.setAttribute("error", "Your doctor registration request is still pending approval. You will be notified when your account is approved.");
+                        request.getRequestDispatcher("/login.jsp").forward(request, response);
+                        return;
+                    }
+                }
+
                 // Create user session using SessionUtil
                 SessionUtil.createUserSession(request, response, user, rememberMe);
 
@@ -56,12 +69,27 @@ public class LoginServlet extends HttpServlet {
                     // Redirect to the requested page
                     response.sendRedirect(redirect);
                 } else {
-                    // Redirect to the dashboard servlet which will handle role-based redirection
-                    response.sendRedirect(request.getContextPath() + "/dashboard");
+                    // Check user role for specific redirects
+                    if ("ADMIN".equals(user.getRole())) {
+                        // Redirect admin directly to admin dashboard
+                        response.sendRedirect(request.getContextPath() + "/admin/index.jsp");
+                    } else {
+                        // Redirect to the dashboard servlet for other roles
+                        response.sendRedirect(request.getContextPath() + "/dashboard");
+                    }
                 }
             } else {
-                // Set error message in request attribute
-                request.setAttribute("error", "Invalid email or password");
+                // Check if there's a pending doctor registration request for this email
+                boolean hasPendingRequest = doctorRegistrationService.getPendingRequests().stream()
+                        .anyMatch(req -> req.getEmail().equals(email));
+
+                if (hasPendingRequest) {
+                    request.setAttribute("error", "Your doctor registration request is still pending approval. You will be notified when your account is approved.");
+                } else {
+                    // Set error message in request attribute
+                    request.setAttribute("error", "Invalid email or password");
+                }
+
                 // Forward back to login page
                 request.getRequestDispatcher("/login.jsp").forward(request, response);
             }

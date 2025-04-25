@@ -1,8 +1,9 @@
 package com.doctorapp.service;
 
+import java.util.List;
+
 import com.doctorapp.dao.DoctorDAO;
 import com.doctorapp.model.Doctor;
-import java.util.List;
 
 /**
  * Service layer for Doctor-related operations.
@@ -10,11 +11,11 @@ import java.util.List;
  */
 public class DoctorService {
     private DoctorDAO doctorDAO;
-    
+
     public DoctorService() {
         this.doctorDAO = new DoctorDAO();
     }
-    
+
     /**
      * Add a new doctor
      * @param doctor The doctor to add
@@ -23,7 +24,7 @@ public class DoctorService {
     public boolean addDoctor(Doctor doctor) {
         return doctorDAO.addDoctor(doctor);
     }
-    
+
     /**
      * Get a doctor by ID
      * @param id Doctor's ID
@@ -32,7 +33,7 @@ public class DoctorService {
     public Doctor getDoctorById(int id) {
         return doctorDAO.getDoctorById(id);
     }
-    
+
     /**
      * Get all doctors
      * @return List of all doctors
@@ -40,7 +41,16 @@ public class DoctorService {
     public List<Doctor> getAllDoctors() {
         return doctorDAO.getAllDoctors();
     }
-    
+
+    /**
+     * Search doctors by name or email
+     * @param searchTerm Term to search for in name or email
+     * @return List of doctors matching the search term
+     */
+    public List<Doctor> searchDoctors(String searchTerm) {
+        return doctorDAO.searchDoctors(searchTerm);
+    }
+
     /**
      * Get doctors by specialization
      * @param specialization Specialization to filter by
@@ -49,7 +59,7 @@ public class DoctorService {
     public List<Doctor> getDoctorsBySpecialization(String specialization) {
         return doctorDAO.getDoctorsBySpecialization(specialization);
     }
-    
+
     /**
      * Update a doctor
      * @param doctor The doctor to update
@@ -58,7 +68,7 @@ public class DoctorService {
     public boolean updateDoctor(Doctor doctor) {
         return doctorDAO.updateDoctor(doctor);
     }
-    
+
     /**
      * Delete a doctor
      * @param id Doctor's ID
@@ -67,7 +77,7 @@ public class DoctorService {
     public boolean deleteDoctor(int id) {
         return doctorDAO.deleteDoctor(id);
     }
-    
+
     /**
      * Get total number of doctors
      * @return Total number of doctors
@@ -75,7 +85,7 @@ public class DoctorService {
     public int getTotalDoctors() {
         return doctorDAO.getTotalDoctors();
     }
-    
+
     /**
      * Get top doctors based on ratings or appointments
      * @param limit Number of doctors to return

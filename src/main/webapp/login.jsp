@@ -66,7 +66,8 @@
                     <label for="password" class="form-label">Password</label>
                     <div style="position: relative;">
                         <i class="fas fa-lock" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #666;"></i>
-                        <input type="password" id="password" name="password" class="form-control" style="padding-left: 45px;" required>
+                        <input type="password" id="password" name="password" class="form-control" style="padding-left: 45px; padding-right: 45px;" required>
+                        <i class="fas fa-eye password-toggle" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #666; cursor: pointer;" onclick="togglePasswordVisibility('password')"></i>
                     </div>
                 </div>
                 <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
@@ -102,5 +103,21 @@
 
 
     <script src="${pageContext.request.contextPath}/assets/js/script.js"></script>
+    <script>
+        function togglePasswordVisibility(inputId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleIcon = document.querySelector('.password-toggle');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
 </body>
 </html>
