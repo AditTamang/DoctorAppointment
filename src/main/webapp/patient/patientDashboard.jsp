@@ -60,7 +60,7 @@
 
             <ul class="sidebar-menu">
                 <li>
-                    <a href="${pageContext.request.contextPath}/patient/patientDashboard.jsp" class="active">
+                    <a href="${pageContext.request.contextPath}/patient/dashboard" class="active">
                         <i class="fas fa-home"></i>
                         <span>Dashboard</span>
                     </a>
@@ -84,7 +84,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/patient/profile.jsp">
+                    <a href="${pageContext.request.contextPath}/profile">
                         <i class="fas fa-user"></i>
                         <span>My Profile</span>
                     </a>

@@ -1,4 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.List" %>
+<%@ page import="com.doctorapp.model.Doctor" %>
+<%@ page import="com.doctorapp.dao.DoctorDAO" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,11 +45,22 @@
                 <ul class="nav-links">
                     <li><a href="index.jsp" class="active">Home</a></li>
                     <li><a href="doctors">Find Doctors</a></li>
+                    <li><a href="find-doctors">Filter Doctors</a></li>
                     <li><a href="about-us.jsp">About Us</a></li>
                     <li><a href="#services">Services</a></li>
                     <li><a href="contact-us">Contact</a></li>
-                    <% if(session.getAttribute("user") != null) { %>
-                        <li><a href="appointments">Appointments</a></li>
+                    <% if(session.getAttribute("user") != null) {
+                        com.doctorapp.model.User currentUser = (com.doctorapp.model.User) session.getAttribute("user");
+                        String dashboardLink = "";
+                        if("PATIENT".equals(currentUser.getRole())) {
+                            dashboardLink = "patient/dashboard";
+                        } else if("DOCTOR".equals(currentUser.getRole())) {
+                            dashboardLink = "dashboard";
+                        } else if("ADMIN".equals(currentUser.getRole())) {
+                            dashboardLink = "admin/index.jsp";
+                        }
+                    %>
+                        <li><a href="<%= dashboardLink %>">Dashboard</a></li>
                         <li><a href="profile">Profile</a></li>
                         <li><a href="logout" class="btn btn-primary">Logout</a></li>
                     <% } else { %>
@@ -198,104 +212,58 @@
             </div>
 
             <div class="doctors-grid">
+                <%
+                // Get top 3 doctors from the database
+                DoctorDAO doctorDAO = new DoctorDAO();
+                List<Doctor> topDoctors = doctorDAO.getTopDoctors(3);
+
+                if (topDoctors != null && !topDoctors.isEmpty()) {
+                    for (Doctor doctor : topDoctors) {
+                %>
                 <div class="doctor-card">
                     <div class="doctor-status">Available Today</div>
                     <div class="doctor-img">
-                        <img src="${pageContext.request.contextPath}/assets/images/doctors/d7.png" alt="Doctor">
+                        <img src="${pageContext.request.contextPath}<%=doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty() ? doctor.getImageUrl() : "/assets/images/doctors/default-doctor.png"%>" alt="<%=doctor.getName()%>">
                         <div class="doctor-rating">
                             <i class="fas fa-star"></i>
-                            <span>4.9</span>
-                            <span>(120)</span>
+                            <span><%=doctor.getRating()%></span>
+                            <span>(<%=doctor.getPatientCount()%>)</span>
                         </div>
                     </div>
                     <div class="doctor-info">
-                        <h3>Dr. John Smith</h3>
-                        <p class="specialization">Cardiologist</p>
-                        <p>MD in Cardiology, 15+ years of experience in treating heart-related issues.</p>
+                        <h3><%=doctor.getName()%></h3>
+                        <p class="specialization"><%=doctor.getSpecialization()%></p>
+                        <p><%=doctor.getQualification()%>, <%=doctor.getExperience()%> of experience</p>
 
                         <div class="doctor-meta">
                             <div class="doctor-meta-item">
                                 <i class="fas fa-briefcase"></i>
-                                <span>15 Years</span>
+                                <span><%=doctor.getExperience()%></span>
                             </div>
                             <div class="doctor-meta-item">
                                 <i class="fas fa-money-bill-wave"></i>
-                                <span>$150</span>
+                                <span>$<%=doctor.getConsultationFee()%></span>
                             </div>
                         </div>
 
                         <div class="doctor-actions">
-                            <a href="doctor/details?id=1" class="btn btn-primary"><i class="fas fa-eye"></i> View Profile</a>
-                            <a href="appointment/book?doctorId=1" class="btn btn-outline"><i class="fas fa-calendar-check"></i> Book</a>
+                            <a href="doctor/details?id=<%=doctor.getId()%>" class="btn btn-primary"><i class="fas fa-eye"></i> View Profile</a>
+                            <a href="appointment/book?doctorId=<%=doctor.getId()%>" class="btn btn-outline"><i class="fas fa-calendar-check"></i> Book</a>
                         </div>
                     </div>
                 </div>
-
-                <div class="doctor-card">
-                    <div class="doctor-status">Available Today</div>
-                    <div class="doctor-img">
-                        <img src="${pageContext.request.contextPath}/assets/images/doctors/d2.png" alt="Doctor">
-                        <div class="doctor-rating">
-                            <i class="fas fa-star"></i>
-                            <span>4.8</span>
-                            <span>(95)</span>
-                        </div>
-                    </div>
-                    <div class="doctor-info">
-                        <h3>Dr. Sarah Johnson</h3>
-                        <p class="specialization">Neurologist</p>
-                        <p>Specialized in treating neurological disorders with 10+ years of experience.</p>
-
-                        <div class="doctor-meta">
-                            <div class="doctor-meta-item">
-                                <i class="fas fa-briefcase"></i>
-                                <span>10 Years</span>
-                            </div>
-                            <div class="doctor-meta-item">
-                                <i class="fas fa-money-bill-wave"></i>
-                                <span>$180</span>
-                            </div>
-                        </div>
-
-                        <div class="doctor-actions">
-                            <a href="doctor/details?id=2" class="btn btn-primary"><i class="fas fa-eye"></i> View Profile</a>
-                            <a href="appointment/book?doctorId=2" class="btn btn-outline"><i class="fas fa-calendar-check"></i> Book</a>
-                        </div>
-                    </div>
+                <%
+                    }
+                } else {
+                    // If no doctors found in the database, show a message
+                %>
+                <div class="no-doctors-message" style="text-align: center; width: 100%; padding: 30px;">
+                    <h3>No doctors available at the moment</h3>
+                    <p>Please check back later or contact us for more information.</p>
                 </div>
-
-                <div class="doctor-card">
-                    <div class="doctor-status">Available Today</div>
-                    <div class="doctor-img">
-                        <img src="${pageContext.request.contextPath}/assets/images/doctors/d1.png" alt="Doctor">
-                        <div class="doctor-rating">
-                            <i class="fas fa-star"></i>
-                            <span>4.7</span>
-                            <span>(87)</span>
-                        </div>
-                    </div>
-                    <div class="doctor-info">
-                        <h3>Dr. Michael Brown</h3>
-                        <p class="specialization">Orthopedic Surgeon</p>
-                        <p>Expert in orthopedic surgeries with 12+ years of experience in joint replacements.</p>
-
-                        <div class="doctor-meta">
-                            <div class="doctor-meta-item">
-                                <i class="fas fa-briefcase"></i>
-                                <span>12 Years</span>
-                            </div>
-                            <div class="doctor-meta-item">
-                                <i class="fas fa-money-bill-wave"></i>
-                                <span>$200</span>
-                            </div>
-                        </div>
-
-                        <div class="doctor-actions">
-                            <a href="doctor/details?id=3" class="btn btn-primary"><i class="fas fa-eye"></i> View Profile</a>
-                            <a href="appointment/book?doctorId=3" class="btn btn-outline"><i class="fas fa-calendar-check"></i> Book</a>
-                        </div>
-                    </div>
-                </div>
+                <%
+                }
+                %>
             </div>
         </div>
     </section>

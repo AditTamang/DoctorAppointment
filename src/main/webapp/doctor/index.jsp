@@ -81,7 +81,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="profile.jsp">
+                        <a href="${pageContext.request.contextPath}/doctor/profile">
                             <i class="fas fa-user-md"></i>
                             <span>My Profile</span>
                         </a>
@@ -117,14 +117,14 @@
             <div class="dashboard-content">
                 <div class="page-header">
                     <h1>Doctor Dashboard</h1>
-                    <p>Welcome back, Dr. John Smith</p>
+                    <p>Welcome back, <%= user.getFirstName() + " " + user.getLastName() %></p>
                 </div>
 
                 <!-- Today's Summary -->
                 <div class="today-summary">
                     <div class="summary-header">
                         <h3>Today's Summary</h3>
-                        <p class="date">Monday, April 18, 2023</p>
+                        <p class="date"><%= new java.text.SimpleDateFormat("EEEE, MMMM d, yyyy").format(new java.util.Date()) %></p>
                     </div>
 
                     <div class="stats-container">
@@ -134,8 +134,8 @@
                             </div>
                             <div class="stat-card-info">
                                 <h3>Today's Appointments</h3>
-                                <h2>8</h2>
-                                <p><span class="positive"><i class="fas fa-arrow-up"></i> 2</span> from yesterday</p>
+                                <h2>${todayAppointmentsCount}</h2>
+                                <p>Scheduled for today</p>
                             </div>
                         </div>
 
@@ -144,9 +144,9 @@
                                 <i class="fas fa-user-check"></i>
                             </div>
                             <div class="stat-card-info">
-                                <h3>Patients Attended</h3>
-                                <h2>5</h2>
-                                <p>3 more to go</p>
+                                <h3>Total Patients</h3>
+                                <h2>${totalPatients}</h2>
+                                <p>Under your care</p>
                             </div>
                         </div>
 
@@ -155,9 +155,9 @@
                                 <i class="fas fa-file-medical"></i>
                             </div>
                             <div class="stat-card-info">
-                                <h3>Prescriptions</h3>
-                                <h2>12</h2>
-                                <p><span class="positive"><i class="fas fa-arrow-up"></i> 4</span> from yesterday</p>
+                                <h3>Pending Reports</h3>
+                                <h2>${pendingReports}</h2>
+                                <p>Need your attention</p>
                             </div>
                         </div>
 
@@ -166,9 +166,9 @@
                                 <i class="fas fa-clock"></i>
                             </div>
                             <div class="stat-card-info">
-                                <h3>Working Hours</h3>
-                                <h2>6.5</h2>
-                                <p>of 8 hours</p>
+                                <h3>Weekly Appointments</h3>
+                                <h2>${weeklyAppointments}</h2>
+                                <p>Last 7 days</p>
                             </div>
                         </div>
                     </div>
@@ -182,110 +182,92 @@
                     </div>
 
                     <div class="appointment-timeline">
-                        <div class="timeline-item current">
+                        <% if (request.getAttribute("todayAppointments") != null && ((List<Appointment>)request.getAttribute("todayAppointments")).size() > 0) {
+                            List<Appointment> todayAppointments = (List<Appointment>)request.getAttribute("todayAppointments");
+                            for (int i = 0; i < todayAppointments.size() && i < 3; i++) {
+                                Appointment appointment = todayAppointments.get(i);
+                                String currentClass = (i == 0) ? "current" : "";
+                        %>
+                        <div class="timeline-item <%= currentClass %>">
                             <div class="timeline-time">
-                                <h4>10:30 AM</h4>
-                                <p>Current</p>
+                                <h4><%= appointment.getAppointmentTime() %></h4>
+                                <p><%= (i == 0) ? "Current" : "Today" %></p>
                             </div>
                             <div class="timeline-content">
                                 <div class="appointment-card">
                                     <div class="appointment-info">
                                         <div class="patient-info">
-                                            <img src="../images/patients/patient1.jpg" alt="Patient">
+                                            <img src="${pageContext.request.contextPath}/assets/images/patients/default.jpg" alt="Patient">
                                             <div>
-                                                <h4>Robert Wilson</h4>
-                                                <p>42 years, Male</p>
-                                                <span class="appointment-type new">New Patient</span>
+                                                <h4><%= appointment.getPatientName() %></h4>
+                                                <p>Patient ID: <%= appointment.getPatientId() %></p>
+                                                <span class="appointment-type <%= appointment.getStatus().toLowerCase() %>"><%= appointment.getStatus() %></span>
                                             </div>
                                         </div>
                                         <div class="appointment-details">
                                             <div class="detail-item">
                                                 <i class="fas fa-heartbeat"></i>
-                                                <span>Heart Checkup</span>
+                                                <span><%= appointment.getReason() != null ? appointment.getReason() : "General Checkup" %></span>
                                             </div>
                                             <div class="detail-item">
-                                                <i class="fas fa-phone"></i>
-                                                <span>+1 234 567 890</span>
+                                                <i class="fas fa-notes-medical"></i>
+                                                <span><%= appointment.getSymptoms() != null ? appointment.getSymptoms() : "No symptoms recorded" %></span>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="appointment-actions">
-                                        <button class="btn btn-primary"><i class="fas fa-check-circle"></i> Start Session</button>
-                                        <button class="btn btn-outline"><i class="fas fa-times-circle"></i> Cancel</button>
+                                        <a href="appointment-details.jsp?id=<%= appointment.getId() %>" class="btn btn-primary"><i class="fas fa-check-circle"></i> Start Session</a>
+                                        <a href="../appointment/cancel?id=<%= appointment.getId() %>" class="btn btn-outline"><i class="fas fa-times-circle"></i> Cancel</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
+                        <% }
+                        } else if (request.getAttribute("upcomingAppointments") != null && ((List<Appointment>)request.getAttribute("upcomingAppointments")).size() > 0) {
+                            List<Appointment> upcomingAppointments = (List<Appointment>)request.getAttribute("upcomingAppointments");
+                            for (int i = 0; i < upcomingAppointments.size() && i < 3; i++) {
+                                Appointment appointment = upcomingAppointments.get(i);
+                        %>
                         <div class="timeline-item">
                             <div class="timeline-time">
-                                <h4>11:15 AM</h4>
-                                <p>In 45 min</p>
+                                <h4><%= appointment.getAppointmentTime() %></h4>
+                                <p><%= new java.text.SimpleDateFormat("MMM d, yyyy").format(appointment.getAppointmentDate()) %></p>
                             </div>
                             <div class="timeline-content">
                                 <div class="appointment-card">
                                     <div class="appointment-info">
                                         <div class="patient-info">
-                                            <img src="../images/patients/patient2.jpg" alt="Patient">
+                                            <img src="${pageContext.request.contextPath}/assets/images/patients/default.jpg" alt="Patient">
                                             <div>
-                                                <h4>Emily Parker</h4>
-                                                <p>35 years, Female</p>
-                                                <span class="appointment-type followup">Follow-up</span>
+                                                <h4><%= appointment.getPatientName() %></h4>
+                                                <p>Patient ID: <%= appointment.getPatientId() %></p>
+                                                <span class="appointment-type <%= appointment.getStatus().toLowerCase() %>"><%= appointment.getStatus() %></span>
                                             </div>
                                         </div>
                                         <div class="appointment-details">
                                             <div class="detail-item">
                                                 <i class="fas fa-heartbeat"></i>
-                                                <span>Blood Pressure Check</span>
+                                                <span><%= appointment.getReason() != null ? appointment.getReason() : "General Checkup" %></span>
                                             </div>
                                             <div class="detail-item">
-                                                <i class="fas fa-phone"></i>
-                                                <span>+1 987 654 321</span>
+                                                <i class="fas fa-notes-medical"></i>
+                                                <span><%= appointment.getSymptoms() != null ? appointment.getSymptoms() : "No symptoms recorded" %></span>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="appointment-actions">
-                                        <button class="btn btn-outline"><i class="fas fa-file-medical"></i> View Records</button>
-                                        <button class="btn btn-outline"><i class="fas fa-times-circle"></i> Cancel</button>
+                                        <a href="appointment-details.jsp?id=<%= appointment.getId() %>" class="btn btn-outline"><i class="fas fa-file-medical"></i> View Details</a>
+                                        <a href="../appointment/cancel?id=<%= appointment.getId() %>" class="btn btn-outline"><i class="fas fa-times-circle"></i> Cancel</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="timeline-item">
-                            <div class="timeline-time">
-                                <h4>1:30 PM</h4>
-                                <p>In 3 hours</p>
-                            </div>
-                            <div class="timeline-content">
-                                <div class="appointment-card">
-                                    <div class="appointment-info">
-                                        <div class="patient-info">
-                                            <img src="../images/patients/patient3.jpg" alt="Patient">
-                                            <div>
-                                                <h4>David Thompson</h4>
-                                                <p>58 years, Male</p>
-                                                <span class="appointment-type emergency">Emergency</span>
-                                            </div>
-                                        </div>
-                                        <div class="appointment-details">
-                                            <div class="detail-item">
-                                                <i class="fas fa-heartbeat"></i>
-                                                <span>Chest Pain</span>
-                                            </div>
-                                            <div class="detail-item">
-                                                <i class="fas fa-phone"></i>
-                                                <span>+1 456 789 012</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="appointment-actions">
-                                        <button class="btn btn-outline"><i class="fas fa-file-medical"></i> View Records</button>
-                                        <button class="btn btn-outline"><i class="fas fa-times-circle"></i> Cancel</button>
-                                    </div>
-                                </div>
-                            </div>
+                        <% }
+                        } else { %>
+                        <div class="no-appointments">
+                            <p>No upcoming appointments scheduled.</p>
                         </div>
+                        <% } %>
                     </div>
                 </div>
 
@@ -336,97 +318,44 @@
                             <thead>
                                 <tr>
                                     <th>Patient</th>
-                                    <th>Last Visit</th>
-                                    <th>Diagnosis</th>
+                                    <th>Contact</th>
+                                    <th>Address</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                <% if (request.getAttribute("recentPatients") != null && ((List<Patient>)request.getAttribute("recentPatients")).size() > 0) {
+                                    List<Patient> recentPatients = (List<Patient>)request.getAttribute("recentPatients");
+                                    for (Patient patient : recentPatients) {
+                                %>
                                 <tr>
                                     <td>
                                         <div class="user-info">
-                                            <img src="../images/patients/patient1.jpg" alt="Patient">
+                                            <img src="${pageContext.request.contextPath}/assets/images/patients/default.jpg" alt="Patient">
                                             <div>
-                                                <h4>Robert Wilson</h4>
-                                                <p>42 years, Male</p>
+                                                <h4><%= patient.getFirstName() + " " + patient.getLastName() %></h4>
+                                                <p><%= patient.getGender() %>, <%= patient.getDateOfBirth() != null ? patient.getAge() + " years" : "Age not available" %></p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td>Today, 10:30 AM</td>
-                                    <td>Hypertension</td>
+                                    <td><%= patient.getPhone() != null ? patient.getPhone() : "N/A" %></td>
+                                    <td><%= patient.getAddress() != null ? patient.getAddress() : "N/A" %></td>
                                     <td><span class="status-badge active">Active</span></td>
                                     <td>
                                         <div class="action-buttons">
-                                            <a href="#" class="btn-icon view"><i class="fas fa-eye"></i></a>
-                                            <a href="#" class="btn-icon edit"><i class="fas fa-file-medical"></i></a>
-                                            <a href="#" class="btn-icon message"><i class="fas fa-comment-medical"></i></a>
+                                            <a href="patient-details.jsp?id=<%= patient.getId() %>" class="btn-icon view"><i class="fas fa-eye"></i></a>
+                                            <a href="patient-records.jsp?id=<%= patient.getId() %>" class="btn-icon edit"><i class="fas fa-file-medical"></i></a>
+                                            <a href="message.jsp?patientId=<%= patient.getId() %>" class="btn-icon message"><i class="fas fa-comment-medical"></i></a>
                                         </div>
                                     </td>
                                 </tr>
+                                <% }
+                                } else { %>
                                 <tr>
-                                    <td>
-                                        <div class="user-info">
-                                            <img src="../images/patients/patient2.jpg" alt="Patient">
-                                            <div>
-                                                <h4>Emily Parker</h4>
-                                                <p>35 years, Female</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>Yesterday, 2:15 PM</td>
-                                    <td>Arrhythmia</td>
-                                    <td><span class="status-badge active">Active</span></td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <a href="#" class="btn-icon view"><i class="fas fa-eye"></i></a>
-                                            <a href="#" class="btn-icon edit"><i class="fas fa-file-medical"></i></a>
-                                            <a href="#" class="btn-icon message"><i class="fas fa-comment-medical"></i></a>
-                                        </div>
-                                    </td>
+                                    <td colspan="5" class="text-center">No recent patients found</td>
                                 </tr>
-                                <tr>
-                                    <td>
-                                        <div class="user-info">
-                                            <img src="../images/patients/patient3.jpg" alt="Patient">
-                                            <div>
-                                                <h4>David Thompson</h4>
-                                                <p>58 years, Male</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>Apr 15, 2023</td>
-                                    <td>Coronary Artery Disease</td>
-                                    <td><span class="status-badge pending">Pending</span></td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <a href="#" class="btn-icon view"><i class="fas fa-eye"></i></a>
-                                            <a href="#" class="btn-icon edit"><i class="fas fa-file-medical"></i></a>
-                                            <a href="#" class="btn-icon message"><i class="fas fa-comment-medical"></i></a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="user-info">
-                                            <img src="../images/patients/patient4.jpg" alt="Patient">
-                                            <div>
-                                                <h4>Jennifer Adams</h4>
-                                                <p>29 years, Female</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>Apr 12, 2023</td>
-                                    <td>Mitral Valve Prolapse</td>
-                                    <td><span class="status-badge completed">Completed</span></td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <a href="#" class="btn-icon view"><i class="fas fa-eye"></i></a>
-                                            <a href="#" class="btn-icon edit"><i class="fas fa-file-medical"></i></a>
-                                            <a href="#" class="btn-icon message"><i class="fas fa-comment-medical"></i></a>
-                                        </div>
-                                    </td>
-                                </tr>
+                                <% } %>
                             </tbody>
                         </table>
                     </div>

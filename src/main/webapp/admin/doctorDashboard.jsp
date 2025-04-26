@@ -175,32 +175,11 @@
                             <%
                                 }
                             } else {
-                                // If no doctors found or if we want to show static data for demo
-                                String[][] demoData = {
-                                    {"Kavya", "kavya@edoc.com", "Child psychiatry"},
-                                    {"Santhosh", "santhosh@edoc.com", "Accident and emergen"},
-                                    {"Samrutha", "sam@edoc.com", "Cardiology"},
-                                    {"Gayathri", "gayathri@edoc.com", "Dermatology"},
-                                    {"Anila", "anila240c@gmail.com", "Plastic surgery"},
-                                    {"Dheekshana", "doctor@edoc.com", "Accident and emergen"}
-                                };
-
-                                for (String[] doctor : demoData) {
                             %>
                             <tr>
-                                <td><%= doctor[0] %></td>
-                                <td><%= doctor[1] %></td>
-                                <td><%= doctor[2] %></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <a href="#" class="btn-icon btn-edit"><i class="fas fa-edit"></i></a>
-                                        <a href="#" class="btn-icon btn-view"><i class="fas fa-eye"></i></a>
-                                        <a href="#" class="btn-icon btn-remove"><i class="fas fa-trash"></i></a>
-                                    </div>
-                                </td>
+                                <td colspan="4" class="text-center">No doctors found. Please add a doctor using the "Add New" button.</td>
                             </tr>
                             <%
-                                }
                             }
                             %>
                         </tbody>

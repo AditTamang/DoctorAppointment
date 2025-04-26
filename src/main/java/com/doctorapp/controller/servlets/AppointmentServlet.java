@@ -115,9 +115,18 @@ public class AppointmentServlet extends HttpServlet {
     }
 
     private void showBookAppointmentForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Get doctor ID from request parameter
+        String doctorIdParam = request.getParameter("doctorId");
+
         // Check if user is logged in
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
+            // If not logged in, save the intended URL and redirect to login
+            if (doctorIdParam != null && !doctorIdParam.isEmpty()) {
+                // Store the doctorId in the session so we can redirect back after login
+                session = request.getSession(true);
+                session.setAttribute("redirectAfterLogin", "appointment/book?doctorId=" + doctorIdParam);
+            }
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
@@ -139,20 +148,62 @@ public class AppointmentServlet extends HttpServlet {
             return;
         }
 
-        // Get doctor ID from request parameter
-        String doctorIdParam = request.getParameter("doctorId");
+        try {
+            // Process doctor ID from request parameter
+            if (doctorIdParam != null && !doctorIdParam.isEmpty()) {
+                try {
+                    int doctorId = Integer.parseInt(doctorIdParam);
+                    Doctor doctor = doctorService.getDoctorById(doctorId);
+                    if (doctor != null) {
+                        request.setAttribute("doctor", doctor);
 
-        if (doctorIdParam != null && !doctorIdParam.isEmpty()) {
-            int doctorId = Integer.parseInt(doctorIdParam);
-            Doctor doctor = doctorService.getDoctorById(doctorId);
-            request.setAttribute("doctor", doctor);
+                        // Get all approved doctors for dropdown
+                        List<Doctor> doctors = doctorService.getApprovedDoctors();
+                        request.setAttribute("doctors", doctors);
+
+                        // Forward to the booking page
+                        request.getRequestDispatcher("/book-appointment.jsp").forward(request, response);
+                        return;
+                    } else {
+                        // Doctor not found
+                        request.setAttribute("error", "Selected doctor not found. Please choose another doctor.");
+                    }
+                } catch (NumberFormatException e) {
+                    // Invalid doctor ID
+                    request.setAttribute("error", "Invalid doctor selection. Please try again.");
+                }
+            }
+
+            // If we get here, either no doctor ID was provided or there was an error
+            // Get all approved doctors for dropdown
+            List<Doctor> doctors = doctorService.getApprovedDoctors();
+            request.setAttribute("doctors", doctors);
+
+            // Forward to the booking page
+            request.getRequestDispatcher("/book-appointment.jsp").forward(request, response);
+            return; // Add return statement to prevent further execution
+
+        } catch (Exception e) {
+            // Log the error
+            System.err.println("Error in showBookAppointmentForm: " + e.getMessage());
+            e.printStackTrace();
+
+            // Set error message
+            request.setAttribute("error", "An error occurred while loading the booking form. Please try again.");
+
+            // Get all approved doctors for dropdown
+            try {
+                List<Doctor> doctors = doctorService.getApprovedDoctors();
+                request.setAttribute("doctors", doctors);
+            } catch (Exception ex) {
+                // If we can't get the doctors, just continue without them
+                System.err.println("Error getting approved doctors: " + ex.getMessage());
+            }
+
+            // Forward to the booking page
+            request.getRequestDispatcher("/book-appointment.jsp").forward(request, response);
+            return; // Add return statement to prevent further execution
         }
-
-        // Get all approved doctors for dropdown
-        List<Doctor> doctors = doctorService.getApprovedDoctors();
-        request.setAttribute("doctors", doctors);
-
-        request.getRequestDispatcher("/book-appointment.jsp").forward(request, response);
     }
 
     private void showAppointmentDetails(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -271,40 +322,100 @@ public class AppointmentServlet extends HttpServlet {
             return;
         }
 
-        // Get form data
-        int doctorId = Integer.parseInt(request.getParameter("doctorId"));
-        String appointmentDateStr = request.getParameter("appointmentDate");
-        String appointmentTime = request.getParameter("appointmentTime");
-        String symptoms = request.getParameter("symptoms");
-        String reason = request.getParameter("reason");
+        try {
+            // Get form data
+            String doctorIdParam = request.getParameter("doctorId");
+            String appointmentDateStr = request.getParameter("appointmentDate");
+            String appointmentTime = request.getParameter("appointmentTime");
+            String symptoms = request.getParameter("symptoms");
+            String reason = request.getParameter("reason");
 
-        // Get doctor and patient names
-        Doctor doctor = doctorService.getDoctorById(doctorId);
-        String patientName = user.getUsername();
-        String doctorName = doctor.getName();
+            if (doctorIdParam == null || appointmentDateStr == null || appointmentTime == null || reason == null) {
+                // Missing required parameters
+                request.setAttribute("error", "Missing required appointment information. Please try again.");
+                request.getRequestDispatcher("/book-appointment.jsp").forward(request, response);
+                return;
+            }
 
-        // Create appointment object
-        Appointment appointment = new Appointment();
-        appointment.setPatientId(patientId);
-        appointment.setDoctorId(doctorId);
-        appointment.setPatientName(patientName);
-        appointment.setDoctorName(doctorName);
-        appointment.setAppointmentDate(Date.valueOf(appointmentDateStr));
-        appointment.setAppointmentTime(appointmentTime);
-        appointment.setStatus("PENDING");
-        appointment.setSymptoms(symptoms);
-        appointment.setReason(reason);
-        appointment.setFee(Double.parseDouble(doctor.getConsultationFee()));
+            int doctorId = Integer.parseInt(doctorIdParam);
 
-        // Book appointment
-        if (appointmentService.bookAppointment(appointment)) {
-            request.setAttribute("message", "Appointment booked successfully!");
-        } else {
-            request.setAttribute("error", "Failed to book appointment. Please try again.");
+            // Get doctor and patient names
+            Doctor doctor = doctorService.getDoctorById(doctorId);
+            if (doctor == null) {
+                // Doctor not found
+                request.setAttribute("error", "Selected doctor not found. Please try again.");
+                request.getRequestDispatcher("/book-appointment.jsp").forward(request, response);
+                return;
+            }
+
+            String patientName = user.getUsername();
+            String doctorName = doctor.getName();
+
+            // Create appointment object
+            Appointment appointment = new Appointment();
+            appointment.setPatientId(patientId);
+            appointment.setDoctorId(doctorId);
+            appointment.setPatientName(patientName);
+            appointment.setDoctorName(doctorName);
+            appointment.setAppointmentDate(Date.valueOf(appointmentDateStr));
+            appointment.setAppointmentTime(appointmentTime);
+            appointment.setStatus("PENDING");
+            appointment.setSymptoms(symptoms != null ? symptoms : "");
+            appointment.setReason(reason);
+            appointment.setFee(Double.parseDouble(doctor.getConsultationFee()));
+
+            // Book appointment
+            if (appointmentService.bookAppointment(appointment)) {
+                session.setAttribute("message", "Appointment booked successfully!");
+            } else {
+                session.setAttribute("error", "Failed to book appointment. Please try again.");
+            }
+
+            // Redirect to appointments list
+            response.sendRedirect(request.getContextPath() + "/appointments");
+        } catch (NumberFormatException e) {
+            // Invalid doctor ID
+            request.setAttribute("error", "Invalid doctor selection. Please try again.");
+            try {
+                // Get all approved doctors for dropdown
+                List<Doctor> doctors = doctorService.getApprovedDoctors();
+                request.setAttribute("doctors", doctors);
+                request.getRequestDispatcher("/book-appointment.jsp").forward(request, response);
+                return; // Add return to prevent further execution
+            } catch (Exception ex) {
+                // If we can't get the doctors, just redirect to the dashboard
+                response.sendRedirect(request.getContextPath() + "/dashboard");
+                return;
+            }
+        } catch (IllegalArgumentException e) {
+            // Invalid date format
+            request.setAttribute("error", "Invalid date format. Please try again.");
+            try {
+                // Get all approved doctors for dropdown
+                List<Doctor> doctors = doctorService.getApprovedDoctors();
+                request.setAttribute("doctors", doctors);
+                request.getRequestDispatcher("/book-appointment.jsp").forward(request, response);
+                return; // Add return to prevent further execution
+            } catch (Exception ex) {
+                // If we can't get the doctors, just redirect to the dashboard
+                response.sendRedirect(request.getContextPath() + "/dashboard");
+                return;
+            }
+        } catch (Exception e) {
+            // Other errors
+            request.setAttribute("error", "An error occurred while booking your appointment: " + e.getMessage());
+            try {
+                // Get all approved doctors for dropdown
+                List<Doctor> doctors = doctorService.getApprovedDoctors();
+                request.setAttribute("doctors", doctors);
+                request.getRequestDispatcher("/book-appointment.jsp").forward(request, response);
+                return; // Add return to prevent further execution
+            } catch (Exception ex) {
+                // If we can't get the doctors, just redirect to the dashboard
+                response.sendRedirect(request.getContextPath() + "/dashboard");
+                return;
+            }
         }
-
-        // Redirect to appointments list
-        response.sendRedirect(request.getContextPath() + "/appointments");
     }
 
     private void cancelAppointment(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

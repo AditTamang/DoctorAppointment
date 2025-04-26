@@ -214,7 +214,9 @@ public class DoctorDAO {
         List<Doctor> doctors = new ArrayList<>();
 
         // Simplified query to get all doctors with their information
-        String query = "SELECT d.*, u.first_name, u.last_name, u.email AS user_email, u.phone AS user_phone, u.address AS user_address " +
+        String query = "SELECT d.id, d.user_id, d.specialization, d.qualification, d.experience, " +
+                      "d.consultation_fee, d.profile_image, d.bio, d.department_id, d.rating, d.patient_count, " +
+                      "u.first_name, u.last_name, u.email AS user_email, u.phone AS user_phone, u.address AS user_address " +
                       "FROM doctors d " +
                       "JOIN users u ON d.user_id = u.id " +
                       "WHERE u.role = 'DOCTOR'";
@@ -227,14 +229,11 @@ public class DoctorDAO {
                 Doctor doctor = new Doctor();
                 doctor.setId(rs.getInt("id"));
 
-                // Use name from doctors table, or construct from first_name and last_name if null
-                String name = rs.getString("name");
-                if (name == null || name.isEmpty()) {
-                    String firstName = rs.getString("first_name");
-                    String lastName = rs.getString("last_name");
-                    name = "Dr. " + (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
-                    name = name.trim();
-                }
+                // Construct name from first_name and last_name
+                String firstName = rs.getString("first_name");
+                String lastName = rs.getString("last_name");
+                String name = "Dr. " + (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                name = name.trim();
                 doctor.setName(name);
 
                 doctor.setSpecialization(rs.getString("specialization"));
@@ -673,9 +672,6 @@ public class DoctorDAO {
                       "FROM doctors d " +
                       "JOIN users u ON d.user_id = u.id " +
                       "WHERE u.role = 'DOCTOR'";
-
-        // Note: All doctors in the doctors table are considered approved since they were moved there
-        // after admin approval. There's no need for additional filtering.
 
         System.out.println("Executing query to get approved doctors: " + query);
 

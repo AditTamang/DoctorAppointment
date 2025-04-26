@@ -26,8 +26,18 @@
                     <li><a href="about-us.jsp">About Us</a></li>
                     <li><a href="index.jsp#services">Services</a></li>
                     <li><a href="index.jsp#contact">Contact</a></li>
-                    <% if(session.getAttribute("user") != null) { %>
-                        <li><a href="appointments">Appointments</a></li>
+                    <% if(session.getAttribute("user") != null) {
+                        com.doctorapp.model.User currentUser = (com.doctorapp.model.User) session.getAttribute("user");
+                        String dashboardLink = "";
+                        if("PATIENT".equals(currentUser.getRole())) {
+                            dashboardLink = "patient/dashboard";
+                        } else if("DOCTOR".equals(currentUser.getRole())) {
+                            dashboardLink = "dashboard";
+                        } else if("ADMIN".equals(currentUser.getRole())) {
+                            dashboardLink = "admin/index.jsp";
+                        }
+                    %>
+                        <li><a href="<%= dashboardLink %>">Dashboard</a></li>
                         <li><a href="profile">Profile</a></li>
                         <li><a href="logout" class="btn btn-primary">Logout</a></li>
                     <% } else { %>
@@ -226,8 +236,8 @@
                         </div>
 
                         <div class="doctor-actions">
-                            <a href="doctor/details?id=<%= doctor.getId() %>" class="btn btn-primary"><i class="fas fa-eye"></i> View Profile</a>
-                            <a href="appointment/book?doctorId=<%= doctor.getId() %>" class="btn btn-outline"><i class="fas fa-calendar-check"></i> Book</a>
+                            <a href="${pageContext.request.contextPath}/doctor/details?id=<%= doctor.getId() %>" class="btn btn-primary"><i class="fas fa-eye"></i> View Profile</a>
+                            <a href="${pageContext.request.contextPath}/appointment/book?doctorId=<%= doctor.getId() %>" class="btn btn-outline"><i class="fas fa-calendar-check"></i> Book</a>
                         </div>
                     </div>
                 </div>

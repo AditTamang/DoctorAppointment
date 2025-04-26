@@ -1,6 +1,7 @@
 package com.doctorapp.controller.servlets;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.doctorapp.model.Doctor;
@@ -16,6 +17,7 @@ import jakarta.servlet.http.HttpSession;
 
 @WebServlet(urlPatterns = {
     "/doctors",
+    "/find-doctors",
     "/doctor/details",
     "/admin/doctors",
     "/admin/doctor/add",
@@ -36,6 +38,9 @@ public class DoctorServlet extends HttpServlet {
         switch (action) {
             case "/doctors":
                 listDoctors(request, response);
+                break;
+            case "/find-doctors":
+                findDoctors(request, response);
                 break;
             case "/doctor/details":
                 showDoctorDetails(request, response);
@@ -80,18 +85,104 @@ public class DoctorServlet extends HttpServlet {
         }
     }
 
-    private void listDoctors(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void findDoctors(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // This method handles the new find-doctors page with the modern UI
         String specialization = request.getParameter("specialization");
+        String searchTerm = request.getParameter("search");
+        String experience = request.getParameter("experience");
         List<Doctor> doctors;
 
+        // Set the specialization as a request attribute for the JSP
         if (specialization != null && !specialization.isEmpty()) {
+            request.setAttribute("specialization", specialization);
             // Use approved doctors by specialization for public display
             System.out.println("Fetching doctors with specialization: " + specialization);
             doctors = doctorService.getApprovedDoctorsBySpecialization(specialization);
+        } else if (searchTerm != null && !searchTerm.isEmpty()) {
+            // Use search functionality if search term is provided
+            System.out.println("Searching for doctors with term: " + searchTerm);
+            doctors = doctorService.searchApprovedDoctors(searchTerm);
         } else {
             // Use approved doctors for public display
             System.out.println("Fetching all approved doctors");
             doctors = doctorService.getApprovedDoctors();
+        }
+
+        // Filter by experience if provided
+        if (experience != null && !experience.isEmpty() && doctors != null) {
+            List<Doctor> filteredDoctors = new ArrayList<>();
+            for (Doctor doctor : doctors) {
+                if (doctor.getExperience() != null && !doctor.getExperience().isEmpty()) {
+                    try {
+                        int exp = Integer.parseInt(doctor.getExperience());
+                        if (experience.equals("0-5") && exp >= 0 && exp <= 5) {
+                            filteredDoctors.add(doctor);
+                        } else if (experience.equals("5-10") && exp > 5 && exp <= 10) {
+                            filteredDoctors.add(doctor);
+                        } else if (experience.equals("10+") && exp > 10) {
+                            filteredDoctors.add(doctor);
+                        }
+                    } catch (NumberFormatException e) {
+                        // If experience is not a number, skip this doctor
+                        continue;
+                    }
+                }
+            }
+            doctors = filteredDoctors;
+        }
+
+        System.out.println("Found " + (doctors != null ? doctors.size() : 0) + " doctors");
+
+        // Set doctors as request attribute
+        request.setAttribute("doctors", doctors);
+
+        // Forward to the find-doctors.jsp page
+        request.getRequestDispatcher("/find-doctors.jsp").forward(request, response);
+    }
+
+    private void listDoctors(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String specialization = request.getParameter("specialization");
+        String searchTerm = request.getParameter("search");
+        String experience = request.getParameter("experience");
+        List<Doctor> doctors;
+
+        // Set the specialization as a request attribute for the JSP
+        if (specialization != null && !specialization.isEmpty()) {
+            request.setAttribute("specialization", specialization);
+            // Use approved doctors by specialization for public display
+            System.out.println("Fetching doctors with specialization: " + specialization);
+            doctors = doctorService.getApprovedDoctorsBySpecialization(specialization);
+        } else if (searchTerm != null && !searchTerm.isEmpty()) {
+            // Use search functionality if search term is provided
+            System.out.println("Searching for doctors with term: " + searchTerm);
+            doctors = doctorService.searchApprovedDoctors(searchTerm);
+        } else {
+            // Use approved doctors for public display
+            System.out.println("Fetching all approved doctors");
+            doctors = doctorService.getApprovedDoctors();
+        }
+
+        // Filter by experience if provided
+        if (experience != null && !experience.isEmpty() && doctors != null) {
+            List<Doctor> filteredDoctors = new ArrayList<>();
+            for (Doctor doctor : doctors) {
+                if (doctor.getExperience() != null && !doctor.getExperience().isEmpty()) {
+                    try {
+                        int exp = Integer.parseInt(doctor.getExperience());
+                        if (experience.equals("0-5") && exp >= 0 && exp <= 5) {
+                            filteredDoctors.add(doctor);
+                        } else if (experience.equals("5-10") && exp > 5 && exp <= 10) {
+                            filteredDoctors.add(doctor);
+                        } else if (experience.equals("10+") && exp > 10) {
+                            filteredDoctors.add(doctor);
+                        }
+                    } catch (NumberFormatException e) {
+                        // If experience is not a number, skip this doctor
+                        continue;
+                    }
+                }
+            }
+            doctors = filteredDoctors;
         }
 
         System.out.println("Found " + (doctors != null ? doctors.size() : 0) + " doctors");

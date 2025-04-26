@@ -48,7 +48,7 @@
             <div class="sidebar-menu">
                 <ul>
                     <li class="active">
-                        <a href="index.jsp">
+                        <a href="${pageContext.request.contextPath}/dashboard">
                             <i class="fas fa-tachometer-alt"></i>
                             <span>Dashboard</span>
                         </a>
@@ -74,37 +74,37 @@
                         </a>
                     </li>
                     <li>
-                        <a href="patients.jsp">
+                        <a href="${pageContext.request.contextPath}/admin/patients">
                             <i class="fas fa-users"></i>
                             <span>Patients</span>
                         </a>
                     </li>
                     <li>
-                        <a href="appointments.jsp">
+                        <a href="${pageContext.request.contextPath}/admin/appointments">
                             <i class="fas fa-calendar-check"></i>
                             <span>Appointments</span>
                         </a>
                     </li>
                     <li>
-                        <a href="specializations.jsp">
+                        <a href="${pageContext.request.contextPath}/admin/specializations">
                             <i class="fas fa-stethoscope"></i>
                             <span>Specializations</span>
                         </a>
                     </li>
                     <li>
-                        <a href="reports.jsp">
+                        <a href="${pageContext.request.contextPath}/admin/reports">
                             <i class="fas fa-chart-bar"></i>
                             <span>Reports</span>
                         </a>
                     </li>
                     <li>
-                        <a href="settings.jsp">
+                        <a href="${pageContext.request.contextPath}/admin/settings">
                             <i class="fas fa-cog"></i>
                             <span>Settings</span>
                         </a>
                     </li>
                     <li class="logout">
-                        <a href="../logout">
+                        <a href="${pageContext.request.contextPath}/logout">
                             <i class="fas fa-sign-out-alt"></i>
                             <span>Logout</span>
                         </a>
@@ -149,25 +149,61 @@
                     <h2>Status</h2>
                     <div class="status-cards">
                         <div class="status-card">
-                            <div class="status-number"><%= request.getAttribute("approvedDoctors") %></div>
+                            <div class="status-number">
+                                <%
+                                Integer approvedDoctors = (Integer)request.getAttribute("approvedDoctors");
+                                if (approvedDoctors != null) {
+                                    out.print(approvedDoctors);
+                                } else {
+                                    out.print("0");
+                                }
+                                %>
+                            </div>
                             <div class="status-label">Doctors</div>
                             <div class="status-icon"><i class="fas fa-user-md"></i></div>
                         </div>
 
                         <div class="status-card">
-                            <div class="status-number"><%= request.getAttribute("totalPatients") %></div>
+                            <div class="status-number">
+                                <%
+                                Integer totalPatients = (Integer)request.getAttribute("totalPatients");
+                                if (totalPatients != null) {
+                                    out.print(totalPatients);
+                                } else {
+                                    out.print("0");
+                                }
+                                %>
+                            </div>
                             <div class="status-label">Patients</div>
                             <div class="status-icon"><i class="fas fa-users"></i></div>
                         </div>
 
                         <div class="status-card">
-                            <div class="status-number"><%= request.getAttribute("newBookings") %></div>
+                            <div class="status-number">
+                                <%
+                                Integer newBookings = (Integer)request.getAttribute("newBookings");
+                                if (newBookings != null) {
+                                    out.print(newBookings);
+                                } else {
+                                    out.print("0");
+                                }
+                                %>
+                            </div>
                             <div class="status-label">NewBooking</div>
                             <div class="status-icon"><i class="fas fa-calendar-plus"></i></div>
                         </div>
 
                         <div class="status-card">
-                            <div class="status-number"><%= request.getAttribute("todayAppointments") %></div>
+                            <div class="status-number">
+                                <%
+                                Integer todayAppointments = (Integer)request.getAttribute("todayAppointments");
+                                if (todayAppointments != null) {
+                                    out.print(todayAppointments);
+                                } else {
+                                    out.print("0");
+                                }
+                                %>
+                            </div>
                             <div class="status-label">Today Sessions</div>
                             <div class="status-icon"><i class="fas fa-calendar-check"></i></div>
                         </div>
@@ -215,7 +251,7 @@
                         </table>
 
                         <div class="show-all-btn">
-                            <a href="appointments.jsp" class="btn">Show all Appointments</a>
+                            <a href="${pageContext.request.contextPath}/admin/appointments" class="btn">Show all Appointments</a>
                         </div>
                     </div>
 
@@ -237,12 +273,12 @@
                                 java.util.List<com.doctorapp.model.Appointment> upcomingSessions =
                                     (java.util.List<com.doctorapp.model.Appointment>)request.getAttribute("upcomingSessions");
                                 if(upcomingSessions != null && !upcomingSessions.isEmpty()) {
-                                    for(com.doctorapp.model.Appointment session : upcomingSessions) {
+                                    for(com.doctorapp.model.Appointment sessionItem : upcomingSessions) {
                                 %>
                                 <tr>
-                                    <td>Appointment #<%= session.getId() %></td>
-                                    <td><%= session.getDoctorName() %></td>
-                                    <td><%= session.getAppointmentDate() %> <%= session.getAppointmentTime() %></td>
+                                    <td>Appointment #<%= sessionItem.getId() %></td>
+                                    <td><%= sessionItem.getDoctorName() %></td>
+                                    <td><%= sessionItem.getAppointmentDate() %> <%= sessionItem.getAppointmentTime() %></td>
                                 </tr>
                                 <%
                                     }
@@ -256,7 +292,7 @@
                         </table>
 
                         <div class="show-all-btn">
-                            <a href="sessions.jsp" class="btn">Show all Sessions</a>
+                            <a href="${pageContext.request.contextPath}/admin/appointments" class="btn">Show all Sessions</a>
                         </div>
                     </div>
                 </div>
@@ -266,7 +302,7 @@
                     <div class="table-card">
                         <div class="table-header">
                             <h3>Recent Doctors</h3>
-                            <a href="doctors.jsp" class="view-all">View All</a>
+                            <a href="${pageContext.request.contextPath}/admin/doctorDashboard" class="view-all">View All</a>
                         </div>
                         <div class="table-responsive">
                             <table>
@@ -279,66 +315,44 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <%
+                                    java.util.List<com.doctorapp.model.Doctor> topDoctors =
+                                        (java.util.List<com.doctorapp.model.Doctor>)request.getAttribute("topDoctors");
+                                    if(topDoctors != null && !topDoctors.isEmpty()) {
+                                        for(com.doctorapp.model.Doctor doctor : topDoctors) {
+                                    %>
                                     <tr>
                                         <td>
                                             <div class="user-info">
-                                                <img src="../images/doctors/doctor1.jpg" alt="Doctor">
+                                                <% if(doctor.getProfileImage() != null && !doctor.getProfileImage().isEmpty()) { %>
+                                                    <img src="${pageContext.request.contextPath}/<%=doctor.getProfileImage()%>" alt="Doctor">
+                                                <% } else { %>
+                                                    <img src="${pageContext.request.contextPath}/images/doctors/default.jpg" alt="Doctor">
+                                                <% } %>
                                                 <div>
-                                                    <h4>Dr. John Smith</h4>
-                                                    <p>ID: DOC-001</p>
+                                                    <h4><%= doctor.getName() %></h4>
+                                                    <p>ID: DOC-<%= doctor.getId() %></p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>Cardiologist</td>
+                                        <td><%= doctor.getSpecialization() %></td>
                                         <td><span class="status-badge active">Active</span></td>
                                         <td>
                                             <div class="action-buttons">
-                                                <a href="#" class="btn-icon view"><i class="fas fa-eye"></i></a>
-                                                <a href="#" class="btn-icon edit"><i class="fas fa-edit"></i></a>
-                                                <a href="#" class="btn-icon delete"><i class="fas fa-trash"></i></a>
+                                                <a href="${pageContext.request.contextPath}/admin/view-doctor?id=<%= doctor.getId() %>" class="btn-icon view"><i class="fas fa-eye"></i></a>
+                                                <a href="${pageContext.request.contextPath}/admin/edit-doctor?id=<%= doctor.getId() %>" class="btn-icon edit"><i class="fas fa-edit"></i></a>
+                                                <a href="#" class="btn-icon delete" onclick="confirmDelete(<%= doctor.getId() %>)"><i class="fas fa-trash"></i></a>
                                             </div>
                                         </td>
                                     </tr>
+                                    <%
+                                        }
+                                    } else {
+                                    %>
                                     <tr>
-                                        <td>
-                                            <div class="user-info">
-                                                <img src="../images/doctors/doctor2.jpg" alt="Doctor">
-                                                <div>
-                                                    <h4>Dr. Sarah Johnson</h4>
-                                                    <p>ID: DOC-002</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>Neurologist</td>
-                                        <td><span class="status-badge active">Active</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <a href="#" class="btn-icon view"><i class="fas fa-eye"></i></a>
-                                                <a href="#" class="btn-icon edit"><i class="fas fa-edit"></i></a>
-                                                <a href="#" class="btn-icon delete"><i class="fas fa-trash"></i></a>
-                                            </div>
-                                        </td>
+                                        <td colspan="4">No doctors found</td>
                                     </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="user-info">
-                                                <img src="../images/doctors/doctor3.jpg" alt="Doctor">
-                                                <div>
-                                                    <h4>Dr. Michael Brown</h4>
-                                                    <p>ID: DOC-003</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>Orthopedic</td>
-                                        <td><span class="status-badge inactive">Inactive</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <a href="#" class="btn-icon view"><i class="fas fa-eye"></i></a>
-                                                <a href="#" class="btn-icon edit"><i class="fas fa-edit"></i></a>
-                                                <a href="#" class="btn-icon delete"><i class="fas fa-trash"></i></a>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <% } %>
                                 </tbody>
                             </table>
                         </div>
@@ -347,7 +361,7 @@
                     <div class="table-card">
                         <div class="table-header">
                             <h3>Recent Patients</h3>
-                            <a href="patients.jsp" class="view-all">View All</a>
+                            <a href="${pageContext.request.contextPath}/admin/patients" class="view-all">View All</a>
                         </div>
                         <div class="table-responsive">
                             <table>
@@ -360,66 +374,40 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <%
+                                    java.util.List<com.doctorapp.model.Appointment> recentAppointments =
+                                        (java.util.List<com.doctorapp.model.Appointment>)request.getAttribute("recentAppointments");
+                                    if(recentAppointments != null && !recentAppointments.isEmpty()) {
+                                        for(com.doctorapp.model.Appointment appointment : recentAppointments) {
+                                    %>
                                     <tr>
                                         <td>
                                             <div class="user-info">
-                                                <img src="../images/patients/patient1.jpg" alt="Patient">
+                                                <img src="${pageContext.request.contextPath}/images/patients/default.jpg" alt="Patient">
                                                 <div>
-                                                    <h4>Robert Wilson</h4>
-                                                    <p>ID: PAT-001</p>
+                                                    <h4><%= appointment.getPatientName() %></h4>
+                                                    <p>ID: PAT-<%= appointment.getPatientId() %></p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>15 Apr 2023</td>
+                                        <td><%= appointment.getAppointmentDate() %></td>
                                         <td><span class="status-badge active">Active</span></td>
                                         <td>
                                             <div class="action-buttons">
-                                                <a href="#" class="btn-icon view"><i class="fas fa-eye"></i></a>
-                                                <a href="#" class="btn-icon edit"><i class="fas fa-edit"></i></a>
-                                                <a href="#" class="btn-icon delete"><i class="fas fa-trash"></i></a>
+                                                <a href="${pageContext.request.contextPath}/admin/view-patient?id=<%= appointment.getPatientId() %>" class="btn-icon view"><i class="fas fa-eye"></i></a>
+                                                <a href="${pageContext.request.contextPath}/admin/edit-patient?id=<%= appointment.getPatientId() %>" class="btn-icon edit"><i class="fas fa-edit"></i></a>
+                                                <a href="#" class="btn-icon delete" onclick="confirmDeletePatient(<%= appointment.getPatientId() %>)"><i class="fas fa-trash"></i></a>
                                             </div>
                                         </td>
                                     </tr>
+                                    <%
+                                        }
+                                    } else {
+                                    %>
                                     <tr>
-                                        <td>
-                                            <div class="user-info">
-                                                <img src="../images/patients/patient2.jpg" alt="Patient">
-                                                <div>
-                                                    <h4>Emily Parker</h4>
-                                                    <p>ID: PAT-002</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>12 Apr 2023</td>
-                                        <td><span class="status-badge active">Active</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <a href="#" class="btn-icon view"><i class="fas fa-eye"></i></a>
-                                                <a href="#" class="btn-icon edit"><i class="fas fa-edit"></i></a>
-                                                <a href="#" class="btn-icon delete"><i class="fas fa-trash"></i></a>
-                                            </div>
-                                        </td>
+                                        <td colspan="4">No patients found</td>
                                     </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="user-info">
-                                                <img src="../images/patients/patient3.jpg" alt="Patient">
-                                                <div>
-                                                    <h4>David Thompson</h4>
-                                                    <p>ID: PAT-003</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>10 Apr 2023</td>
-                                        <td><span class="status-badge inactive">Inactive</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <a href="#" class="btn-icon view"><i class="fas fa-eye"></i></a>
-                                                <a href="#" class="btn-icon edit"><i class="fas fa-edit"></i></a>
-                                                <a href="#" class="btn-icon delete"><i class="fas fa-trash"></i></a>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <% } %>
                                 </tbody>
                             </table>
                         </div>
@@ -460,6 +448,20 @@
             dateElements.forEach(element => {
                 element.textContent = formatDate(todayDate);
             });
+        }
+
+        // Confirm delete for doctor
+        function confirmDelete(doctorId) {
+            if (confirm('Are you sure you want to delete this doctor?')) {
+                window.location.href = '${pageContext.request.contextPath}/admin/delete-doctor?id=' + doctorId;
+            }
+        }
+
+        // Confirm delete for patient
+        function confirmDeletePatient(patientId) {
+            if (confirm('Are you sure you want to delete this patient?')) {
+                window.location.href = '${pageContext.request.contextPath}/admin/delete-patient?id=' + patientId;
+            }
         }
     </script>
 </body>
