@@ -209,7 +209,7 @@ public class DoctorDAO {
         return null;
     }
 
-    // Get all doctors
+    // Get all doctors (for admin use)
     public List<Doctor> getAllDoctors() {
         List<Doctor> doctors = new ArrayList<>();
 
@@ -660,6 +660,295 @@ public class DoctorDAO {
         return 0.0;
     }
 
+    // Get only approved doctors (for public display)
+    public List<Doctor> getApprovedDoctors() {
+        List<Doctor> doctors = new ArrayList<>();
+
+        // Query to get only doctors that have been approved by admin
+        // These are doctors that exist in the doctors table after being moved from doctor_registration_requests
+        // Since all doctors in the doctors table are approved, we just need to make sure they have the DOCTOR role
+        String query = "SELECT d.id, d.user_id, d.specialization, d.qualification, d.experience, " +
+                      "d.consultation_fee, d.profile_image, d.bio, d.department_id, d.rating, d.patient_count, " +
+                      "u.first_name, u.last_name, u.email AS user_email, u.phone AS user_phone, u.address AS user_address " +
+                      "FROM doctors d " +
+                      "JOIN users u ON d.user_id = u.id " +
+                      "WHERE u.role = 'DOCTOR'";
+
+        // Note: All doctors in the doctors table are considered approved since they were moved there
+        // after admin approval. There's no need for additional filtering.
+
+        System.out.println("Executing query to get approved doctors: " + query);
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            System.out.println("Checking for doctors in result set...");
+            int count = 0;
+            while (rs.next()) {
+                count++;
+                System.out.println("Found doctor #" + count + " in result set");
+                Doctor doctor = new Doctor();
+                doctor.setId(rs.getInt("id"));
+
+                // Construct name from first_name and last_name
+                String firstName = rs.getString("first_name");
+                String lastName = rs.getString("last_name");
+                String name = "Dr. " + (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                name = name.trim();
+                System.out.println("Constructed doctor name: " + name);
+                doctor.setName(name);
+
+                doctor.setSpecialization(rs.getString("specialization"));
+                doctor.setQualification(rs.getString("qualification"));
+                doctor.setExperience(rs.getString("experience"));
+
+                // Set email from users table
+                doctor.setEmail(rs.getString("user_email"));
+
+                // Set phone from users table
+                doctor.setPhone(rs.getString("user_phone"));
+
+                // Set address from users table
+                doctor.setAddress(rs.getString("user_address"));
+
+                // Get consultation fee, set default if null
+                String consultationFee = rs.getString("consultation_fee");
+                if (consultationFee == null || consultationFee.isEmpty()) {
+                    consultationFee = "1000";
+                }
+                doctor.setConsultationFee(consultationFee);
+
+                // Set default values for fields that might not exist in the database
+                doctor.setAvailableDays("Monday,Tuesday,Wednesday,Thursday,Friday");
+                doctor.setAvailableTime("09:00 AM - 05:00 PM");
+
+                // Use profile_image for imageUrl if available
+                String profileImage = rs.getString("profile_image");
+                if (profileImage != null && !profileImage.isEmpty()) {
+                    doctor.setImageUrl(profileImage);
+                    doctor.setProfileImage(profileImage);
+                } else {
+                    doctor.setImageUrl("/assets/images/doctors/default-doctor.png");
+                    doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                }
+
+                // Set bio if available
+                String bio = rs.getString("bio");
+                if (bio != null) {
+                    doctor.setBio(bio);
+                }
+
+                // Set rating and patient count
+                doctor.setRating(rs.getDouble("rating"));
+                doctor.setPatientCount(rs.getInt("patient_count"));
+                doctor.setSuccessRate(90); // Default value
+
+                // Only add doctors with valid information
+                if (name != null && !name.isEmpty() &&
+                    doctor.getSpecialization() != null && !doctor.getSpecialization().isEmpty()) {
+                    doctors.add(doctor);
+                }
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            System.out.println("Error getting approved doctors: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        System.out.println("Returning " + doctors.size() + " approved doctors from database");
+
+        return doctors;
+    }
+
+    // Get approved doctors by specialization (for public display)
+    public List<Doctor> getApprovedDoctorsBySpecialization(String specialization) {
+        List<Doctor> doctors = new ArrayList<>();
+
+        // Query to get only doctors that have been approved by admin with the specified specialization
+        String query = "SELECT d.id, d.user_id, d.specialization, d.qualification, d.experience, " +
+                      "d.consultation_fee, d.profile_image, d.bio, d.department_id, d.rating, d.patient_count, " +
+                      "u.first_name, u.last_name, u.email AS user_email, u.phone AS user_phone, u.address AS user_address " +
+                      "FROM doctors d " +
+                      "JOIN users u ON d.user_id = u.id " +
+                      "WHERE d.specialization = ? AND u.role = 'DOCTOR'";
+
+        System.out.println("Executing query to get approved doctors by specialization: " + specialization);
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, specialization);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Doctor doctor = new Doctor();
+                    doctor.setId(rs.getInt("id"));
+
+                    // Construct name from first_name and last_name
+                    String firstName = rs.getString("first_name");
+                    String lastName = rs.getString("last_name");
+                    String name = "Dr. " + (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                    name = name.trim();
+                    doctor.setName(name);
+
+                    doctor.setSpecialization(rs.getString("specialization"));
+                    doctor.setQualification(rs.getString("qualification"));
+                    doctor.setExperience(rs.getString("experience"));
+
+                    // Set email from users table
+                    doctor.setEmail(rs.getString("user_email"));
+
+                    // Set phone from users table
+                    doctor.setPhone(rs.getString("user_phone"));
+
+                    // Set address from users table
+                    doctor.setAddress(rs.getString("user_address"));
+
+                    // Get consultation fee, set default if null
+                    String consultationFee = rs.getString("consultation_fee");
+                    if (consultationFee == null || consultationFee.isEmpty()) {
+                        consultationFee = "1000";
+                    }
+                    doctor.setConsultationFee(consultationFee);
+
+                    // Set default values for fields that might not exist in the database
+                    doctor.setAvailableDays("Monday,Tuesday,Wednesday,Thursday,Friday");
+                    doctor.setAvailableTime("09:00 AM - 05:00 PM");
+
+                    // Use profile_image for imageUrl if available
+                    String profileImage = rs.getString("profile_image");
+                    if (profileImage != null && !profileImage.isEmpty()) {
+                        doctor.setImageUrl(profileImage);
+                        doctor.setProfileImage(profileImage);
+                    } else {
+                        doctor.setImageUrl("/assets/images/doctors/default-doctor.png");
+                        doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                    }
+
+                    // Set bio if available
+                    String bio = rs.getString("bio");
+                    if (bio != null) {
+                        doctor.setBio(bio);
+                    }
+
+                    // Set rating and patient count
+                    doctor.setRating(rs.getDouble("rating"));
+                    doctor.setPatientCount(rs.getInt("patient_count"));
+                    doctor.setSuccessRate(90); // Default value
+
+                    // Only add doctors with valid information
+                    if (name != null && !name.isEmpty() &&
+                        doctor.getSpecialization() != null && !doctor.getSpecialization().isEmpty()) {
+                        doctors.add(doctor);
+                    }
+                }
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            System.out.println("Error getting approved doctors by specialization: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        System.out.println("Returning " + doctors.size() + " approved doctors with specialization: " + specialization + " from database");
+
+        return doctors;
+    }
+
+    // Get approved doctors by search term (for public display)
+    public List<Doctor> searchApprovedDoctors(String searchTerm) {
+        List<Doctor> doctors = new ArrayList<>();
+
+        // Query to get only doctors that have been approved by admin matching the search term
+        String query = "SELECT d.id, d.user_id, d.specialization, d.qualification, d.experience, " +
+                      "d.consultation_fee, d.profile_image, d.bio, d.department_id, d.rating, d.patient_count, " +
+                      "u.first_name, u.last_name, u.email AS user_email, u.phone AS user_phone, u.address AS user_address " +
+                      "FROM doctors d " +
+                      "JOIN users u ON d.user_id = u.id " +
+                      "WHERE (d.specialization LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ?) " +
+                      "AND u.role = 'DOCTOR'";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            String searchPattern = "%" + searchTerm + "%";
+            pstmt.setString(1, searchPattern);
+            pstmt.setString(2, searchPattern);
+            pstmt.setString(3, searchPattern);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Doctor doctor = new Doctor();
+                    doctor.setId(rs.getInt("id"));
+
+                    // Construct name from first_name and last_name
+                    String firstName = rs.getString("first_name");
+                    String lastName = rs.getString("last_name");
+                    String name = "Dr. " + (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                    name = name.trim();
+                    doctor.setName(name);
+
+                    doctor.setSpecialization(rs.getString("specialization"));
+                    doctor.setQualification(rs.getString("qualification"));
+                    doctor.setExperience(rs.getString("experience"));
+
+                    // Set email from users table
+                    doctor.setEmail(rs.getString("user_email"));
+
+                    // Set phone from users table
+                    doctor.setPhone(rs.getString("user_phone"));
+
+                    // Set address from users table
+                    doctor.setAddress(rs.getString("user_address"));
+
+                    // Get consultation fee, set default if null
+                    String consultationFee = rs.getString("consultation_fee");
+                    if (consultationFee == null || consultationFee.isEmpty()) {
+                        consultationFee = "1000";
+                    }
+                    doctor.setConsultationFee(consultationFee);
+
+                    // Set default values for fields that might not exist in the database
+                    doctor.setAvailableDays("Monday,Tuesday,Wednesday,Thursday,Friday");
+                    doctor.setAvailableTime("09:00 AM - 05:00 PM");
+
+                    // Use profile_image for imageUrl if available
+                    String profileImage = rs.getString("profile_image");
+                    if (profileImage != null && !profileImage.isEmpty()) {
+                        doctor.setImageUrl(profileImage);
+                        doctor.setProfileImage(profileImage);
+                    } else {
+                        doctor.setImageUrl("/assets/images/doctors/default-doctor.png");
+                        doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                    }
+
+                    // Set bio if available
+                    String bio = rs.getString("bio");
+                    if (bio != null) {
+                        doctor.setBio(bio);
+                    }
+
+                    // Set rating and patient count
+                    doctor.setRating(rs.getDouble("rating"));
+                    doctor.setPatientCount(rs.getInt("patient_count"));
+                    doctor.setSuccessRate(90); // Default value
+
+                    // Only add doctors with valid information
+                    if (name != null && !name.isEmpty() &&
+                        doctor.getSpecialization() != null && !doctor.getSpecialization().isEmpty()) {
+                        doctors.add(doctor);
+                    }
+                }
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            System.out.println("Error searching approved doctors: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return doctors;
+    }
+
     // Get top doctors
     public List<Doctor> getTopDoctors(int limit) {
         List<Doctor> doctors = new ArrayList<>();
@@ -685,7 +974,10 @@ public class DoctorDAO {
                     doctor.setId(rs.getInt("id"));
 
                     // Combine first and last name from users table
-                    String fullName = rs.getString("first_name") + " " + rs.getString("last_name");
+                    String firstName = rs.getString("first_name");
+                    String lastName = rs.getString("last_name");
+                    String fullName = "Dr. " + (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                    fullName = fullName.trim();
                     doctor.setName(fullName);
 
                     doctor.setSpecialization(rs.getString("specialization"));
@@ -694,8 +986,28 @@ public class DoctorDAO {
                     doctor.setEmail(rs.getString("email"));
                     doctor.setPhone(rs.getString("phone"));
                     doctor.setAddress(rs.getString("address"));
-                    doctor.setConsultationFee(rs.getString("consultation_fee"));
-                    doctor.setImageUrl(rs.getString("profile_image"));
+
+                    // Get consultation fee, set default if null
+                    String consultationFee = rs.getString("consultation_fee");
+                    if (consultationFee == null || consultationFee.isEmpty()) {
+                        consultationFee = "1000";
+                    }
+                    doctor.setConsultationFee(consultationFee);
+
+                    // Set default values for fields that might not exist in the database
+                    doctor.setAvailableDays("Monday,Tuesday,Wednesday,Thursday,Friday");
+                    doctor.setAvailableTime("09:00 AM - 05:00 PM");
+
+                    // Use profile_image for imageUrl if available
+                    String profileImage = rs.getString("profile_image");
+                    if (profileImage != null && !profileImage.isEmpty()) {
+                        doctor.setImageUrl(profileImage);
+                        doctor.setProfileImage(profileImage);
+                    } else {
+                        doctor.setImageUrl("/assets/images/doctors/default-doctor.png");
+                        doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                    }
+
                     doctor.setRating(rs.getDouble("rating"));
                     doctor.setPatientCount(rs.getInt("patient_count"));
                     doctor.setSuccessRate(90); // Default value for now
@@ -705,46 +1017,81 @@ public class DoctorDAO {
             }
 
         } catch (SQLException | ClassNotFoundException e) {
+            System.out.println("Error getting top doctors: " + e.getMessage());
             e.printStackTrace();
-            // Fallback: Return some sample data if the query fails
-            if (doctors.isEmpty()) {
-                // Create sample doctors for testing
-                Doctor doctor1 = new Doctor();
-                doctor1.setId(1);
-                doctor1.setName("Dr. John Smith");
-                doctor1.setSpecialization("Cardiologist");
-                doctor1.setQualification("MD, MBBS");
-                doctor1.setExperience("10 years");
-                doctor1.setRating(4.8);
-                doctor1.setPatientCount(125);
-                doctor1.setSuccessRate(98);
-
-                Doctor doctor2 = new Doctor();
-                doctor2.setId(2);
-                doctor2.setName("Dr. Sarah Johnson");
-                doctor2.setSpecialization("Neurologist");
-                doctor2.setQualification("MD, PhD");
-                doctor2.setExperience("8 years");
-                doctor2.setRating(4.9);
-                doctor2.setPatientCount(110);
-                doctor2.setSuccessRate(95);
-
-                Doctor doctor3 = new Doctor();
-                doctor3.setId(3);
-                doctor3.setName("Dr. Michael Brown");
-                doctor3.setSpecialization("Orthopedic");
-                doctor3.setQualification("MBBS, MS");
-                doctor3.setExperience("12 years");
-                doctor3.setRating(4.7);
-                doctor3.setPatientCount(95);
-                doctor3.setSuccessRate(92);
-
-                doctors.add(doctor1);
-                doctors.add(doctor2);
-                doctors.add(doctor3);
-            }
         }
 
+        System.out.println("Returning " + doctors.size() + " top doctors from database");
+
         return doctors;
+    }
+
+    /**
+     * Get the count of approved doctors
+     * @return The count of approved doctors
+     */
+    public int getApprovedDoctorsCount() {
+        String query = "SELECT COUNT(*) FROM doctors d JOIN users u ON d.user_id = u.id WHERE u.role = 'DOCTOR'";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Error getting approved doctors count: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    /**
+     * Get the count of rejected doctor requests
+     * @return The count of rejected doctor requests
+     */
+    public int getRejectedDoctorsCount() {
+        String query = "SELECT COUNT(*) FROM doctor_registration_requests WHERE status = 'REJECTED'";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Error getting rejected doctors count: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    /**
+     * Get the count of pending doctor requests
+     * @return The count of pending doctor requests
+     */
+    public int getPendingDoctorsCount() {
+        String query = "SELECT COUNT(*) FROM doctor_registration_requests WHERE status = 'PENDING'";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Error getting pending doctors count: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return 0;
     }
 }

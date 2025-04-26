@@ -16,7 +16,34 @@
         <%@ include file="../css/adminDashboard.css" %>
     </style>
     <style>
-        /* No status badges needed as we only show pending requests */
+        /* Status badges */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending {
+            background-color: #fff8e1;
+            color: #ff9800;
+            border: 1px solid #ffcc80;
+        }
+
+        .status-approved {
+            background-color: #e8f5e9;
+            color: #4caf50;
+            border: 1px solid #a5d6a7;
+        }
+
+        .status-rejected {
+            background-color: #ffebee;
+            color: #f44336;
+            border: 1px solid #ef9a9a;
+        }
 
         /* Card header styling */
         .card-header {
@@ -268,7 +295,7 @@
 
                 <div class="card">
                     <div class="card-header">
-                        <h3>Pending Doctor Requests</h3>
+                        <h3>Doctor Registration Requests</h3>
                     </div>
                     <div class="card-body">
                         <%
@@ -284,6 +311,7 @@
                                         <th>Email</th>
                                         <th>Specialization</th>
                                         <th>Date</th>
+                                        <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -296,16 +324,33 @@
                                         <td><%= req.getSpecialization() %></td>
                                         <td><%= req.getCreatedAt() %></td>
                                         <td>
+                                            <%
+                                            String status = req.getStatus();
+                                            String statusClass = "";
+
+                                            if ("PENDING".equals(status)) {
+                                                statusClass = "status-pending";
+                                            } else if ("APPROVED".equals(status)) {
+                                                statusClass = "status-approved";
+                                            } else if ("REJECTED".equals(status)) {
+                                                statusClass = "status-rejected";
+                                            }
+                                            %>
+                                            <span class="status-badge <%= statusClass %>"><%= status %></span>
+                                        </td>
+                                        <td>
                                             <div class="action-buttons">
                                                 <a href="${pageContext.request.contextPath}/admin/doctor-request/view?id=<%= req.getId() %>" class="btn-icon btn-view" title="View Details">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
+                                                <% if ("PENDING".equals(req.getStatus())) { %>
                                                 <a href="#" class="btn-icon btn-approve" title="Approve" onclick="approveRequest(<%= req.getId() %>)">
                                                     <i class="fas fa-check"></i>
                                                 </a>
                                                 <a href="#" class="btn-icon btn-reject" title="Reject" onclick="rejectRequest(<%= req.getId() %>)">
                                                     <i class="fas fa-times"></i>
                                                 </a>
+                                                <% } %>
                                             </div>
                                         </td>
                                     </tr>

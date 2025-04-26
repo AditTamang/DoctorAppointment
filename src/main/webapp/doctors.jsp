@@ -118,43 +118,43 @@
 
             <!-- Specialty Quick Filters -->
             <div class="specialty-filters">
-                <a href="doctors" class="specialty-filter <%= request.getAttribute("specialization") == null ? "active" : "" %>">
+                <a href="javascript:void(0);" onclick="filterBySpecialty('')" class="specialty-filter <%= request.getAttribute("specialization") == null ? "active" : "" %>">
                     <div class="specialty-icon">
                         <i class="fas fa-user-md"></i>
                     </div>
                     <span>All</span>
                 </a>
-                <a href="doctors?specialization=Cardiologist" class="specialty-filter <%= request.getAttribute("specialization") != null && request.getAttribute("specialization").equals("Cardiologist") ? "active" : "" %>">
+                <a href="javascript:void(0);" onclick="filterBySpecialty('Cardiologist')" class="specialty-filter <%= request.getAttribute("specialization") != null && request.getAttribute("specialization").equals("Cardiologist") ? "active" : "" %>">
                     <div class="specialty-icon">
                         <i class="fas fa-heartbeat"></i>
                     </div>
                     <span>Cardiology</span>
                 </a>
-                <a href="doctors?specialization=Neurologist" class="specialty-filter <%= request.getAttribute("specialization") != null && request.getAttribute("specialization").equals("Neurologist") ? "active" : "" %>">
+                <a href="javascript:void(0);" onclick="filterBySpecialty('Neurologist')" class="specialty-filter <%= request.getAttribute("specialization") != null && request.getAttribute("specialization").equals("Neurologist") ? "active" : "" %>">
                     <div class="specialty-icon">
                         <i class="fas fa-brain"></i>
                     </div>
                     <span>Neurology</span>
                 </a>
-                <a href="doctors?specialization=Orthopedic" class="specialty-filter <%= request.getAttribute("specialization") != null && request.getAttribute("specialization").equals("Orthopedic") ? "active" : "" %>">
+                <a href="javascript:void(0);" onclick="filterBySpecialty('Orthopedic')" class="specialty-filter <%= request.getAttribute("specialization") != null && request.getAttribute("specialization").equals("Orthopedic") ? "active" : "" %>">
                     <div class="specialty-icon">
                         <i class="fas fa-bone"></i>
                     </div>
                     <span>Orthopedic</span>
                 </a>
-                <a href="doctors?specialization=Dermatologist" class="specialty-filter <%= request.getAttribute("specialization") != null && request.getAttribute("specialization").equals("Dermatologist") ? "active" : "" %>">
+                <a href="javascript:void(0);" onclick="filterBySpecialty('Dermatologist')" class="specialty-filter <%= request.getAttribute("specialization") != null && request.getAttribute("specialization").equals("Dermatologist") ? "active" : "" %>">
                     <div class="specialty-icon">
                         <i class="fas fa-allergies"></i>
                     </div>
                     <span>Dermatology</span>
                 </a>
-                <a href="doctors?specialization=Pediatrician" class="specialty-filter <%= request.getAttribute("specialization") != null && request.getAttribute("specialization").equals("Pediatrician") ? "active" : "" %>">
+                <a href="javascript:void(0);" onclick="filterBySpecialty('Pediatrician')" class="specialty-filter <%= request.getAttribute("specialization") != null && request.getAttribute("specialization").equals("Pediatrician") ? "active" : "" %>">
                     <div class="specialty-icon">
                         <i class="fas fa-baby"></i>
                     </div>
                     <span>Pediatrics</span>
                 </a>
-                <a href="doctors?specialization=Gynecologist" class="specialty-filter <%= request.getAttribute("specialization") != null && request.getAttribute("specialization").equals("Gynecologist") ? "active" : "" %>">
+                <a href="javascript:void(0);" onclick="filterBySpecialty('Gynecologist')" class="specialty-filter <%= request.getAttribute("specialization") != null && request.getAttribute("specialization").equals("Gynecologist") ? "active" : "" %>">
                     <div class="specialty-icon">
                         <i class="fas fa-venus"></i>
                     </div>
@@ -240,7 +240,8 @@
                         <i class="fas fa-user-md"></i>
                     </div>
                     <h3>No Doctors Found</h3>
-                    <p>We couldn't find any doctors matching your criteria. Please try a different specialization or check back later.</p>
+                    <p>We couldn't find any approved doctors matching your criteria. Please try a different specialization or check back later.</p>
+                    <p>Our admin team is reviewing doctor applications. New doctors will be available soon!</p>
                     <a href="doctors" class="btn btn-primary">View All Doctors</a>
                 </div>
                 <% } %>
@@ -249,15 +250,15 @@
             <!-- Pagination -->
             <% if(doctors != null && !doctors.isEmpty()) { %>
             <div class="pagination">
-                <a href="#" class="pagination-arrow">
+                <a href="javascript:void(0);" class="pagination-arrow">
                     <i class="fas fa-chevron-left"></i>
                 </a>
-                <a href="#" class="pagination-number active">1</a>
-                <a href="#" class="pagination-number">2</a>
-                <a href="#" class="pagination-number">3</a>
+                <a href="javascript:void(0);" class="pagination-number active">1</a>
+                <a href="javascript:void(0);" class="pagination-number">2</a>
+                <a href="javascript:void(0);" class="pagination-number">3</a>
                 <span class="pagination-dots">...</span>
-                <a href="#" class="pagination-number">10</a>
-                <a href="#" class="pagination-arrow">
+                <a href="javascript:void(0);" class="pagination-number">10</a>
+                <a href="javascript:void(0);" class="pagination-arrow">
                     <i class="fas fa-chevron-right"></i>
                 </a>
             </div>
@@ -360,5 +361,44 @@
     </footer>
 
     <script src="${pageContext.request.contextPath}/assets/js/script.js"></script>
+    <script>
+        // Function to filter doctors by specialty
+        function filterBySpecialty(specialty) {
+            // Update the active class on the specialty filters
+            document.querySelectorAll('.specialty-filter').forEach(filter => {
+                filter.classList.remove('active');
+            });
+
+            // Find the clicked filter and add the active class
+            if (specialty === '') {
+                document.querySelector('.specialty-filter:first-child').classList.add('active');
+            } else {
+                document.querySelectorAll('.specialty-filter').forEach(filter => {
+                    if (filter.querySelector('span').textContent.trim() === specialty ||
+                        filter.querySelector('span').textContent.trim() === specialty + 'y') {
+                        filter.classList.add('active');
+                    }
+                });
+            }
+
+            // Redirect to the appropriate URL
+            if (specialty === '') {
+                window.location.href = 'doctors';
+            } else {
+                window.location.href = 'doctors?specialization=' + specialty;
+            }
+        }
+
+        // Add event listener to the pagination links to prevent default behavior
+        document.addEventListener('DOMContentLoaded', function() {
+            const paginationLinks = document.querySelectorAll('.pagination a');
+            paginationLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Pagination functionality would be implemented here
+                });
+            });
+        });
+    </script>
 </body>
 </html>

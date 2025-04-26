@@ -86,13 +86,34 @@ public class DashboardServlet extends HttpServlet {
             int totalAppointments = appointmentDAO.getTotalAppointments();
             double totalRevenue = appointmentDAO.getTotalRevenue();
 
-            System.out.println("Admin dashboard stats: Doctors=" + totalDoctors + ", Patients=" + totalPatients + ", Appointments=" + totalAppointments);
+            // Get doctor counts by status
+            int approvedDoctors = doctorDAO.getApprovedDoctorsCount();
+            int pendingDoctors = doctorDAO.getPendingDoctorsCount();
+            int rejectedDoctors = doctorDAO.getRejectedDoctorsCount();
 
-            // Get recent appointments
+            // Get today's appointments count
+            int todayAppointments = appointmentDAO.getTodayAppointmentsCount();
+
+            // Get new bookings count (pending appointments)
+            int newBookings = appointmentDAO.getPendingAppointmentsCount();
+
+            System.out.println("Admin dashboard stats: Doctors=" + totalDoctors + ", Patients=" + totalPatients + ", Appointments=" + totalAppointments);
+            System.out.println("Doctor status counts: Approved=" + approvedDoctors + ", Pending=" + pendingDoctors + ", Rejected=" + rejectedDoctors);
+
+            // Set attributes for the dashboard
             request.setAttribute("totalDoctors", totalDoctors);
             request.setAttribute("totalPatients", totalPatients);
             request.setAttribute("totalAppointments", totalAppointments);
             request.setAttribute("totalRevenue", totalRevenue);
+            request.setAttribute("approvedDoctors", approvedDoctors);
+            request.setAttribute("pendingDoctors", pendingDoctors);
+            request.setAttribute("rejectedDoctors", rejectedDoctors);
+            request.setAttribute("todayAppointments", todayAppointments);
+            request.setAttribute("newBookings", newBookings);
+
+            // Get upcoming appointments and sessions
+            request.setAttribute("upcomingAppointments", appointmentDAO.getUpcomingAppointments(5));
+            request.setAttribute("upcomingSessions", appointmentDAO.getUpcomingSessions(5));
             request.setAttribute("recentAppointments", appointmentDAO.getRecentAppointments(5));
             request.setAttribute("topDoctors", doctorDAO.getTopDoctors(3));
 

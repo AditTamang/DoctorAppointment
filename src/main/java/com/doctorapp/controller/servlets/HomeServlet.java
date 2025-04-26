@@ -27,8 +27,13 @@ public class HomeServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            // Get top doctors for the home page (featured doctors)
-            List<Doctor> featuredDoctors = doctorService.getTopDoctors(3);
+            // Get top approved doctors for the home page (featured doctors)
+            // Only show doctors that have been approved by admin
+            List<Doctor> featuredDoctors = doctorService.getApprovedDoctors();
+            // Limit to 3 doctors for display
+            if (featuredDoctors.size() > 3) {
+                featuredDoctors = featuredDoctors.subList(0, 3);
+            }
             request.setAttribute("featuredDoctors", featuredDoctors);
 
             // Check if there's a redirect parameter

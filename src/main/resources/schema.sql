@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS prescriptions;
 DROP TABLE IF EXISTS appointments;
 DROP TABLE IF EXISTS doctor_schedules;
 DROP TABLE IF EXISTS doctor_ratings;
+DROP TABLE IF EXISTS doctor_settings;
 DROP TABLE IF EXISTS doctors;
 DROP TABLE IF EXISTS patients;
 DROP TABLE IF EXISTS departments;
@@ -201,5 +202,19 @@ CREATE TABLE doctor_registration_requests (
     admin_notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Create doctor_settings table
+CREATE TABLE doctor_settings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    doctor_id INT NOT NULL,
+    appointment_duration INT DEFAULT 30,
+    max_appointments_per_day INT DEFAULT 20,
+    notification_preferences VARCHAR(255) DEFAULT 'email,sms',
+    working_days VARCHAR(255) DEFAULT 'Monday,Tuesday,Wednesday,Thursday,Friday',
+    working_hours VARCHAR(255) DEFAULT '09:00-17:00',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE
 );
 

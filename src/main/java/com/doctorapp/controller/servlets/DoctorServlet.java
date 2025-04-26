@@ -85,11 +85,19 @@ public class DoctorServlet extends HttpServlet {
         List<Doctor> doctors;
 
         if (specialization != null && !specialization.isEmpty()) {
-            doctors = doctorService.getDoctorsBySpecialization(specialization);
+            // Use approved doctors by specialization for public display
+            System.out.println("Fetching doctors with specialization: " + specialization);
+            doctors = doctorService.getApprovedDoctorsBySpecialization(specialization);
         } else {
-            doctors = doctorService.getAllDoctors();
+            // Use approved doctors for public display
+            System.out.println("Fetching all approved doctors");
+            doctors = doctorService.getApprovedDoctors();
         }
 
+        System.out.println("Found " + (doctors != null ? doctors.size() : 0) + " doctors");
+
+        // Set the specialization attribute for the JSP
+        request.setAttribute("specialization", specialization);
         request.setAttribute("doctors", doctors);
         request.getRequestDispatcher("/doctors.jsp").forward(request, response);
     }

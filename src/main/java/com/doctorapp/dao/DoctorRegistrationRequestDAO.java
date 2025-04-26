@@ -92,9 +92,23 @@ public class DoctorRegistrationRequestDAO {
      * @return List of all doctor registration requests
      */
     public List<DoctorRegistrationRequest> getAllRequests() {
-        // Since approved and rejected requests are now deleted,
-        // this method will only return pending requests
-        return getPendingRequests();
+        List<DoctorRegistrationRequest> requests = new ArrayList<>();
+        String query = "SELECT * FROM doctor_registration_requests ORDER BY created_at DESC";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                DoctorRegistrationRequest request = mapResultSetToRequest(rs);
+                requests.add(request);
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return requests;
     }
 
     /**
@@ -200,8 +214,8 @@ public class DoctorRegistrationRequestDAO {
     }
 
     /**
-     * Approve a doctor registration request and create the user and doctor records
-     * Then delete the request from doctor_registration_requests table
+     * Approve a doctor registration request, create the user and doctor records,
+     * and delete the request from doctor_registration_requests table
      * @param id The ID of the request
      * @param adminNotes Admin notes about the approval
      * @return true if the approval was successful, false otherwise
@@ -407,15 +421,15 @@ public class DoctorRegistrationRequestDAO {
                 throw e; // Re-throw to be handled by the caller
             }
 
-            // Now we can safely delete the request as it has been moved to users and doctors tables
-            System.out.println("Deleting doctor registration request with ID: " + id + " after successful approval");
+            // Delete the request after approval
+            System.out.println("Deleting doctor registration request with ID: " + id + " after approval");
 
             // Delete the request
             String deleteQuery = "DELETE FROM doctor_registration_requests WHERE id = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(deleteQuery)) {
                 pstmt.setInt(1, id);
                 int rowsAffected = pstmt.executeUpdate();
-                System.out.println("Doctor registration request deleted. Rows affected: " + rowsAffected);
+                System.out.println("Doctor registration request deleted after approval. Rows affected: " + rowsAffected);
 
                 if (rowsAffected <= 0) {
                     System.err.println("Warning: Failed to delete request after approval, but user and doctor records were created successfully.");
@@ -475,6 +489,7 @@ public class DoctorRegistrationRequestDAO {
 
     /**
      * Reject a doctor registration request and delete it from the database
+     * This completely removes the request from the doctor_registration_requests table
      * @param id The ID of the request
      * @param adminNotes Admin notes about the rejection (reason for rejection)
      * @return true if the rejection was successful, false otherwise
@@ -493,7 +508,7 @@ public class DoctorRegistrationRequestDAO {
             return false;
         }
 
-        // Delete the request directly
+        // Delete the request after rejection
         String deleteQuery = "DELETE FROM doctor_registration_requests WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection()) {
@@ -501,7 +516,7 @@ public class DoctorRegistrationRequestDAO {
             conn.setAutoCommit(false);
 
             try {
-                // Log the rejection reason before deleting (for audit purposes)
+                // Log the rejection reason
                 System.out.println("Rejecting doctor registration request with ID: " + id +
                                   ", Reason: " + (adminNotes != null ? adminNotes : "Rejected by admin"));
 

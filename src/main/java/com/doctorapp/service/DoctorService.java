@@ -35,7 +35,7 @@ public class DoctorService {
     }
 
     /**
-     * Get all doctors
+     * Get all doctors (for admin use)
      * @return List of all doctors
      */
     public List<Doctor> getAllDoctors() {
@@ -43,7 +43,15 @@ public class DoctorService {
     }
 
     /**
-     * Search doctors by name or email
+     * Get only approved doctors (for public display)
+     * @return List of approved doctors
+     */
+    public List<Doctor> getApprovedDoctors() {
+        return doctorDAO.getApprovedDoctors();
+    }
+
+    /**
+     * Search doctors by name or email (for admin use)
      * @param searchTerm Term to search for in name or email
      * @return List of doctors matching the search term
      */
@@ -52,12 +60,30 @@ public class DoctorService {
     }
 
     /**
-     * Get doctors by specialization
+     * Search approved doctors by name or specialization (for public display)
+     * @param searchTerm Term to search for in name or specialization
+     * @return List of approved doctors matching the search term
+     */
+    public List<Doctor> searchApprovedDoctors(String searchTerm) {
+        return doctorDAO.searchApprovedDoctors(searchTerm);
+    }
+
+    /**
+     * Get doctors by specialization (for admin use)
      * @param specialization Specialization to filter by
      * @return List of doctors with the specified specialization
      */
     public List<Doctor> getDoctorsBySpecialization(String specialization) {
         return doctorDAO.getDoctorsBySpecialization(specialization);
+    }
+
+    /**
+     * Get approved doctors by specialization (for public display)
+     * @param specialization Specialization to filter by
+     * @return List of approved doctors with the specified specialization
+     */
+    public List<Doctor> getApprovedDoctorsBySpecialization(String specialization) {
+        return doctorDAO.getApprovedDoctorsBySpecialization(specialization);
     }
 
     /**
@@ -84,6 +110,14 @@ public class DoctorService {
      */
     public int getTotalDoctors() {
         return doctorDAO.getTotalDoctors();
+    }
+
+    /**
+     * Get total number of approved doctors
+     * @return Total number of approved doctors
+     */
+    public int getTotalApprovedDoctors() {
+        return doctorDAO.getApprovedDoctorsCount();
     }
 
     /**

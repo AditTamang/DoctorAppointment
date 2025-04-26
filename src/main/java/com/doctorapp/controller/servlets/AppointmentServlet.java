@@ -4,19 +4,19 @@ import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-
 import com.doctorapp.model.Appointment;
 import com.doctorapp.model.Doctor;
 import com.doctorapp.model.User;
 import com.doctorapp.service.AppointmentService;
 import com.doctorapp.service.DoctorService;
 import com.doctorapp.service.PatientService;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet(urlPatterns = {
     "/appointments",
@@ -148,8 +148,8 @@ public class AppointmentServlet extends HttpServlet {
             request.setAttribute("doctor", doctor);
         }
 
-        // Get all doctors for dropdown
-        List<Doctor> doctors = doctorService.getAllDoctors();
+        // Get all approved doctors for dropdown
+        List<Doctor> doctors = doctorService.getApprovedDoctors();
         request.setAttribute("doctors", doctors);
 
         request.getRequestDispatcher("/book-appointment.jsp").forward(request, response);

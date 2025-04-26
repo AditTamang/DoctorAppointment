@@ -227,7 +227,7 @@ public class DoctorRequestsServlet extends HttpServlet {
             boolean success = doctorRegistrationService.rejectRequest(id, adminNotes);
 
             if (success) {
-                session.setAttribute("message", "Doctor registration request rejected and removed from the system successfully!");
+                session.setAttribute("message", "Doctor registration request rejected successfully! Request has been removed from the system.");
                 System.out.println("Doctor registration rejected successfully for ID: " + id);
             } else {
                 session.setAttribute("error", "Failed to reject doctor registration request. Please check the logs for details and try again.");

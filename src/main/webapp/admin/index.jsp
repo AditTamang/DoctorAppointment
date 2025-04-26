@@ -1,15 +1,24 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.doctorapp.model.User" %>
 <%@ page import="com.doctorapp.model.Doctor" %>
 <%@ page import="com.doctorapp.model.Patient" %>
 <%@ page import="com.doctorapp.model.Appointment" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%
+    // Check if user is logged in and is an admin
+    User user = (User) session.getAttribute("user");
+    if (user == null || !"ADMIN".equals(user.getRole())) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | HealthCare</title>
+    <title>Admin Dashboard | Doctor Appointment System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Include CSS files using JSP include directive -->
@@ -24,7 +33,11 @@
         <div class="dashboard-sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
-                    <img src="../images/logo.png" alt="HealthCare Logo">
+                    <% if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) { %>
+                        <div class="profile-initials">AT</div>
+                    <% } else { %>
+                        <img src="${pageContext.request.contextPath}/assets/images/admin/default.jpg" alt="Admin">
+                    <% } %>
                     <h2>Health<span>Care</span></h2>
                 </div>
                 <div class="sidebar-close" id="sidebarClose">
@@ -109,24 +122,10 @@
                 </div>
 
                 <div class="nav-right">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Search...">
-                    </div>
-
-                    <div class="nav-notifications">
-                        <div class="icon-badge">
-                            <i class="fas fa-bell"></i>
-                            <span class="badge">5</span>
-                        </div>
-                    </div>
-
-                    <div class="nav-user">
-                        <img src="../images/admin-avatar.jpg" alt="Admin">
-                        <div class="user-info">
-                            <h4>Admin User</h4>
-                            <p>Administrator</p>
-                        </div>
+                    <div class="logout-nav">
+                        <a href="${pageContext.request.contextPath}/logout" class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
                     </div>
                 </div>
             </div>
@@ -138,149 +137,126 @@
                     <p>Welcome to the admin dashboard</p>
                 </div>
 
-                <!-- Stats Cards -->
-                <div class="stats-container">
-                    <div class="stat-card">
-                        <div class="stat-card-icon blue">
-                            <i class="fas fa-user-md"></i>
-                        </div>
-                        <div class="stat-card-info">
-                            <h3>Total Doctors</h3>
-                            <h2>42</h2>
-                            <p><span class="positive"><i class="fas fa-arrow-up"></i> 12%</span> from last month</p>
-                        </div>
+                <!-- Date Display -->
+                <div class="date-container">
+                    <div class="date-display">
+                        Today's Date: <span class="today-date"></span>
                     </div>
+                </div>
 
-                    <div class="stat-card">
-                        <div class="stat-card-icon green">
-                            <i class="fas fa-users"></i>
+                <!-- Status Section -->
+                <div class="status-section">
+                    <h2>Status</h2>
+                    <div class="status-cards">
+                        <div class="status-card">
+                            <div class="status-number"><%= request.getAttribute("approvedDoctors") %></div>
+                            <div class="status-label">Doctors</div>
+                            <div class="status-icon"><i class="fas fa-user-md"></i></div>
                         </div>
-                        <div class="stat-card-info">
-                            <h3>Total Patients</h3>
-                            <h2>1,286</h2>
-                            <p><span class="positive"><i class="fas fa-arrow-up"></i> 8%</span> from last month</p>
-                        </div>
-                    </div>
 
-                    <div class="stat-card">
-                        <div class="stat-card-icon purple">
-                            <i class="fas fa-calendar-check"></i>
+                        <div class="status-card">
+                            <div class="status-number"><%= request.getAttribute("totalPatients") %></div>
+                            <div class="status-label">Patients</div>
+                            <div class="status-icon"><i class="fas fa-users"></i></div>
                         </div>
-                        <div class="stat-card-info">
-                            <h3>Appointments</h3>
-                            <h2>152</h2>
-                            <p><span class="positive"><i class="fas fa-arrow-up"></i> 5%</span> from last month</p>
-                        </div>
-                    </div>
 
-                    <div class="stat-card">
-                        <div class="stat-card-icon orange">
-                            <i class="fas fa-money-bill-wave"></i>
+                        <div class="status-card">
+                            <div class="status-number"><%= request.getAttribute("newBookings") %></div>
+                            <div class="status-label">NewBooking</div>
+                            <div class="status-icon"><i class="fas fa-calendar-plus"></i></div>
                         </div>
-                        <div class="stat-card-info">
-                            <h3>Revenue</h3>
-                            <h2>$24,500</h2>
-                            <p><span class="positive"><i class="fas fa-arrow-up"></i> 15%</span> from last month</p>
+
+                        <div class="status-card">
+                            <div class="status-number"><%= request.getAttribute("todayAppointments") %></div>
+                            <div class="status-label">Today Sessions</div>
+                            <div class="status-icon"><i class="fas fa-calendar-check"></i></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Charts Section -->
-                <div class="charts-container">
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Appointment Statistics</h3>
-                            <div class="chart-actions">
-                                <select>
-                                    <option>Last 7 Days</option>
-                                    <option>Last 30 Days</option>
-                                    <option>Last 90 Days</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="chart-body">
-                            <canvas id="appointmentChart"></canvas>
+                <!-- Upcoming Appointments Section -->
+                <div class="upcoming-section">
+                    <div class="upcoming-appointments">
+                        <h2>Upcoming Appointments until Next Friday</h2>
+                        <p>Here's Quick access to Upcoming Appointments until 7 days<br>
+                        More details available in @Appointment section.</p>
+
+                        <table class="appointment-table">
+                            <thead>
+                                <tr>
+                                    <th>Appointment number</th>
+                                    <th>Patient name</th>
+                                    <th>Doctor</th>
+                                    <th>Session</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <%
+                                java.util.List<com.doctorapp.model.Appointment> upcomingAppointments =
+                                    (java.util.List<com.doctorapp.model.Appointment>)request.getAttribute("upcomingAppointments");
+                                if(upcomingAppointments != null && !upcomingAppointments.isEmpty()) {
+                                    for(com.doctorapp.model.Appointment appointment : upcomingAppointments) {
+                                %>
+                                <tr>
+                                    <td><%= appointment.getId() %></td>
+                                    <td><%= appointment.getPatientName() %></td>
+                                    <td><%= appointment.getDoctorName() %></td>
+                                    <td><%= appointment.getAppointmentDate() %> <%= appointment.getAppointmentTime() %></td>
+                                </tr>
+                                <%
+                                    }
+                                } else {
+                                %>
+                                <tr>
+                                    <td colspan="4">No upcoming appointments found</td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+
+                        <div class="show-all-btn">
+                            <a href="appointments.jsp" class="btn">Show all Appointments</a>
                         </div>
                     </div>
 
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Revenue Overview</h3>
-                            <div class="chart-actions">
-                                <select>
-                                    <option>Last 7 Days</option>
-                                    <option>Last 30 Days</option>
-                                    <option>Last 90 Days</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="chart-body">
-                            <canvas id="revenueChart"></canvas>
-                        </div>
-                    </div>
-                </div>
+                    <div class="upcoming-sessions">
+                        <h2>Upcoming Sessions until Next Friday</h2>
+                        <p>Here's Quick access to Upcoming Sessions that Scheduled until 7 days<br>
+                        Add/Remove and Many features available in @Schedule section.</p>
 
-                <!-- Recent Activity -->
-                <div class="recent-activity">
-                    <div class="section-header">
-                        <h3>Recent Activity</h3>
-                        <a href="#" class="view-all">View All</a>
-                    </div>
+                        <table class="session-table">
+                            <thead>
+                                <tr>
+                                    <th>Session Title</th>
+                                    <th>Doctor</th>
+                                    <th>Scheduled Date & Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <%
+                                java.util.List<com.doctorapp.model.Appointment> upcomingSessions =
+                                    (java.util.List<com.doctorapp.model.Appointment>)request.getAttribute("upcomingSessions");
+                                if(upcomingSessions != null && !upcomingSessions.isEmpty()) {
+                                    for(com.doctorapp.model.Appointment session : upcomingSessions) {
+                                %>
+                                <tr>
+                                    <td>Appointment #<%= session.getId() %></td>
+                                    <td><%= session.getDoctorName() %></td>
+                                    <td><%= session.getAppointmentDate() %> <%= session.getAppointmentTime() %></td>
+                                </tr>
+                                <%
+                                    }
+                                } else {
+                                %>
+                                <tr>
+                                    <td colspan="3">No upcoming sessions found</td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
 
-                    <div class="activity-list">
-                        <div class="activity-item">
-                            <div class="activity-icon green">
-                                <i class="fas fa-user-plus"></i>
-                            </div>
-                            <div class="activity-details">
-                                <h4>New doctor registered</h4>
-                                <p>Dr. Sarah Johnson (Neurologist) has registered</p>
-                                <span class="activity-time">2 hours ago</span>
-                            </div>
-                        </div>
-
-                        <div class="activity-item">
-                            <div class="activity-icon blue">
-                                <i class="fas fa-calendar-plus"></i>
-                            </div>
-                            <div class="activity-details">
-                                <h4>New appointment booked</h4>
-                                <p>John Smith booked an appointment with Dr. Michael Brown</p>
-                                <span class="activity-time">3 hours ago</span>
-                            </div>
-                        </div>
-
-                        <div class="activity-item">
-                            <div class="activity-icon orange">
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <div class="activity-details">
-                                <h4>New review received</h4>
-                                <p>Dr. Emily Parker received a 5-star review</p>
-                                <span class="activity-time">5 hours ago</span>
-                            </div>
-                        </div>
-
-                        <div class="activity-item">
-                            <div class="activity-icon purple">
-                                <i class="fas fa-calendar-times"></i>
-                            </div>
-                            <div class="activity-details">
-                                <h4>Appointment cancelled</h4>
-                                <p>Robert Wilson cancelled his appointment with Dr. John Smith</p>
-                                <span class="activity-time">Yesterday</span>
-                            </div>
-                        </div>
-
-                        <div class="activity-item">
-                            <div class="activity-icon red">
-                                <i class="fas fa-exclamation-circle"></i>
-                            </div>
-                            <div class="activity-details">
-                                <h4>System alert</h4>
-                                <p>Server maintenance completed successfully</p>
-                                <span class="activity-time">Yesterday</span>
-                            </div>
+                        <div class="show-all-btn">
+                            <a href="sessions.jsp" class="btn">Show all Sessions</a>
                         </div>
                     </div>
                 </div>
@@ -459,7 +435,6 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Toggle sidebar on mobile
         document.getElementById('menuToggle').addEventListener('click', function() {
@@ -470,83 +445,22 @@
             document.querySelector('.dashboard-sidebar').classList.remove('active');
         });
 
-        // Charts
-        const appointmentCtx = document.getElementById('appointmentChart').getContext('2d');
-        const appointmentChart = new Chart(appointmentCtx, {
-            type: 'line',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [{
-                    label: 'Appointments',
-                    data: [15, 22, 18, 24, 30, 25, 18],
-                    backgroundColor: 'rgba(78, 84, 200, 0.1)',
-                    borderColor: '#4e54c8',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            display: true,
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
-                }
-            }
-        });
+        // Get today's date and display it
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
 
-        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-        const revenueChart = new Chart(revenueCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [{
-                    label: 'Revenue',
-                    data: [3500, 4200, 3800, 5000, 4800, 5500, 4000],
-                    backgroundColor: '#00d2ff',
-                    borderRadius: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            display: true,
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
-                }
-            }
-        });
+        // Add today's date to the page if there's a date element
+        const todayDate = new Date();
+        const dateElements = document.querySelectorAll('.today-date');
+        if (dateElements.length > 0) {
+            dateElements.forEach(element => {
+                element.textContent = formatDate(todayDate);
+            });
+        }
     </script>
 </body>
 </html>
