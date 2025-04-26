@@ -20,33 +20,33 @@
             margin-bottom: 30px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
-        
+
         .search-header {
             margin-bottom: 20px;
         }
-        
+
         .search-header h2 {
             font-size: 1.5rem;
             color: #333;
             margin-bottom: 5px;
         }
-        
+
         .search-header p {
             color: #666;
             font-size: 0.9rem;
         }
-        
+
         .search-form {
             display: flex;
             flex-wrap: wrap;
             gap: 15px;
         }
-        
+
         .search-group {
             flex: 1;
             min-width: 200px;
         }
-        
+
         .search-group label {
             display: block;
             margin-bottom: 8px;
@@ -54,7 +54,7 @@
             color: #555;
             font-size: 0.9rem;
         }
-        
+
         .search-input {
             width: 100%;
             padding: 10px 15px;
@@ -63,12 +63,12 @@
             font-size: 0.9rem;
             transition: border-color 0.3s;
         }
-        
+
         .search-input:focus {
             border-color: #4e73df;
             outline: none;
         }
-        
+
         .search-select {
             width: 100%;
             padding: 10px 15px;
@@ -81,7 +81,7 @@
             background-position: right 10px center;
             background-size: 20px;
         }
-        
+
         .search-button {
             background-color: #4e73df;
             color: white;
@@ -95,17 +95,17 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .search-button:hover {
             background-color: #3a5fc8;
         }
-        
+
         .search-button-container {
             display: flex;
             align-items: flex-end;
             margin-top: 24px;
         }
-        
+
         /* Specialty Filter Styles */
         .specialty-filters {
             display: flex;
@@ -113,7 +113,7 @@
             gap: 15px;
             margin-bottom: 30px;
         }
-        
+
         .specialty-filter {
             display: flex;
             flex-direction: column;
@@ -130,16 +130,16 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             border: 2px solid transparent;
         }
-        
+
         .specialty-filter:hover {
             transform: translateY(-5px);
         }
-        
+
         .specialty-filter.active {
             border-color: #4e73df;
             color: #4e73df;
         }
-        
+
         .specialty-icon {
             width: 50px;
             height: 50px;
@@ -152,18 +152,18 @@
             font-size: 1.5rem;
             color: #4e73df;
         }
-        
+
         .specialty-filter.active .specialty-icon {
             background-color: #4e73df;
             color: white;
         }
-        
+
         .specialty-filter span {
             font-size: 0.85rem;
             font-weight: 500;
             text-align: center;
         }
-        
+
         /* Doctor List Styles */
         .doctors-header {
             display: flex;
@@ -171,7 +171,7 @@
             align-items: center;
             margin-bottom: 20px;
         }
-        
+
         .doctors-count h3 {
             font-size: 1.2rem;
             color: #333;
@@ -179,7 +179,7 @@
             align-items: center;
             gap: 10px;
         }
-        
+
         .count-badge {
             background-color: #f0f4ff;
             color: #4e73df;
@@ -188,7 +188,7 @@
             font-size: 0.8rem;
             font-weight: 500;
         }
-        
+
         .doctors-sort select {
             padding: 8px 15px;
             border: 1px solid #ddd;
@@ -198,14 +198,14 @@
             background-color: #fff;
             cursor: pointer;
         }
-        
+
         .doctors-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
-        
+
         .doctor-card {
             background-color: #fff;
             border-radius: 10px;
@@ -214,12 +214,12 @@
             transition: transform 0.3s, box-shadow 0.3s;
             position: relative;
         }
-        
+
         .doctor-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
         }
-        
+
         .doctor-status {
             position: absolute;
             top: 15px;
@@ -232,24 +232,24 @@
             font-weight: 500;
             z-index: 1;
         }
-        
+
         .doctor-img {
             height: 200px;
             position: relative;
             overflow: hidden;
         }
-        
+
         .doctor-img img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             transition: transform 0.5s;
         }
-        
+
         .doctor-card:hover .doctor-img img {
             transform: scale(1.05);
         }
-        
+
         .doctor-rating {
             position: absolute;
             bottom: 10px;
@@ -262,41 +262,41 @@
             gap: 5px;
             font-size: 0.8rem;
         }
-        
+
         .doctor-rating i {
             color: #ffc107;
         }
-        
+
         .doctor-info {
             padding: 20px;
         }
-        
+
         .doctor-info h3 {
             margin: 0 0 5px 0;
             font-size: 1.1rem;
             color: #333;
         }
-        
+
         .doctor-info .specialization {
             color: #4e73df;
             font-weight: 500;
             margin-bottom: 5px;
             font-size: 0.9rem;
         }
-        
+
         .doctor-info p {
             color: #666;
             font-size: 0.85rem;
             margin-bottom: 15px;
             line-height: 1.5;
         }
-        
+
         .doctor-meta {
             display: flex;
             gap: 15px;
             margin-bottom: 15px;
         }
-        
+
         .doctor-meta-item {
             display: flex;
             align-items: center;
@@ -304,16 +304,16 @@
             font-size: 0.85rem;
             color: #555;
         }
-        
+
         .doctor-meta-item i {
             color: #4e73df;
         }
-        
+
         .doctor-actions {
             display: flex;
             gap: 10px;
         }
-        
+
         .doctor-actions a {
             flex: 1;
             text-align: center;
@@ -328,27 +328,27 @@
             justify-content: center;
             gap: 5px;
         }
-        
+
         .doctor-actions .btn-primary {
             background-color: #4e73df;
             color: white;
         }
-        
+
         .doctor-actions .btn-primary:hover {
             background-color: #3a5fc8;
         }
-        
+
         .doctor-actions .btn-outline {
             border: 1px solid #4e73df;
             color: #4e73df;
             background-color: transparent;
         }
-        
+
         .doctor-actions .btn-outline:hover {
             background-color: #4e73df;
             color: white;
         }
-        
+
         .no-results-card {
             grid-column: 1 / -1;
             background-color: #fff;
@@ -357,20 +357,20 @@
             text-align: center;
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
         }
-        
+
         .no-results-icon {
             font-size: 3rem;
             color: #4e73df;
             margin-bottom: 20px;
             opacity: 0.7;
         }
-        
+
         .no-results-card h3 {
             font-size: 1.5rem;
             color: #333;
             margin-bottom: 10px;
         }
-        
+
         .no-results-card p {
             color: #666;
             margin-bottom: 20px;
@@ -378,7 +378,7 @@
             margin-left: auto;
             margin-right: auto;
         }
-        
+
         .no-results-card .btn-primary {
             display: inline-block;
             background-color: #4e73df;
@@ -389,11 +389,11 @@
             font-weight: 500;
             transition: background-color 0.3s;
         }
-        
+
         .no-results-card .btn-primary:hover {
             background-color: #3a5fc8;
         }
-        
+
         /* Pagination Styles */
         .pagination {
             display: flex;
@@ -401,7 +401,7 @@
             gap: 5px;
             margin-top: 30px;
         }
-        
+
         .pagination a {
             display: flex;
             align-items: center;
@@ -414,28 +414,28 @@
             font-weight: 500;
             transition: background-color 0.3s, color 0.3s;
         }
-        
+
         .pagination-number {
             background-color: #f0f4ff;
         }
-        
+
         .pagination-number.active {
             background-color: #4e73df;
             color: white;
         }
-        
+
         .pagination-number:hover:not(.active) {
             background-color: #e0e7ff;
         }
-        
+
         .pagination-arrow {
             background-color: #f0f4ff;
         }
-        
+
         .pagination-arrow:hover {
             background-color: #e0e7ff;
         }
-        
+
         .pagination-dots {
             display: flex;
             align-items: center;
@@ -444,35 +444,35 @@
             height: 40px;
             color: #555;
         }
-        
+
         /* Responsive Styles */
         @media (max-width: 768px) {
             .search-form {
                 flex-direction: column;
             }
-            
+
             .search-group {
                 width: 100%;
             }
-            
+
             .doctors-header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 10px;
             }
-            
+
             .doctors-sort {
                 width: 100%;
             }
-            
+
             .doctors-sort select {
                 width: 100%;
             }
-            
+
             .doctors-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .specialty-filters {
                 justify-content: center;
             }
@@ -482,20 +482,20 @@
 <body>
     <div class="container">
         <h1>Find Doctors</h1>
-        
+
         <!-- Search and Filter Section -->
         <div class="search-container">
             <div class="search-header">
                 <h2>Search Doctor</h2>
                 <p>Find the right doctor for your needs</p>
             </div>
-            
+
             <form action="${pageContext.request.contextPath}/doctors" method="get" class="search-form">
                 <div class="search-group">
                     <label for="search">Search Doctor</label>
                     <input type="text" id="search" name="search" placeholder="Search by name or specialty" class="search-input">
                 </div>
-                
+
                 <div class="search-group">
                     <label for="specialization">Specialization</label>
                     <select id="specialization" name="specialization" class="search-select">
@@ -508,7 +508,7 @@
                         <option value="Gynecologist" <%= request.getAttribute("specialization") != null && request.getAttribute("specialization").equals("Gynecologist") ? "selected" : "" %>>Gynecologist</option>
                     </select>
                 </div>
-                
+
                 <div class="search-group">
                     <label for="experience">Experience</label>
                     <select id="experience" name="experience" class="search-select">
@@ -518,7 +518,7 @@
                         <option value="10+">10+ Years</option>
                     </select>
                 </div>
-                
+
                 <div class="search-group search-button-container">
                     <button type="submit" class="search-button">
                         <i class="fas fa-filter"></i> Apply Filters
@@ -526,7 +526,7 @@
                 </div>
             </form>
         </div>
-        
+
         <!-- Specialty Quick Filters -->
         <div class="specialty-filters">
             <a href="javascript:void(0);" onclick="filterBySpecialty('')" class="specialty-filter <%= request.getAttribute("specialization") == null ? "active" : "" %>">
@@ -572,7 +572,7 @@
                 <span>Gynecology</span>
             </a>
         </div>
-        
+
         <!-- Doctor Count -->
         <%
         List<Doctor> doctors = null;
@@ -603,7 +603,7 @@
                 </select>
             </div>
         </div>
-        
+
         <div class="doctors-grid">
             <%
             if(doctors != null && !doctors.isEmpty()) {
@@ -624,7 +624,7 @@
                     <h3><%= doctor.getName() %></h3>
                     <p class="specialization"><%= doctor.getSpecialization() %></p>
                     <p><%= doctor.getQualification() != null ? doctor.getQualification() : "Specialist Doctor" %></p>
-                    
+
                     <div class="doctor-meta">
                         <div class="doctor-meta-item">
                             <i class="fas fa-briefcase"></i>
@@ -635,10 +635,10 @@
                             <span><%= doctor.getConsultationFee() != null ? "$" + doctor.getConsultationFee() : "$100" %></span>
                         </div>
                     </div>
-                    
+
                     <div class="doctor-actions">
                         <a href="${pageContext.request.contextPath}/doctor/details?id=<%= doctor.getId() %>" class="btn-primary"><i class="fas fa-eye"></i> View Profile</a>
-                        <a href="${pageContext.request.contextPath}/appointment/book?doctorId=<%= doctor.getId() %>" class="btn-outline"><i class="fas fa-calendar-check"></i> Book</a>
+                        <a href="${pageContext.request.contextPath}/doctors?action=book&doctorId=<%= doctor.getId() %>" class="btn-outline"><i class="fas fa-calendar-check"></i> Book</a>
                     </div>
                 </div>
             </div>
@@ -657,7 +657,7 @@
             </div>
             <% } %>
         </div>
-        
+
         <!-- Pagination -->
         <% if(doctors != null && !doctors.isEmpty() && doctors.size() > 10) { %>
         <div class="pagination">
@@ -675,7 +675,7 @@
         </div>
         <% } %>
     </div>
-    
+
     <script>
         // Function to filter doctors by specialty
         function filterBySpecialty(specialty) {
@@ -683,7 +683,7 @@
             document.querySelectorAll('.specialty-filter').forEach(filter => {
                 filter.classList.remove('active');
             });
-            
+
             // Find the clicked filter and add the active class
             if (specialty === '') {
                 document.querySelector('.specialty-filter:first-child').classList.add('active');
@@ -695,7 +695,7 @@
                     }
                 });
             }
-            
+
             // Redirect to the appropriate URL
             if (specialty === '') {
                 window.location.href = '${pageContext.request.contextPath}/doctors';
@@ -703,7 +703,7 @@
                 window.location.href = '${pageContext.request.contextPath}/doctors?specialization=' + specialty;
             }
         }
-        
+
         // Function to sort doctors
         function sortDoctors(sortBy) {
             // This would be implemented with server-side sorting in a real application

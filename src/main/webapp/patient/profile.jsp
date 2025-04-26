@@ -24,12 +24,14 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patientDashboard.css">
     <style>
+        /* Profile Page Specific Styles */
         .profile-container {
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             padding: 30px;
             margin-bottom: 30px;
+            width: 100%;
         }
 
         .profile-header {
@@ -47,6 +49,7 @@
             overflow: hidden;
             margin-right: 30px;
             border: 5px solid #f0f0f0;
+            flex-shrink: 0;
         }
 
         .profile-image img {
@@ -67,15 +70,28 @@
             font-weight: 600;
         }
 
+        .profile-info {
+            flex: 1;
+        }
+
         .profile-info h2 {
             font-size: 1.8rem;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
             color: #333;
         }
 
         .profile-info p {
             color: #666;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-info p i {
+            margin-right: 10px;
+            color: #4CAF50;
+            width: 20px;
+            text-align: center;
         }
 
         .profile-details {
@@ -88,6 +104,7 @@
             background-color: #f9f9f9;
             border-radius: 8px;
             padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
 
         .detail-card h3 {
@@ -96,6 +113,13 @@
             color: #333;
             border-bottom: 1px solid #eee;
             padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .detail-card h3 i {
+            margin-right: 10px;
+            color: #4CAF50;
         }
 
         .detail-item {
@@ -107,6 +131,7 @@
             font-weight: 600;
             width: 40%;
             color: #555;
+            padding-right: 15px;
         }
 
         .detail-value {
@@ -115,18 +140,102 @@
         }
 
         .edit-profile-btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             background-color: #4CAF50;
             color: white;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 5px;
             text-decoration: none;
             margin-top: 20px;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .edit-profile-btn i {
+            margin-right: 8px;
         }
 
         .edit-profile-btn:hover {
             background-color: #388E3C;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Form Styles */
+        input[type="text"],
+        input[type="tel"],
+        input[type="email"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background-color: #fff;
+        }
+
+        input[type="text"]:focus,
+        input[type="tel"]:focus,
+        input[type="email"]:focus,
+        input[type="date"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+        }
+
+        .form-error {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-error:before {
+            content: "⚠";
+            margin-right: 5px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .alert i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 992px) {
+            .profile-details {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -140,8 +249,16 @@
                 margin-bottom: 20px;
             }
 
-            .profile-details {
-                grid-template-columns: 1fr;
+            .detail-item {
+                flex-direction: column;
+            }
+
+            .detail-label, .detail-value {
+                width: 100%;
+            }
+
+            .detail-label {
+                margin-bottom: 5px;
             }
         }
     </style>
@@ -177,7 +294,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/profile" class="active">
+                    <a href="${pageContext.request.contextPath}/patient/profile" class="active">
                         <i class="fas fa-user"></i>
                         <span>My Profile</span>
                     </a>
@@ -225,59 +342,120 @@
                     </div>
                 </div>
 
-                <div class="profile-details">
-                    <div class="detail-card">
-                        <h3>Personal Information</h3>
-                        <div class="detail-item">
-                            <div class="detail-label">Full Name</div>
-                            <div class="detail-value"><%= user.getFirstName() + " " + user.getLastName() %></div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Email</div>
-                            <div class="detail-value"><%= user.getEmail() %></div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Phone</div>
-                            <div class="detail-value"><%= user.getPhone() != null ? user.getPhone() : "Not provided" %></div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Date of Birth</div>
-                            <div class="detail-value"><%= user.getDateOfBirth() != null ? user.getDateOfBirth() : "Not provided" %></div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Gender</div>
-                            <div class="detail-value"><%= user.getGender() != null ? user.getGender() : "Not provided" %></div>
-                        </div>
+                <!-- Success or Error Messages -->
+                <c:if test="${not empty successMessage}">
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> ${successMessage}
                     </div>
+                </c:if>
 
-                    <div class="detail-card">
-                        <h3>Address Information</h3>
-                        <div class="detail-item">
-                            <div class="detail-label">Address</div>
-                            <div class="detail-value"><%= user.getAddress() != null ? user.getAddress() : "Not provided" %></div>
+                <c:if test="${not empty errorMessage}">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> ${errorMessage}
+                    </div>
+                </c:if>
+
+                <!-- Profile Form -->
+                <form action="${pageContext.request.contextPath}/patient/profile/update" method="post">
+                    <div class="profile-details">
+                        <div class="detail-card">
+                            <h3><i class="fas fa-user"></i> Personal Information</h3>
+                            <div class="detail-item">
+                                <div class="detail-label">First Name</div>
+                                <div class="detail-value">
+                                    <input type="text" name="firstName" value="<%= user.getFirstName() %>" required>
+                                    <c:if test="${not empty firstNameError}">
+                                        <div class="form-error">${firstNameError}</div>
+                                    </c:if>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Last Name</div>
+                                <div class="detail-value">
+                                    <input type="text" name="lastName" value="<%= user.getLastName() %>" required>
+                                    <c:if test="${not empty lastNameError}">
+                                        <div class="form-error">${lastNameError}</div>
+                                    </c:if>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Email</div>
+                                <div class="detail-value"><%= user.getEmail() %></div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Phone</div>
+                                <div class="detail-value">
+                                    <input type="tel" name="phone" value="<%= user.getPhone() != null ? user.getPhone() : "" %>">
+                                    <c:if test="${not empty phoneError}">
+                                        <div class="form-error">${phoneError}</div>
+                                    </c:if>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Date of Birth</div>
+                                <div class="detail-value">
+                                    <input type="date" name="dateOfBirth" value="<%= user.getDateOfBirth() != null ? user.getDateOfBirth() : "" %>">
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Gender</div>
+                                <div class="detail-value">
+                                    <select name="gender">
+                                        <option value="" <%= user.getGender() == null ? "selected" : "" %>>Select Gender</option>
+                                        <option value="Male" <%= "Male".equals(user.getGender()) ? "selected" : "" %>>Male</option>
+                                        <option value="Female" <%= "Female".equals(user.getGender()) ? "selected" : "" %>>Female</option>
+                                        <option value="Other" <%= "Other".equals(user.getGender()) ? "selected" : "" %>>Other</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
 
-                        <% if (patient != null) { %>
+                        <div class="detail-card">
+                            <h3><i class="fas fa-heartbeat"></i> Medical Information</h3>
+                            <div class="detail-item">
+                                <div class="detail-label">Address</div>
+                                <div class="detail-value">
+                                    <textarea name="address" rows="3"><%= user.getAddress() != null ? user.getAddress() : "" %></textarea>
+                                </div>
+                            </div>
+
                             <div class="detail-item">
                                 <div class="detail-label">Blood Group</div>
-                                <div class="detail-value"><%= patient.getBloodGroup() != null ? patient.getBloodGroup() : "Not provided" %></div>
+                                <div class="detail-value">
+                                    <select name="bloodGroup">
+                                        <option value="" <%= patient == null || patient.getBloodGroup() == null ? "selected" : "" %>>Select Blood Group</option>
+                                        <option value="A+" <%= patient != null && "A+".equals(patient.getBloodGroup()) ? "selected" : "" %>>A+</option>
+                                        <option value="A-" <%= patient != null && "A-".equals(patient.getBloodGroup()) ? "selected" : "" %>>A-</option>
+                                        <option value="B+" <%= patient != null && "B+".equals(patient.getBloodGroup()) ? "selected" : "" %>>B+</option>
+                                        <option value="B-" <%= patient != null && "B-".equals(patient.getBloodGroup()) ? "selected" : "" %>>B-</option>
+                                        <option value="AB+" <%= patient != null && "AB+".equals(patient.getBloodGroup()) ? "selected" : "" %>>AB+</option>
+                                        <option value="AB-" <%= patient != null && "AB-".equals(patient.getBloodGroup()) ? "selected" : "" %>>AB-</option>
+                                        <option value="O+" <%= patient != null && "O+".equals(patient.getBloodGroup()) ? "selected" : "" %>>O+</option>
+                                        <option value="O-" <%= patient != null && "O-".equals(patient.getBloodGroup()) ? "selected" : "" %>>O-</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="detail-item">
                                 <div class="detail-label">Allergies</div>
-                                <div class="detail-value"><%= patient.getAllergies() != null ? patient.getAllergies() : "None" %></div>
-                            </div>
-                        <% } else { %>
-                            <div class="detail-item">
-                                <div class="detail-label">Blood Group</div>
-                                <div class="detail-value">Not provided</div>
+                                <div class="detail-value">
+                                    <textarea name="allergies" rows="3"><%= patient != null && patient.getAllergies() != null ? patient.getAllergies() : "" %></textarea>
+                                </div>
                             </div>
                             <div class="detail-item">
-                                <div class="detail-label">Allergies</div>
-                                <div class="detail-value">None</div>
+                                <div class="detail-label">Medical History</div>
+                                <div class="detail-value">
+                                    <textarea name="medicalHistory" rows="5"><%= patient != null && patient.getMedicalHistory() != null ? patient.getMedicalHistory() : "" %></textarea>
+                                </div>
                             </div>
-                        <% } %>
+                        </div>
                     </div>
-                </div>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button type="submit" class="edit-profile-btn">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
