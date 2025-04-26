@@ -11,26 +11,21 @@ import java.util.logging.Logger;
  */
 @WebListener
 public class AppInitializer implements ServletContextListener {
-
+    
     private static final Logger LOGGER = Logger.getLogger(AppInitializer.class.getName());
-
+    
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         LOGGER.info("Application starting up...");
-
+        
         // Initialize the database
         DatabaseInitializer.initialize();
-
+        
         LOGGER.info("Application startup complete.");
     }
-
+    
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         LOGGER.info("Application shutting down...");
-
-        // Close all database connections
-        DBConnection.closeAllConnections();
-
-        LOGGER.info("Application shutdown complete.");
     }
 }

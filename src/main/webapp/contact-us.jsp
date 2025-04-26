@@ -9,41 +9,41 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         <%@include file="./assets/css/style.css"%>
-
+        
         /* Additional styles for contact page */
         .contact-page {
             padding: 80px 0;
         }
-
+        
         .alert {
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 5px;
         }
-
+        
         .alert-success {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
-
+        
         .alert-danger {
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
-
+        
         .contact-page-header {
             text-align: center;
             margin-bottom: 50px;
         }
-
+        
         .contact-page-header h1 {
             font-size: 2.5rem;
             color: #333;
             margin-bottom: 15px;
         }
-
+        
         .contact-page-header p {
             font-size: 1.1rem;
             color: #666;
@@ -64,18 +64,8 @@
                     <li><a href="about-us.jsp">About Us</a></li>
                     <li><a href="index.jsp#services">Services</a></li>
                     <li><a href="contact-us.jsp" class="active">Contact</a></li>
-                    <% if(session.getAttribute("user") != null) {
-                        com.doctorapp.model.User currentUser = (com.doctorapp.model.User) session.getAttribute("user");
-                        String dashboardLink = "";
-                        if("PATIENT".equals(currentUser.getRole())) {
-                            dashboardLink = "patient/dashboard";
-                        } else if("DOCTOR".equals(currentUser.getRole())) {
-                            dashboardLink = "dashboard";
-                        } else if("ADMIN".equals(currentUser.getRole())) {
-                            dashboardLink = "admin/index.jsp";
-                        }
-                    %>
-                        <li><a href="<%= dashboardLink %>">Dashboard</a></li>
+                    <% if(session.getAttribute("user") != null) { %>
+                        <li><a href="appointments">Appointments</a></li>
                         <li><a href="profile">Profile</a></li>
                         <li><a href="logout" class="btn btn-primary">Logout</a></li>
                     <% } else { %>
@@ -97,7 +87,7 @@
                 <p>Have questions or need assistance? Reach out to us and we'll be happy to help. Fill out the form below or use our contact information to get in touch.</p>
             </div>
         </section>
-
+        
         <!-- Contact Section -->
         <section class="contact contact-page">
             <div class="container">
@@ -107,13 +97,13 @@
                         <%= request.getAttribute("successMessage") %>
                     </div>
                 <% } %>
-
+                
                 <% if(request.getAttribute("errorMessage") != null) { %>
                     <div class="alert alert-danger">
                         <%= request.getAttribute("errorMessage") %>
                     </div>
                 <% } %>
-
+                
                 <div class="contact-container">
                     <div class="contact-info">
                         <h3>Contact Information</h3>

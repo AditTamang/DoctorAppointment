@@ -1,21 +1,17 @@
 -- Optimized Database Schema for Doctor Appointment System
 
--- Create database if it doesn't exist
--- Note: These statements are handled separately in the code
--- CREATE DATABASE IF NOT EXISTS doctor_appointment;
--- USE doctor_appointment;
+CREATE DATABASE IF NOT EXISTS doctor_appointment;
+USE doctor_appointment;
 
 -- Drop tables if they exist (in correct order to respect foreign key constraints)
--- Order is important: tables with foreign keys must be dropped before the tables they reference
 DROP TABLE IF EXISTS prescriptions;
-DROP TABLE IF EXISTS doctor_ratings;
 DROP TABLE IF EXISTS appointments;
 DROP TABLE IF EXISTS doctor_schedules;
-DROP TABLE IF EXISTS doctor_settings;
+DROP TABLE IF EXISTS doctor_ratings;
 DROP TABLE IF EXISTS doctors;
 DROP TABLE IF EXISTS patients;
-DROP TABLE IF EXISTS announcements;
 DROP TABLE IF EXISTS departments;
+DROP TABLE IF EXISTS announcements;
 DROP TABLE IF EXISTS contact_messages;
 DROP TABLE IF EXISTS doctor_registration_requests;
 DROP TABLE IF EXISTS users;
@@ -170,6 +166,21 @@ CREATE TABLE contact_messages (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- Create doctor_ratings table
+CREATE TABLE doctor_ratings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    doctor_id INT NOT NULL,
+    patient_id INT NOT NULL,
+    appointment_id INT,
+    rating DECIMAL(3, 1) NOT NULL,
+    review TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE,
+    FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE,
+    FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE SET NULL
+);
+
 -- Create doctor_registration_requests table
 CREATE TABLE doctor_registration_requests (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -190,34 +201,5 @@ CREATE TABLE doctor_registration_requests (
     admin_notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- Create doctor_ratings table
-CREATE TABLE doctor_ratings (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    doctor_id INT NOT NULL,
-    patient_id INT NOT NULL,
-    appointment_id INT,
-    rating DECIMAL(3, 1) NOT NULL,
-    review TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE,
-    FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE,
-    FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE SET NULL
-);
-
--- Create doctor_settings table
-CREATE TABLE doctor_settings (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    doctor_id INT NOT NULL,
-    appointment_duration INT DEFAULT 30,
-    max_appointments_per_day INT DEFAULT 20,
-    notification_preferences VARCHAR(255) DEFAULT 'email,sms',
-    working_days VARCHAR(255) DEFAULT 'Monday,Tuesday,Wednesday,Thursday,Friday',
-    working_hours VARCHAR(255) DEFAULT '09:00-17:00',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE
 );
 

@@ -1,10 +1,10 @@
 package com.doctorapp.service;
 
-import java.util.List;
-
 import com.doctorapp.dao.DoctorRegistrationRequestDAO;
 import com.doctorapp.dao.UserDAO;
 import com.doctorapp.model.DoctorRegistrationRequest;
+
+import java.util.List;
 
 /**
  * Service class for doctor registration requests
@@ -28,12 +28,12 @@ public class DoctorRegistrationService {
         if (userDAO.emailExists(request.getEmail())) {
             return false;
         }
-
+        
         // Check if email already exists in requests table
         if (requestDAO.emailExists(request.getEmail())) {
             return false;
         }
-
+        
         return requestDAO.createRequest(request);
     }
 

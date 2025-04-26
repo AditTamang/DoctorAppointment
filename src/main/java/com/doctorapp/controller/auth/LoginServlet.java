@@ -65,14 +65,7 @@ public class LoginServlet extends HttpServlet {
                 // Check if there's a redirect parameter
                 String redirect = request.getParameter("redirect");
 
-                // Check if there's a redirectAfterLogin attribute in the session
-                String redirectAfterLogin = (String) request.getSession().getAttribute("redirectAfterLogin");
-                if (redirectAfterLogin != null) {
-                    // Remove the attribute from the session
-                    request.getSession().removeAttribute("redirectAfterLogin");
-                    // Redirect to the stored URL
-                    response.sendRedirect(request.getContextPath() + "/" + redirectAfterLogin);
-                } else if (redirect != null && !redirect.isEmpty()) {
+                if (redirect != null && !redirect.isEmpty()) {
                     // Redirect to the requested page
                     response.sendRedirect(redirect);
                 } else {
@@ -80,12 +73,9 @@ public class LoginServlet extends HttpServlet {
                     if ("ADMIN".equals(user.getRole())) {
                         // Redirect admin directly to admin dashboard
                         response.sendRedirect(request.getContextPath() + "/admin/index.jsp");
-                    } else if ("DOCTOR".equals(user.getRole())) {
-                        // Redirect doctor to doctor dashboard
-                        response.sendRedirect(request.getContextPath() + "/dashboard");
                     } else {
-                        // Redirect patient to home page
-                        response.sendRedirect(request.getContextPath() + "/index.jsp");
+                        // Redirect to the dashboard servlet for other roles
+                        response.sendRedirect(request.getContextPath() + "/dashboard");
                     }
                 }
             } else {

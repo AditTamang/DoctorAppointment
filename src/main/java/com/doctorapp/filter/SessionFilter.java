@@ -29,8 +29,7 @@ public class SessionFilter implements Filter {
     private static final List<String> PUBLIC_PATHS = Arrays.asList(
             "/", "/login", "/register", "/logout", "/index.jsp", "/login.jsp", "/register.jsp",
             "/about-us", "/contact-us", "/doctors", "/assets/", "/error.jsp", "/404.jsp",
-            "/index", "/home", "/css/", "/js/", "/images/", "/fonts/", "/doctor/details",
-            "/appointment/book"
+            "/index", "/home", "/css/", "/js/", "/images/", "/fonts/"
     );
 
     @Override

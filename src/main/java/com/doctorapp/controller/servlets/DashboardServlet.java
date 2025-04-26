@@ -1,16 +1,11 @@
 package com.doctorapp.controller.servlets;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.doctorapp.dao.AppointmentDAO;
 import com.doctorapp.dao.DoctorDAO;
 import com.doctorapp.dao.PatientDAO;
 import com.doctorapp.dao.UserDAO;
-import com.doctorapp.model.Appointment;
-import com.doctorapp.model.Doctor;
-import com.doctorapp.model.Patient;
 import com.doctorapp.model.User;
 
 import jakarta.servlet.ServletException;
@@ -91,46 +86,15 @@ public class DashboardServlet extends HttpServlet {
             int totalAppointments = appointmentDAO.getTotalAppointments();
             double totalRevenue = appointmentDAO.getTotalRevenue();
 
-            // Get doctor counts by status
-            int approvedDoctors = doctorDAO.getApprovedDoctorsCount();
-            int pendingDoctors = doctorDAO.getPendingDoctorsCount();
-            int rejectedDoctors = doctorDAO.getRejectedDoctorsCount();
-
-            // Get today's appointments count
-            int todayAppointments = appointmentDAO.getTodayAppointmentsCount();
-
-            // Get new bookings count (pending appointments)
-            int newBookings = appointmentDAO.getPendingAppointmentsCount();
-
             System.out.println("Admin dashboard stats: Doctors=" + totalDoctors + ", Patients=" + totalPatients + ", Appointments=" + totalAppointments);
-            System.out.println("Doctor status counts: Approved=" + approvedDoctors + ", Pending=" + pendingDoctors + ", Rejected=" + rejectedDoctors);
 
-            // Set attributes for the dashboard
+            // Get recent appointments
             request.setAttribute("totalDoctors", totalDoctors);
             request.setAttribute("totalPatients", totalPatients);
             request.setAttribute("totalAppointments", totalAppointments);
             request.setAttribute("totalRevenue", totalRevenue);
-            request.setAttribute("approvedDoctors", approvedDoctors);
-            request.setAttribute("pendingDoctors", pendingDoctors);
-            request.setAttribute("rejectedDoctors", rejectedDoctors);
-            request.setAttribute("todayAppointments", todayAppointments);
-            request.setAttribute("newBookings", newBookings);
-
-            // Get upcoming appointments and sessions
-            try {
-                request.setAttribute("upcomingAppointments", appointmentDAO.getUpcomingAppointments(5));
-                request.setAttribute("upcomingSessions", appointmentDAO.getUpcomingSessions(5));
-                request.setAttribute("recentAppointments", appointmentDAO.getRecentAppointments(5));
-                request.setAttribute("topDoctors", doctorDAO.getTopDoctors(3));
-            } catch (Exception e) {
-                System.err.println("Error getting dashboard data: " + e.getMessage());
-                e.printStackTrace();
-                // Set empty lists as fallback
-                request.setAttribute("upcomingAppointments", new ArrayList<Appointment>());
-                request.setAttribute("upcomingSessions", new ArrayList<Appointment>());
-                request.setAttribute("recentAppointments", new ArrayList<Appointment>());
-                request.setAttribute("topDoctors", new ArrayList<Doctor>());
-            }
+            request.setAttribute("recentAppointments", appointmentDAO.getRecentAppointments(5));
+            request.setAttribute("topDoctors", doctorDAO.getTopDoctors(3));
 
             System.out.println("Forwarding to admin/index.jsp");
             // Forward to admin dashboard
@@ -143,52 +107,30 @@ public class DashboardServlet extends HttpServlet {
     }
 
     private void loadDoctorDashboard(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-            // Get the logged-in doctor's ID
-            HttpSession session = request.getSession(false);
-            User user = (User) session.getAttribute("user");
-            int doctorId = doctorDAO.getDoctorIdByUserId(user.getId());
+        // Get the logged-in doctor's ID
+        HttpSession session = request.getSession(false);
+        User user = (User) session.getAttribute("user");
+        int doctorId = doctorDAO.getDoctorIdByUserId(user.getId());
 
-            if (doctorId == 0) {
-                // Doctor profile not found, redirect to complete profile
-                response.sendRedirect(request.getContextPath() + "/complete-profile.jsp");
-                return;
-            }
-
-            // Get doctor information
-            Doctor doctor = doctorDAO.getDoctorById(doctorId);
-            request.setAttribute("doctor", doctor);
-
-            // Load doctor dashboard data
-            int totalPatients = doctorDAO.getTotalPatientsByDoctor(doctorId);
-            int weeklyAppointments = appointmentDAO.getWeeklyAppointmentsByDoctor(doctorId);
-            int pendingReports = doctorDAO.getPendingReportsByDoctor(doctorId);
-            double averageRating = doctorDAO.getAverageRatingByDoctor(doctorId);
-
-            request.setAttribute("totalPatients", totalPatients);
-            request.setAttribute("weeklyAppointments", weeklyAppointments);
-            request.setAttribute("pendingReports", pendingReports);
-            request.setAttribute("averageRating", averageRating);
-
-            // Get today's appointments
-            List<Appointment> todayAppointments = appointmentDAO.getTodayAppointmentsByDoctor(doctorId);
-            List<Patient> recentPatients = patientDAO.getRecentPatientsByDoctor(doctorId, 4);
-            List<Appointment> upcomingAppointments = appointmentDAO.getUpcomingAppointmentsByDoctor(doctorId, 4);
-
-            request.setAttribute("todayAppointments", todayAppointments);
-            request.setAttribute("todayAppointmentsCount", todayAppointments != null ? todayAppointments.size() : 0);
-            request.setAttribute("recentPatients", recentPatients);
-            request.setAttribute("upcomingAppointments", upcomingAppointments);
-            request.setAttribute("upcomingAppointmentsCount", upcomingAppointments != null ? upcomingAppointments.size() : 0);
-
-            System.out.println("Forwarding to doctor/index.jsp");
-            // Forward to doctor dashboard
-            request.getRequestDispatcher("/doctor/index.jsp").forward(request, response);
-        } catch (Exception e) {
-            System.err.println("Error loading doctor dashboard: " + e.getMessage());
-            e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/error.jsp");
+        if (doctorId == 0) {
+            // Doctor profile not found, redirect to complete profile
+            response.sendRedirect(request.getContextPath() + "/complete-profile.jsp");
+            return;
         }
+
+        // Load doctor dashboard data
+        request.setAttribute("totalPatients", doctorDAO.getTotalPatientsByDoctor(doctorId));
+        request.setAttribute("weeklyAppointments", appointmentDAO.getWeeklyAppointmentsByDoctor(doctorId));
+        request.setAttribute("pendingReports", doctorDAO.getPendingReportsByDoctor(doctorId));
+        request.setAttribute("averageRating", doctorDAO.getAverageRatingByDoctor(doctorId));
+
+        // Get today's appointments
+        request.setAttribute("todayAppointments", appointmentDAO.getTodayAppointmentsByDoctor(doctorId));
+        request.setAttribute("recentPatients", patientDAO.getRecentPatientsByDoctor(doctorId, 4));
+        request.setAttribute("upcomingAppointments", appointmentDAO.getUpcomingAppointmentsByDoctor(doctorId, 4));
+
+        // Forward to doctor dashboard
+        request.getRequestDispatcher("/doctor-dashboard.jsp").forward(request, response);
     }
 
     private void loadPatientDashboard(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

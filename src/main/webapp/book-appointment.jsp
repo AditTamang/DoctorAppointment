@@ -46,7 +46,7 @@
                 <form action="${pageContext.request.contextPath}/appointment/book" method="post" id="appointmentForm">
                     <div class="form-section">
                         <h3><i class="fas fa-user-md"></i> Select Doctor</h3>
-
+                        
                         <div class="form-group">
                             <label for="doctorId">Choose a Doctor:</label>
                             <select id="doctorId" name="doctorId" class="form-control" required>
@@ -66,13 +66,13 @@
 
                     <div class="form-section">
                         <h3><i class="fas fa-calendar-alt"></i> Appointment Details</h3>
-
+                        
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="appointmentDate">Appointment Date:</label>
                                 <input type="date" id="appointmentDate" name="appointmentDate" class="form-control" required>
                             </div>
-
+                            
                             <div class="form-group">
                                 <label for="appointmentTime">Preferred Time:</label>
                                 <select id="appointmentTime" name="appointmentTime" class="form-control" required>
@@ -95,18 +95,18 @@
                                 </select>
                             </div>
                         </div>
-
+                        
                         <div id="availabilityMessage" class="availability-message"></div>
                     </div>
 
                     <div class="form-section">
                         <h3><i class="fas fa-notes-medical"></i> Medical Information</h3>
-
+                        
                         <div class="form-group">
                             <label for="reason">Reason for Visit:</label>
                             <input type="text" id="reason" name="reason" class="form-control" placeholder="Brief reason for your appointment" required>
                         </div>
-
+                        
                         <div class="form-group">
                             <label for="symptoms">Symptoms:</label>
                             <textarea id="symptoms" name="symptoms" class="form-control" rows="3" placeholder="Describe your symptoms in detail"></textarea>
@@ -130,14 +130,14 @@
             // Set minimum date to today
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('appointmentDate').min = today;
-
+            
             // Doctor selection change handler
             const doctorSelect = document.getElementById('doctorId');
             const doctorDetails = document.getElementById('doctorDetails');
-
+            
             doctorSelect.addEventListener('change', function() {
                 const doctorId = this.value;
-
+                
                 if (doctorId) {
                     // In a real application, you would fetch doctor details via AJAX
                     // For now, we'll simulate it with a simple display
@@ -146,66 +146,51 @@
                     doctorDetails.style.display = 'none';
                 }
             });
-
+            
             // If a doctor is pre-selected (from URL parameter), show their details
             if (doctorSelect.value) {
                 fetchDoctorDetails(doctorSelect.value);
             }
-
+            
             // Date and time selection handlers for availability check
             const dateInput = document.getElementById('appointmentDate');
             const timeSelect = document.getElementById('appointmentTime');
             const availabilityMessage = document.getElementById('availabilityMessage');
-
+            
             function checkAvailability() {
                 const date = dateInput.value;
                 const time = timeSelect.value;
                 const doctorId = doctorSelect.value;
-
+                
                 if (date && time && doctorId) {
                     // In a real application, you would check availability via AJAX
                     // For now, we'll simulate it
                     simulateAvailabilityCheck(doctorId, date, time);
                 }
             }
-
+            
             dateInput.addEventListener('change', checkAvailability);
             timeSelect.addEventListener('change', checkAvailability);
-
+            
             // Form validation
             const appointmentForm = document.getElementById('appointmentForm');
-
+            
             appointmentForm.addEventListener('submit', function(e) {
                 const doctorId = doctorSelect.value;
                 const date = dateInput.value;
                 const time = timeSelect.value;
-
+                
                 if (!doctorId || !date || !time) {
                     e.preventDefault();
                     alert('Please select a doctor, date, and time for your appointment.');
                 }
             });
         });
-
-        // Helper function to generate star rating HTML
-        function generateStarRating(rating) {
-            let stars = '';
-            for (let i = 1; i <= 5; i++) {
-                if (i <= rating) {
-                    stars += '<i class="fas fa-star"></i>';
-                } else if (i <= rating + 0.5) {
-                    stars += '<i class="fas fa-star-half-alt"></i>';
-                } else {
-                    stars += '<i class="far fa-star"></i>';
-                }
-            }
-            return stars;
-        }
-
+        
         // Simulated functions that would be replaced with real AJAX calls in production
         function fetchDoctorDetails(doctorId) {
             const doctorDetails = document.getElementById('doctorDetails');
-
+            
             // In a real app, this would be an AJAX call to get doctor details
             // For now, we'll simulate it with hardcoded data
             const doctors = {
@@ -221,10 +206,10 @@
                     }${!status.last ? ',' : ''}
                 </c:forEach>
             };
-
+            
             if (doctors[doctorId]) {
                 const doctor = doctors[doctorId];
-
+                
                 doctorDetails.innerHTML = `
                     <div class="doctor-card">
                         <div class="doctor-image">
@@ -244,25 +229,39 @@
                         </div>
                     </div>
                 `;
-
+                
                 doctorDetails.style.display = 'block';
             } else {
                 doctorDetails.style.display = 'none';
             }
         }
-
+        
         function simulateAvailabilityCheck(doctorId, date, time) {
             const availabilityMessage = document.getElementById('availabilityMessage');
-
+            
             // In a real app, this would be an AJAX call to check availability
             // For now, we'll simulate it with a random response
             const isAvailable = Math.random() > 0.3; // 70% chance of availability
-
+            
             if (isAvailable) {
                 availabilityMessage.innerHTML = '<div class="available"><i class="fas fa-check-circle"></i> The selected time slot is available!</div>';
             } else {
                 availabilityMessage.innerHTML = '<div class="unavailable"><i class="fas fa-times-circle"></i> Sorry, this time slot is not available. Please select another time.</div>';
             }
+        }
+        
+        function generateStarRating(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '<i class="fas fa-star"></i>';
+                } else if (i <= rating + 0.5) {
+                    stars += '<i class="fas fa-star-half-alt"></i>';
+                } else {
+                    stars += '<i class="far fa-star"></i>';
+                }
+            }
+            return stars;
         }
     </script>
 </body>

@@ -57,7 +57,7 @@ public class PatientDAO {
 
     // Get patient by ID
     public Patient getPatientById(int patientId) {
-        String query = "SELECT p.*, u.email, u.first_name, u.last_name, u.date_of_birth, u.gender, u.phone, u.address FROM patients p JOIN users u ON p.user_id = u.id WHERE p.id = ?";
+        String query = "SELECT p.*, u.email FROM patients p JOIN users u ON p.user_id = u.id WHERE p.id = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -93,7 +93,7 @@ public class PatientDAO {
     // Get recent patients by doctor
     public List<Patient> getRecentPatientsByDoctor(int doctorId, int limit) {
         List<Patient> patients = new ArrayList<>();
-        String query = "SELECT DISTINCT p.*, u.email, u.first_name, u.last_name, u.date_of_birth, u.gender, u.phone, u.address, MAX(a.appointment_date) as last_visit " +
+        String query = "SELECT DISTINCT p.*, u.email, MAX(a.appointment_date) as last_visit " +
                       "FROM patients p " +
                       "JOIN appointments a ON p.id = a.patient_id " +
                       "JOIN users u ON p.user_id = u.id " +
@@ -138,10 +138,9 @@ public class PatientDAO {
     // Get recent medical records
     public List<MedicalRecord> getRecentMedicalRecords(int patientId, int limit) {
         List<MedicalRecord> records = new ArrayList<>();
-        String query = "SELECT mr.*, u.first_name as doctor_first_name, u.last_name as doctor_last_name " +
+        String query = "SELECT mr.*, d.first_name as doctor_first_name, d.last_name as doctor_last_name " +
                       "FROM medical_records mr " +
                       "JOIN doctors d ON mr.doctor_id = d.id " +
-                      "JOIN users u ON d.user_id = u.id " +
                       "WHERE mr.patient_id = ? " +
                       "ORDER BY mr.record_date DESC " +
                       "LIMIT ?";
@@ -231,10 +230,9 @@ public class PatientDAO {
     // Get current prescriptions
     public List<Prescription> getCurrentPrescriptions(int patientId) {
         List<Prescription> prescriptions = new ArrayList<>();
-        String query = "SELECT p.*, u.first_name as doctor_first_name, u.last_name as doctor_last_name " +
+        String query = "SELECT p.*, d.first_name as doctor_first_name, d.last_name as doctor_last_name " +
                       "FROM prescriptions p " +
                       "JOIN doctors d ON p.doctor_id = d.id " +
-                      "JOIN users u ON d.user_id = u.id " +
                       "WHERE p.patient_id = ? AND p.end_date >= CURRENT_DATE " +
                       "ORDER BY p.start_date DESC";
 

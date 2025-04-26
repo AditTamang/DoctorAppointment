@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="com.doctorapp.model.Doctor" %>
-<%@ page import="com.doctorapp.model.User" %>
+<%@ page import="model.Doctor" %>
+<%@ page import="model.User" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,19 +18,19 @@
     <header class="header">
         <div class="container">
             <nav class="navbar">
-                <a href="${pageContext.request.contextPath}/index.jsp" class="logo">Health<span>Care</span></a>
+                <a href="../index.jsp" class="logo">Health<span>Care</span></a>
                 <ul class="nav-links">
-                    <li><a href="${pageContext.request.contextPath}/index.jsp">Home</a></li>
-                    <li><a href="${pageContext.request.contextPath}/doctors" class="active">Find Doctors</a></li>
-                    <li><a href="${pageContext.request.contextPath}/about-us.jsp">About Us</a></li>
-                    <li><a href="${pageContext.request.contextPath}/index.jsp#services">Services</a></li>
-                    <li><a href="${pageContext.request.contextPath}/index.jsp#contact">Contact</a></li>
+                    <li><a href="../index.jsp">Home</a></li>
+                    <li><a href="../doctors" class="active">Find Doctors</a></li>
+                    <li><a href="about-us.jsp">Find Doctors</a></li>
+                    <li><a href="../index.jsp#services">Services</a></li>
+                    <li><a href="../index.jsp#contact">Contact</a></li>
                     <% if(session.getAttribute("user") != null) { %>
-                        <li><a href="${pageContext.request.contextPath}/appointments">Appointments</a></li>
-                        <li><a href="${pageContext.request.contextPath}/profile">Profile</a></li>
-                        <li><a href="${pageContext.request.contextPath}/logout" class="btn btn-primary">Logout</a></li>
+                        <li><a href="../appointments">Appointments</a></li>
+                        <li><a href="../profile">Profile</a></li>
+                        <li><a href="../logout" class="btn btn-primary">Logout</a></li>
                     <% } else { %>
-                        <li><a href="${pageContext.request.contextPath}/login" class="login-btn"><i class="fas fa-user"></i></a></li>
+                        <li><a href="../login" class="login-btn"><i class="fas fa-user"></i></a></li>
                     <% } %>
                 </ul>
                 <div class="mobile-menu">
@@ -50,9 +50,9 @@
             <!-- Breadcrumb -->
             <div style="margin-bottom: 2rem;">
                 <ul style="display: flex; list-style: none; gap: 0.5rem; align-items: center;">
-                    <li><a href="${pageContext.request.contextPath}/index.jsp" style="color: #666;">Home</a></li>
+                    <li><a href="../index.jsp" style="color: #666;">Home</a></li>
                     <li><i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #666;"></i></li>
-                    <li><a href="${pageContext.request.contextPath}/doctors" style="color: #666;">Doctors</a></li>
+                    <li><a href="../doctors" style="color: #666;">Doctors</a></li>
                     <li><i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #666;"></i></li>
                     <li><span style="color: var(--primary-color);"><%= doctor.getName() %></span></li>
                 </ul>
@@ -60,7 +60,7 @@
 
             <div class="doctor-details">
                 <div class="doctor-profile-img">
-                    <img src="${pageContext.request.contextPath}/<%= doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty() ? doctor.getImageUrl() : "assets/images/doctors/d1.png" %>" alt="<%= doctor.getName() %>">
+                    <img src="../<%= doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty() ? doctor.getImageUrl() : "images/doctor-placeholder.jpg" %>" alt="<%= doctor.getName() %>">
 
                     <!-- Doctor Rating -->
                     <div style="position: absolute; bottom: 20px; left: 20px; background: rgba(255, 255, 255, 0.9); padding: 0.5rem 1rem; border-radius: 50px; display: flex; align-items: center; z-index: 2;">
@@ -189,14 +189,14 @@
                     <!-- Book Appointment Button -->
                     <div style="display: flex; gap: 1rem;">
                         <% if(session.getAttribute("user") != null) { %>
-                            <a href="${pageContext.request.contextPath}/appointment/book?doctorId=<%= doctor.getId() %>" class="btn btn-primary" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <a href="../appointment/book?doctorId=<%= doctor.getId() %>" class="btn btn-primary" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                                 <i class="fas fa-calendar-check"></i> Book Appointment
                             </a>
                             <a href="tel:<%= doctor.getPhone() %>" class="btn btn-outline" style="width: 50px; height: 50px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
                                 <i class="fas fa-phone"></i>
                             </a>
                         <% } else { %>
-                            <a href="${pageContext.request.contextPath}/login" class="btn btn-primary" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <a href="../login" class="btn btn-primary" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                                 <i class="fas fa-user"></i> Login to Book Appointment
                             </a>
                         <% } %>
@@ -210,7 +210,7 @@
                 </div>
                 <h2 style="margin-bottom: 1rem; color: var(--dark-color); font-size: 2rem;">Doctor Not Found</h2>
                 <p style="color: #666; margin-bottom: 2rem; font-size: 1.1rem;">The doctor you are looking for does not exist or has been removed.</p>
-                <a href="${pageContext.request.contextPath}/doctors" class="btn btn-primary">View All Doctors</a>
+                <a href="../doctors" class="btn btn-primary">View All Doctors</a>
             </div>
             <% } %>
         </div>
@@ -233,12 +233,12 @@
                 <div class="footer-col">
                     <h3>Quick Links</h3>
                     <ul class="footer-links">
-                        <li><a href="${pageContext.request.contextPath}/index.jsp">Home</a></li>
-                        <li><a href="${pageContext.request.contextPath}/index.jsp#services">Services</a></li>
-                        <li><a href="${pageContext.request.contextPath}/doctors">Doctors</a></li>
-                        <li><a href="${pageContext.request.contextPath}/index.jsp#contact">Contact</a></li>
-                        <li><a href="${pageContext.request.contextPath}/login">Login</a></li>
-                        <li><a href="${pageContext.request.contextPath}/register">Register</a></li>
+                        <li><a href="../index.jsp">Home</a></li>
+                        <li><a href="../index.jsp#services">Services</a></li>
+                        <li><a href="../doctors">Doctors</a></li>
+                        <li><a href="../index.jsp#contact">Contact</a></li>
+                        <li><a href="../login">Login</a></li>
+                        <li><a href="../register">Register</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
@@ -265,6 +265,6 @@
         </div>
     </footer>
 
-    <script src="${pageContext.request.contextPath}/assets/js/script.js"></script>
+    <script src="../js/script.js"></script>
 </body>
 </html>

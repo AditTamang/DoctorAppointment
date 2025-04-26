@@ -1,46 +1,32 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.doctorapp.model.User" %>
-<%@ page import="com.doctorapp.model.Patient" %>
-<%@ page import="com.doctorapp.model.Appointment" %>
-<%@ page import="com.doctorapp.model.Doctor" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%
-    // Check if user is logged in and is a doctor
-    User user = (User) session.getAttribute("user");
-    if (user == null || !"DOCTOR".equals(user.getRole())) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
-        return;
-    }
-%>
+<%@ page import="model.Patient" %>
+<%@ page import="model.Appointment" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctor Dashboard | Doctor Appointment System</title>
+    <title>Doctor Dashboard | HealthCare</title>
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctorDashboard.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
 </head>
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="user-profile">
-                <div class="profile-image">
-                    <% if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) { %>
-                        <div class="profile-initials">AT</div>
-                    <% } else { %>
-                        <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
-                    <% } %>
+        <div class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <img src="../images/logo.png" alt="HealthCare Logo">
+                    <h2>Health<span>Care</span></h2>
                 </div>
-                <h3 class="user-name"><%= user.getFirstName() + " " + user.getLastName() %></h3>
-                <p class="user-email"><%= user.getEmail() %></p>
-                <p class="user-phone"><%= user.getPhone() %></p>
+                <div class="sidebar-close" id="sidebarClose">
+                    <i class="fas fa-times"></i>
+                </div>
             </div>
-
+            
             <div class="sidebar-menu">
                 <ul>
                     <li class="active">
@@ -81,7 +67,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="${pageContext.request.contextPath}/doctor/profile">
+                        <a href="profile.jsp">
                             <i class="fas fa-user-md"></i>
                             <span>My Profile</span>
                         </a>
@@ -95,7 +81,7 @@
                 </ul>
             </div>
         </div>
-
+        
         <!-- Main Content -->
         <div class="dashboard-main">
             <!-- Top Navigation -->
@@ -103,30 +89,51 @@
                 <div class="menu-toggle" id="menuToggle">
                     <i class="fas fa-bars"></i>
                 </div>
-
+                
                 <div class="nav-right">
-                    <div class="logout-nav">
-                        <a href="${pageContext.request.contextPath}/logout" class="logout-btn">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </a>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search patients...">
+                    </div>
+                    
+                    <div class="nav-notifications">
+                        <div class="icon-badge">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">3</span>
+                        </div>
+                    </div>
+                    
+                    <div class="nav-messages">
+                        <div class="icon-badge">
+                            <i class="fas fa-envelope"></i>
+                            <span class="badge">5</span>
+                        </div>
+                    </div>
+                    
+                    <div class="nav-user">
+                        <img src="../images/doctors/doctor1.jpg" alt="Doctor">
+                        <div class="user-info">
+                            <h4>Dr. John Smith</h4>
+                            <p>Cardiologist</p>
+                        </div>
                     </div>
                 </div>
             </div>
-
+            
             <!-- Dashboard Content -->
             <div class="dashboard-content">
                 <div class="page-header">
                     <h1>Doctor Dashboard</h1>
-                    <p>Welcome back, <%= user.getFirstName() + " " + user.getLastName() %></p>
+                    <p>Welcome back, Dr. John Smith</p>
                 </div>
-
+                
                 <!-- Today's Summary -->
                 <div class="today-summary">
                     <div class="summary-header">
                         <h3>Today's Summary</h3>
-                        <p class="date"><%= new java.text.SimpleDateFormat("EEEE, MMMM d, yyyy").format(new java.util.Date()) %></p>
+                        <p class="date">Monday, April 18, 2023</p>
                     </div>
-
+                    
                     <div class="stats-container">
                         <div class="stat-card">
                             <div class="stat-card-icon blue">
@@ -134,143 +141,161 @@
                             </div>
                             <div class="stat-card-info">
                                 <h3>Today's Appointments</h3>
-                                <h2>${todayAppointmentsCount}</h2>
-                                <p>Scheduled for today</p>
+                                <h2>8</h2>
+                                <p><span class="positive"><i class="fas fa-arrow-up"></i> 2</span> from yesterday</p>
                             </div>
                         </div>
-
+                        
                         <div class="stat-card">
                             <div class="stat-card-icon green">
                                 <i class="fas fa-user-check"></i>
                             </div>
                             <div class="stat-card-info">
-                                <h3>Total Patients</h3>
-                                <h2>${totalPatients}</h2>
-                                <p>Under your care</p>
+                                <h3>Patients Attended</h3>
+                                <h2>5</h2>
+                                <p>3 more to go</p>
                             </div>
                         </div>
-
+                        
                         <div class="stat-card">
                             <div class="stat-card-icon purple">
                                 <i class="fas fa-file-medical"></i>
                             </div>
                             <div class="stat-card-info">
-                                <h3>Pending Reports</h3>
-                                <h2>${pendingReports}</h2>
-                                <p>Need your attention</p>
+                                <h3>Prescriptions</h3>
+                                <h2>12</h2>
+                                <p><span class="positive"><i class="fas fa-arrow-up"></i> 4</span> from yesterday</p>
                             </div>
                         </div>
-
+                        
                         <div class="stat-card">
                             <div class="stat-card-icon orange">
                                 <i class="fas fa-clock"></i>
                             </div>
                             <div class="stat-card-info">
-                                <h3>Weekly Appointments</h3>
-                                <h2>${weeklyAppointments}</h2>
-                                <p>Last 7 days</p>
+                                <h3>Working Hours</h3>
+                                <h2>6.5</h2>
+                                <p>of 8 hours</p>
                             </div>
                         </div>
                     </div>
                 </div>
-
+                
                 <!-- Upcoming Appointments -->
                 <div class="upcoming-appointments">
                     <div class="section-header">
                         <h3>Upcoming Appointments</h3>
                         <a href="appointments.jsp" class="view-all">View All</a>
                     </div>
-
+                    
                     <div class="appointment-timeline">
-                        <% if (request.getAttribute("todayAppointments") != null && ((List<Appointment>)request.getAttribute("todayAppointments")).size() > 0) {
-                            List<Appointment> todayAppointments = (List<Appointment>)request.getAttribute("todayAppointments");
-                            for (int i = 0; i < todayAppointments.size() && i < 3; i++) {
-                                Appointment appointment = todayAppointments.get(i);
-                                String currentClass = (i == 0) ? "current" : "";
-                        %>
-                        <div class="timeline-item <%= currentClass %>">
+                        <div class="timeline-item current">
                             <div class="timeline-time">
-                                <h4><%= appointment.getAppointmentTime() %></h4>
-                                <p><%= (i == 0) ? "Current" : "Today" %></p>
+                                <h4>10:30 AM</h4>
+                                <p>Current</p>
                             </div>
                             <div class="timeline-content">
                                 <div class="appointment-card">
                                     <div class="appointment-info">
                                         <div class="patient-info">
-                                            <img src="${pageContext.request.contextPath}/assets/images/patients/default.jpg" alt="Patient">
+                                            <img src="../images/patients/patient1.jpg" alt="Patient">
                                             <div>
-                                                <h4><%= appointment.getPatientName() %></h4>
-                                                <p>Patient ID: <%= appointment.getPatientId() %></p>
-                                                <span class="appointment-type <%= appointment.getStatus().toLowerCase() %>"><%= appointment.getStatus() %></span>
+                                                <h4>Robert Wilson</h4>
+                                                <p>42 years, Male</p>
+                                                <span class="appointment-type new">New Patient</span>
                                             </div>
                                         </div>
                                         <div class="appointment-details">
                                             <div class="detail-item">
                                                 <i class="fas fa-heartbeat"></i>
-                                                <span><%= appointment.getReason() != null ? appointment.getReason() : "General Checkup" %></span>
+                                                <span>Heart Checkup</span>
                                             </div>
                                             <div class="detail-item">
-                                                <i class="fas fa-notes-medical"></i>
-                                                <span><%= appointment.getSymptoms() != null ? appointment.getSymptoms() : "No symptoms recorded" %></span>
+                                                <i class="fas fa-phone"></i>
+                                                <span>+1 234 567 890</span>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="appointment-actions">
-                                        <a href="appointment-details.jsp?id=<%= appointment.getId() %>" class="btn btn-primary"><i class="fas fa-check-circle"></i> Start Session</a>
-                                        <a href="../appointment/cancel?id=<%= appointment.getId() %>" class="btn btn-outline"><i class="fas fa-times-circle"></i> Cancel</a>
+                                        <button class="btn btn-primary"><i class="fas fa-check-circle"></i> Start Session</button>
+                                        <button class="btn btn-outline"><i class="fas fa-times-circle"></i> Cancel</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <% }
-                        } else if (request.getAttribute("upcomingAppointments") != null && ((List<Appointment>)request.getAttribute("upcomingAppointments")).size() > 0) {
-                            List<Appointment> upcomingAppointments = (List<Appointment>)request.getAttribute("upcomingAppointments");
-                            for (int i = 0; i < upcomingAppointments.size() && i < 3; i++) {
-                                Appointment appointment = upcomingAppointments.get(i);
-                        %>
+                        
                         <div class="timeline-item">
                             <div class="timeline-time">
-                                <h4><%= appointment.getAppointmentTime() %></h4>
-                                <p><%= new java.text.SimpleDateFormat("MMM d, yyyy").format(appointment.getAppointmentDate()) %></p>
+                                <h4>11:15 AM</h4>
+                                <p>In 45 min</p>
                             </div>
                             <div class="timeline-content">
                                 <div class="appointment-card">
                                     <div class="appointment-info">
                                         <div class="patient-info">
-                                            <img src="${pageContext.request.contextPath}/assets/images/patients/default.jpg" alt="Patient">
+                                            <img src="../images/patients/patient2.jpg" alt="Patient">
                                             <div>
-                                                <h4><%= appointment.getPatientName() %></h4>
-                                                <p>Patient ID: <%= appointment.getPatientId() %></p>
-                                                <span class="appointment-type <%= appointment.getStatus().toLowerCase() %>"><%= appointment.getStatus() %></span>
+                                                <h4>Emily Parker</h4>
+                                                <p>35 years, Female</p>
+                                                <span class="appointment-type followup">Follow-up</span>
                                             </div>
                                         </div>
                                         <div class="appointment-details">
                                             <div class="detail-item">
                                                 <i class="fas fa-heartbeat"></i>
-                                                <span><%= appointment.getReason() != null ? appointment.getReason() : "General Checkup" %></span>
+                                                <span>Blood Pressure Check</span>
                                             </div>
                                             <div class="detail-item">
-                                                <i class="fas fa-notes-medical"></i>
-                                                <span><%= appointment.getSymptoms() != null ? appointment.getSymptoms() : "No symptoms recorded" %></span>
+                                                <i class="fas fa-phone"></i>
+                                                <span>+1 987 654 321</span>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="appointment-actions">
-                                        <a href="appointment-details.jsp?id=<%= appointment.getId() %>" class="btn btn-outline"><i class="fas fa-file-medical"></i> View Details</a>
-                                        <a href="../appointment/cancel?id=<%= appointment.getId() %>" class="btn btn-outline"><i class="fas fa-times-circle"></i> Cancel</a>
+                                        <button class="btn btn-outline"><i class="fas fa-file-medical"></i> View Records</button>
+                                        <button class="btn btn-outline"><i class="fas fa-times-circle"></i> Cancel</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <% }
-                        } else { %>
-                        <div class="no-appointments">
-                            <p>No upcoming appointments scheduled.</p>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-time">
+                                <h4>1:30 PM</h4>
+                                <p>In 3 hours</p>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="appointment-card">
+                                    <div class="appointment-info">
+                                        <div class="patient-info">
+                                            <img src="../images/patients/patient3.jpg" alt="Patient">
+                                            <div>
+                                                <h4>David Thompson</h4>
+                                                <p>58 years, Male</p>
+                                                <span class="appointment-type emergency">Emergency</span>
+                                            </div>
+                                        </div>
+                                        <div class="appointment-details">
+                                            <div class="detail-item">
+                                                <i class="fas fa-heartbeat"></i>
+                                                <span>Chest Pain</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <i class="fas fa-phone"></i>
+                                                <span>+1 456 789 012</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="appointment-actions">
+                                        <button class="btn btn-outline"><i class="fas fa-file-medical"></i> View Records</button>
+                                        <button class="btn btn-outline"><i class="fas fa-times-circle"></i> Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <% } %>
                     </div>
                 </div>
-
+                
                 <!-- Charts and Patient Stats -->
                 <div class="charts-container">
                     <div class="chart-card">
@@ -288,7 +313,7 @@
                             <canvas id="appointmentChart"></canvas>
                         </div>
                     </div>
-
+                    
                     <div class="chart-card">
                         <div class="chart-header">
                             <h3>Patient Demographics</h3>
@@ -305,63 +330,116 @@
                         </div>
                     </div>
                 </div>
-
+                
                 <!-- Recent Patients -->
                 <div class="recent-patients">
                     <div class="section-header">
                         <h3>Recent Patients</h3>
                         <a href="patients.jsp" class="view-all">View All</a>
                     </div>
-
+                    
                     <div class="table-responsive">
                         <table>
                             <thead>
                                 <tr>
                                     <th>Patient</th>
-                                    <th>Contact</th>
-                                    <th>Address</th>
+                                    <th>Last Visit</th>
+                                    <th>Diagnosis</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <% if (request.getAttribute("recentPatients") != null && ((List<Patient>)request.getAttribute("recentPatients")).size() > 0) {
-                                    List<Patient> recentPatients = (List<Patient>)request.getAttribute("recentPatients");
-                                    for (Patient patient : recentPatients) {
-                                %>
                                 <tr>
                                     <td>
                                         <div class="user-info">
-                                            <img src="${pageContext.request.contextPath}/assets/images/patients/default.jpg" alt="Patient">
+                                            <img src="../images/patients/patient1.jpg" alt="Patient">
                                             <div>
-                                                <h4><%= patient.getFirstName() + " " + patient.getLastName() %></h4>
-                                                <p><%= patient.getGender() %>, <%= patient.getDateOfBirth() != null ? patient.getAge() + " years" : "Age not available" %></p>
+                                                <h4>Robert Wilson</h4>
+                                                <p>42 years, Male</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td><%= patient.getPhone() != null ? patient.getPhone() : "N/A" %></td>
-                                    <td><%= patient.getAddress() != null ? patient.getAddress() : "N/A" %></td>
+                                    <td>Today, 10:30 AM</td>
+                                    <td>Hypertension</td>
                                     <td><span class="status-badge active">Active</span></td>
                                     <td>
                                         <div class="action-buttons">
-                                            <a href="patient-details.jsp?id=<%= patient.getId() %>" class="btn-icon view"><i class="fas fa-eye"></i></a>
-                                            <a href="patient-records.jsp?id=<%= patient.getId() %>" class="btn-icon edit"><i class="fas fa-file-medical"></i></a>
-                                            <a href="message.jsp?patientId=<%= patient.getId() %>" class="btn-icon message"><i class="fas fa-comment-medical"></i></a>
+                                            <a href="#" class="btn-icon view"><i class="fas fa-eye"></i></a>
+                                            <a href="#" class="btn-icon edit"><i class="fas fa-file-medical"></i></a>
+                                            <a href="#" class="btn-icon message"><i class="fas fa-comment-medical"></i></a>
                                         </div>
                                     </td>
                                 </tr>
-                                <% }
-                                } else { %>
                                 <tr>
-                                    <td colspan="5" class="text-center">No recent patients found</td>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="../images/patients/patient2.jpg" alt="Patient">
+                                            <div>
+                                                <h4>Emily Parker</h4>
+                                                <p>35 years, Female</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Yesterday, 2:15 PM</td>
+                                    <td>Arrhythmia</td>
+                                    <td><span class="status-badge active">Active</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="#" class="btn-icon view"><i class="fas fa-eye"></i></a>
+                                            <a href="#" class="btn-icon edit"><i class="fas fa-file-medical"></i></a>
+                                            <a href="#" class="btn-icon message"><i class="fas fa-comment-medical"></i></a>
+                                        </div>
+                                    </td>
                                 </tr>
-                                <% } %>
+                                <tr>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="../images/patients/patient3.jpg" alt="Patient">
+                                            <div>
+                                                <h4>David Thompson</h4>
+                                                <p>58 years, Male</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Apr 15, 2023</td>
+                                    <td>Coronary Artery Disease</td>
+                                    <td><span class="status-badge pending">Pending</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="#" class="btn-icon view"><i class="fas fa-eye"></i></a>
+                                            <a href="#" class="btn-icon edit"><i class="fas fa-file-medical"></i></a>
+                                            <a href="#" class="btn-icon message"><i class="fas fa-comment-medical"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="../images/patients/patient4.jpg" alt="Patient">
+                                            <div>
+                                                <h4>Jennifer Adams</h4>
+                                                <p>29 years, Female</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Apr 12, 2023</td>
+                                    <td>Mitral Valve Prolapse</td>
+                                    <td><span class="status-badge completed">Completed</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="#" class="btn-icon view"><i class="fas fa-eye"></i></a>
+                                            <a href="#" class="btn-icon edit"><i class="fas fa-file-medical"></i></a>
+                                            <a href="#" class="btn-icon message"><i class="fas fa-comment-medical"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-
+            
             <!-- Footer -->
             <div class="dashboard-footer">
                 <p>&copy; 2023 HealthCare. All Rights Reserved.</p>
@@ -369,18 +447,18 @@
             </div>
         </div>
     </div>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Toggle sidebar on mobile
         document.getElementById('menuToggle').addEventListener('click', function() {
             document.querySelector('.dashboard-sidebar').classList.toggle('active');
         });
-
+        
         document.getElementById('sidebarClose').addEventListener('click', function() {
             document.querySelector('.dashboard-sidebar').classList.remove('active');
         });
-
+        
         // Charts
         const appointmentCtx = document.getElementById('appointmentChart').getContext('2d');
         const appointmentChart = new Chart(appointmentCtx, {
@@ -421,7 +499,7 @@
                 }
             }
         });
-
+        
         const demographicsCtx = document.getElementById('demographicsChart').getContext('2d');
         const demographicsChart = new Chart(demographicsCtx, {
             type: 'doughnut',

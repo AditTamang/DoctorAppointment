@@ -320,18 +320,8 @@
                     <li><a href="about-us.jsp" class="active">About Us</a></li>
                     <li><a href="index.jsp#services">Services</a></li>
                     <li><a href="contact-us">Contact</a></li>
-                    <% if(session.getAttribute("user") != null) {
-                        com.doctorapp.model.User currentUser = (com.doctorapp.model.User) session.getAttribute("user");
-                        String dashboardLink = "";
-                        if("PATIENT".equals(currentUser.getRole())) {
-                            dashboardLink = "patient/dashboard";
-                        } else if("DOCTOR".equals(currentUser.getRole())) {
-                            dashboardLink = "dashboard";
-                        } else if("ADMIN".equals(currentUser.getRole())) {
-                            dashboardLink = "admin/index.jsp";
-                        }
-                    %>
-                        <li><a href="<%= dashboardLink %>">Dashboard</a></li>
+                    <% if(session.getAttribute("user") != null) { %>
+                        <li><a href="appointments">Appointments</a></li>
                         <li><a href="profile">Profile</a></li>
                         <li><a href="logout" class="btn btn-primary">Logout</a></li>
                     <% } else { %>
