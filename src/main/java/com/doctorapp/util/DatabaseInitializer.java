@@ -67,13 +67,16 @@ public class DatabaseInitializer {
         LOGGER.info("Initializing database...");
 
         try {
+            // First try to create the appointments table
+            createAppointmentsTable();
+
             // Load the SQL script
-            InputStream is = DatabaseInitializer.class.getClassLoader().getResourceAsStream("schema.sql");
+            InputStream is = DatabaseInitializer.class.getClassLoader().getResourceAsStream("doctor_appointment_tables.sql");
 
             // If still not found, log an error
             if (is == null) {
-                LOGGER.severe("ERROR: schema.sql not found in classpath. Database initialization will fail.");
-                throw new IOException("schema.sql not found in classpath");
+                LOGGER.warning("doctor_appointment_tables.sql not found in classpath. Will continue with minimal initialization.");
+                return;
             }
 
             // Read the SQL script
@@ -145,4 +148,44 @@ public class DatabaseInitializer {
     }
 
     // Database initialization is now handled by AppInitializer
+
+    /**
+     * Create the appointments table if it doesn't exist
+     */
+    private static void createAppointmentsTable() {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS `appointments` (\n" +
+            "  `id` int(11) NOT NULL AUTO_INCREMENT,\n" +
+            "  `patient_id` int(11) NOT NULL,\n" +
+            "  `doctor_id` int(11) NOT NULL,\n" +
+            "  `patient_name` varchar(100),\n" +
+            "  `doctor_name` varchar(100),\n" +
+            "  `appointment_date` date NOT NULL,\n" +
+            "  `appointment_time` varchar(20) NOT NULL,\n" +
+            "  `status` ENUM('PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED') DEFAULT 'PENDING',\n" +
+            "  `reason` varchar(255),\n" +
+            "  `symptoms` text,\n" +
+            "  `prescription` text,\n" +
+            "  `notes` text,\n" +
+            "  `fee` double,\n" +
+            "  `medical_report` text,\n" +
+            "  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n" +
+            "  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n" +
+            "  PRIMARY KEY (`id`),\n" +
+            "  KEY `patient_id` (`patient_id`),\n" +
+            "  KEY `doctor_id` (`doctor_id`),\n" +
+            "  FOREIGN KEY (`patient_id`) REFERENCES `patients`(`id`) ON DELETE CASCADE,\n" +
+            "  FOREIGN KEY (`doctor_id`) REFERENCES `doctors`(`id`) ON DELETE CASCADE\n" +
+            ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+        try (Connection conn = DBConnection.getConnection();
+             Statement stmt = conn.createStatement()) {
+
+            LOGGER.info("Creating appointments table if it doesn't exist...");
+            stmt.execute(createTableSQL);
+            LOGGER.info("Appointments table created or already exists.");
+
+        } catch (SQLException | ClassNotFoundException e) {
+            LOGGER.log(Level.SEVERE, "Error creating appointments table", e);
+        }
+    }
 }

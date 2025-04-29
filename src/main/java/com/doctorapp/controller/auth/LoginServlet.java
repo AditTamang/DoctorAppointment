@@ -8,6 +8,8 @@ import com.doctorapp.service.DoctorRegistrationService;
 import com.doctorapp.service.UserService;
 import com.doctorapp.util.SessionUtil;
 
+import jakarta.servlet.http.HttpSession;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -60,7 +62,9 @@ public class LoginServlet extends HttpServlet {
                 }
 
                 // Create user session using SessionUtil
-                SessionUtil.createUserSession(request, response, user, rememberMe);
+                HttpSession session = SessionUtil.createUserSession(request, response, user, rememberMe);
+                System.out.println("LoginServlet: Created session with ID: " + session.getId());
+                System.out.println("LoginServlet: User in session: " + session.getAttribute("user"));
 
                 // Check if there's a redirect parameter
                 String redirect = request.getParameter("redirect");
@@ -73,9 +77,12 @@ public class LoginServlet extends HttpServlet {
                     if ("ADMIN".equals(user.getRole())) {
                         // Redirect admin directly to admin dashboard
                         response.sendRedirect(request.getContextPath() + "/admin/index.jsp");
-                    } else {
-                        // Redirect to the dashboard servlet for other roles
+                    } else if ("DOCTOR".equals(user.getRole())) {
+                        // Redirect doctors to their dashboard
                         response.sendRedirect(request.getContextPath() + "/dashboard");
+                    } else {
+                        // Redirect patients to the index page
+                        response.sendRedirect(request.getContextPath() + "/index.jsp");
                     }
                 }
             } else {

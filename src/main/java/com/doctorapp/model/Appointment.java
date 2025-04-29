@@ -1,5 +1,8 @@
 package com.doctorapp.model;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 public class Appointment {
@@ -86,12 +89,51 @@ public class Appointment {
         this.appointmentDate = appointmentDate;
     }
 
+    // Method to handle LocalDate
+    public void setAppointmentDate(LocalDate localDate) {
+        if (localDate != null) {
+            this.appointmentDate = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        }
+    }
+
+    // Method to get LocalDate
+    public LocalDate getAppointmentLocalDate() {
+        if (appointmentDate != null) {
+            return appointmentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        }
+        return null;
+    }
+
     public String getAppointmentTime() {
         return appointmentTime;
     }
 
     public void setAppointmentTime(String appointmentTime) {
         this.appointmentTime = appointmentTime;
+    }
+
+    // Method to handle LocalTime
+    public void setAppointmentTime(LocalTime localTime) {
+        if (localTime != null) {
+            this.appointmentTime = localTime.toString();
+        }
+    }
+
+    // Method to get LocalTime
+    public LocalTime getAppointmentLocalTime() {
+        if (appointmentTime != null && !appointmentTime.isEmpty()) {
+            try {
+                return LocalTime.parse(appointmentTime);
+            } catch (Exception e) {
+                // Handle time formats like "10:00 AM"
+                try {
+                    return LocalTime.parse(appointmentTime, java.time.format.DateTimeFormatter.ofPattern("h:mm a"));
+                } catch (Exception ex) {
+                    return null;
+                }
+            }
+        }
+        return null;
     }
 
     public String getStatus() {

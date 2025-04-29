@@ -43,11 +43,11 @@
                     <li><a href="index.jsp" class="active">Home</a></li>
                     <li><a href="doctors">Find Doctors</a></li>
                     <li><a href="about-us.jsp">About Us</a></li>
-                    <li><a href="#services">Services</a></li>
+                    <li><a href="services.jsp">Services</a></li>
                     <li><a href="contact-us">Contact</a></li>
                     <% if(session.getAttribute("user") != null) { %>
-                        <li><a href="appointments">Appointments</a></li>
-                        <li><a href="profile">Profile</a></li>
+                        <li><a href="patient/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a href="patient/profile">Profile</a></li>
                         <li><a href="logout" class="btn btn-primary">Logout</a></li>
                     <% } else { %>
                         <li><a href="login" class="login-btn"><i class="fas fa-user"></i></a></li>
@@ -69,7 +69,7 @@
                 <p>Book appointments with the best doctors in your city. We provide quality medical services for you and your family.</p>
                 <div class="btn-group">
                     <a href="doctors" class="btn btn-primary">Find a Doctor <i class="fas fa-user-md"></i></a>
-                    <a href="#services" class="btn btn-outline">Our Services <i class="fas fa-chevron-down"></i></a>
+                    <a href="services.jsp" class="btn btn-outline">Our Services <i class="fas fa-chevron-right"></i></a>
                 </div>
             </div>
 
@@ -417,7 +417,7 @@
                     <h3>Quick Links</h3>
                     <ul class="footer-links">
                         <li><a href="index.jsp"><i class="fas fa-chevron-right"></i> Home</a></li>
-                        <li><a href="#services"><i class="fas fa-chevron-right"></i> Services</a></li>
+                        <li><a href="services.jsp"><i class="fas fa-chevron-right"></i> Services</a></li>
                         <li><a href="doctors"><i class="fas fa-chevron-right"></i> Doctors</a></li>
                         <li><a href="#contact"><i class="fas fa-chevron-right"></i> Contact</a></li>
                         <li><a href="login"><i class="fas fa-chevron-right"></i> Login</a></li>

@@ -60,8 +60,11 @@ public class SessionFilter implements Filter {
             return;
         }
 
+        // Always create a session if it doesn't exist
+        HttpSession session = httpRequest.getSession(true);
+        System.out.println("SessionFilter: Path: " + path + ", Session ID: " + session.getId());
+
         // Check if user is authenticated
-        HttpSession session = httpRequest.getSession(false);
         boolean isLoggedIn = SessionUtil.isLoggedIn(httpRequest);
 
         if (isLoggedIn) {

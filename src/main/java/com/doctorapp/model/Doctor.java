@@ -3,6 +3,7 @@ package com.doctorapp.model;
 public class Doctor {
     private int id;
     private int userId;
+    private int departmentId;
     private String name;
     private String firstName;
     private String lastName;
@@ -21,6 +22,7 @@ public class Doctor {
     private double rating;
     private int patientCount;
     private int successRate;
+    private String status; // "ACTIVE", "INACTIVE", "PENDING"
 
     public Doctor() {
     }
@@ -201,6 +203,22 @@ public class Doctor {
 
     public void setSuccessRate(int successRate) {
         this.successRate = successRate;
+    }
+
+    public int getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(int departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     // Helper method to get full name

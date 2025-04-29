@@ -10,14 +10,14 @@
             <i class="fas fa-bars"></i>
         </button>
     </div>
-    
+
     <div class="header-search">
         <form>
             <input type="text" placeholder="Search...">
             <button type="submit"><i class="fas fa-search"></i></button>
         </form>
     </div>
-    
+
     <div class="header-actions">
         <div class="notification-bell">
             <i class="fas fa-bell"></i>
@@ -55,7 +55,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="message-icon">
             <i class="fas fa-envelope"></i>
             <span class="badge">2</span>
@@ -91,7 +91,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="user-profile">
             <c:choose>
                 <c:when test="${sessionScope.user.role == 'DOCTOR'}">
@@ -106,9 +106,9 @@
             </c:choose>
             <span>${sessionScope.user.username}</span>
             <i class="fas fa-chevron-down"></i>
-            
+
             <div class="dropdown-menu">
-                <a href="${pageContext.request.contextPath}/profile" class="dropdown-item">
+                <a href="${pageContext.request.contextPath}/profile-redirect" class="dropdown-item">
                     <i class="fas fa-user"></i> My Profile
                 </a>
                 <a href="${pageContext.request.contextPath}/settings" class="dropdown-item">
@@ -127,31 +127,31 @@
     // Toggle dropdown menus
     document.addEventListener('DOMContentLoaded', function() {
         const dropdownTriggers = document.querySelectorAll('.notification-bell, .message-icon, .user-profile');
-        
+
         dropdownTriggers.forEach(trigger => {
             trigger.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const dropdown = this.querySelector('.dropdown-menu');
-                
+
                 // Close all other dropdowns
                 document.querySelectorAll('.dropdown-menu').forEach(menu => {
                     if (menu !== dropdown) {
                         menu.classList.remove('show');
                     }
                 });
-                
+
                 // Toggle current dropdown
                 dropdown.classList.toggle('show');
             });
         });
-        
+
         // Close dropdowns when clicking outside
         document.addEventListener('click', function() {
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
                 menu.classList.remove('show');
             });
         });
-        
+
         // Prevent dropdown from closing when clicking inside it
         document.querySelectorAll('.dropdown-menu').forEach(menu => {
             menu.addEventListener('click', function(e) {

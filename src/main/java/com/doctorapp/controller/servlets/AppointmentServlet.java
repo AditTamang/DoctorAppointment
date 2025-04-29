@@ -20,7 +20,6 @@ import com.doctorapp.service.PatientService;
 
 @WebServlet(urlPatterns = {
     "/appointments",
-    "/appointment/book",
     "/appointment/details",
     "/appointment/cancel",
     "/doctor/appointments",
@@ -45,9 +44,6 @@ public class AppointmentServlet extends HttpServlet {
             case "/appointments":
                 listAppointments(request, response);
                 break;
-            case "/appointment/book":
-                showBookAppointmentForm(request, response);
-                break;
             case "/appointment/details":
                 showAppointmentDetails(request, response);
                 break;
@@ -64,9 +60,6 @@ public class AppointmentServlet extends HttpServlet {
         String action = request.getServletPath();
 
         switch (action) {
-            case "/appointment/book":
-                bookAppointment(request, response);
-                break;
             case "/appointment/cancel":
                 cancelAppointment(request, response);
                 break;
@@ -114,46 +107,7 @@ public class AppointmentServlet extends HttpServlet {
         }
     }
 
-    private void showBookAppointmentForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Check if user is logged in
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
-            return;
-        }
 
-        User user = (User) session.getAttribute("user");
-
-        if (!"PATIENT".equals(user.getRole())) {
-            // Only patients can book appointments
-            response.sendRedirect(request.getContextPath() + "/dashboard");
-            return;
-        }
-
-        // Get patient ID
-        int patientId = patientService.getPatientIdByUserId(user.getId());
-
-        if (patientId == 0) {
-            // Patient profile not found, redirect to complete profile
-            response.sendRedirect(request.getContextPath() + "/complete-profile.jsp");
-            return;
-        }
-
-        // Get doctor ID from request parameter
-        String doctorIdParam = request.getParameter("doctorId");
-
-        if (doctorIdParam != null && !doctorIdParam.isEmpty()) {
-            int doctorId = Integer.parseInt(doctorIdParam);
-            Doctor doctor = doctorService.getDoctorById(doctorId);
-            request.setAttribute("doctor", doctor);
-        }
-
-        // Get all doctors for dropdown
-        List<Doctor> doctors = doctorService.getAllDoctors();
-        request.setAttribute("doctors", doctors);
-
-        request.getRequestDispatcher("/book-appointment.jsp").forward(request, response);
-    }
 
     private void showAppointmentDetails(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Check if user is logged in
@@ -246,66 +200,7 @@ public class AppointmentServlet extends HttpServlet {
         request.getRequestDispatcher("/doctor/appointments.jsp").forward(request, response);
     }
 
-    private void bookAppointment(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Check if user is logged in
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
-            return;
-        }
 
-        User user = (User) session.getAttribute("user");
-
-        if (!"PATIENT".equals(user.getRole())) {
-            // Only patients can book appointments
-            response.sendRedirect(request.getContextPath() + "/dashboard");
-            return;
-        }
-
-        // Get patient ID
-        int patientId = patientService.getPatientIdByUserId(user.getId());
-
-        if (patientId == 0) {
-            // Patient profile not found, redirect to complete profile
-            response.sendRedirect(request.getContextPath() + "/complete-profile.jsp");
-            return;
-        }
-
-        // Get form data
-        int doctorId = Integer.parseInt(request.getParameter("doctorId"));
-        String appointmentDateStr = request.getParameter("appointmentDate");
-        String appointmentTime = request.getParameter("appointmentTime");
-        String symptoms = request.getParameter("symptoms");
-        String reason = request.getParameter("reason");
-
-        // Get doctor and patient names
-        Doctor doctor = doctorService.getDoctorById(doctorId);
-        String patientName = user.getUsername();
-        String doctorName = doctor.getName();
-
-        // Create appointment object
-        Appointment appointment = new Appointment();
-        appointment.setPatientId(patientId);
-        appointment.setDoctorId(doctorId);
-        appointment.setPatientName(patientName);
-        appointment.setDoctorName(doctorName);
-        appointment.setAppointmentDate(Date.valueOf(appointmentDateStr));
-        appointment.setAppointmentTime(appointmentTime);
-        appointment.setStatus("PENDING");
-        appointment.setSymptoms(symptoms);
-        appointment.setReason(reason);
-        appointment.setFee(Double.parseDouble(doctor.getConsultationFee()));
-
-        // Book appointment
-        if (appointmentService.bookAppointment(appointment)) {
-            request.setAttribute("message", "Appointment booked successfully!");
-        } else {
-            request.setAttribute("error", "Failed to book appointment. Please try again.");
-        }
-
-        // Redirect to appointments list
-        response.sendRedirect(request.getContextPath() + "/appointments");
-    }
 
     private void cancelAppointment(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Check if user is logged in

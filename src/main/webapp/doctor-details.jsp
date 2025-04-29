@@ -26,8 +26,9 @@
                     <li><a href="../index.jsp#services">Services</a></li>
                     <li><a href="../index.jsp#contact">Contact</a></li>
                     <% if(session.getAttribute("user") != null) { %>
+                        <li><a href="../dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                         <li><a href="../appointments">Appointments</a></li>
-                        <li><a href="../profile">Profile</a></li>
+                        <li><a href="../profile-redirect">Profile</a></li>
                         <li><a href="../logout" class="btn btn-primary">Logout</a></li>
                     <% } else { %>
                         <li><a href="../login" class="login-btn"><i class="fas fa-user"></i></a></li>

@@ -91,26 +91,24 @@
     <!-- JSTL Configuration -->
     <jsp-config>
         <taglib>
-            <taglib-uri>http://java.sun.com/jsp/jstl/core</taglib-uri>
-            <taglib-location>/WEB-INF/tags/c.tld</taglib-location>
-        </taglib>
-        <taglib>
-            <taglib-uri>http://java.sun.com/jsp/jstl/fmt</taglib-uri>
-            <taglib-location>/WEB-INF/tags/fmt.tld</taglib-location>
-        </taglib>
-        <taglib>
-            <taglib-uri>http://java.sun.com/jsp/jstl/functions</taglib-uri>
-            <taglib-location>/WEB-INF/tags/fn.tld</taglib-location>
-        </taglib>
-        <taglib>
             <taglib-uri>http://doctorapp.com/tags</taglib-uri>
             <taglib-location>/WEB-INF/doctorapp.tld</taglib-location>
         </taglib>
     </jsp-config>
 
+    <!-- Filters -->
+    <filter>
+        <filter-name>SessionFilter</filter-name>
+        <filter-class>com.doctorapp.filter.SessionFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>SessionFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
     <!-- Listeners -->
     <listener>
-        <listener-class>com.doctorapp.util.AppInitializer</listener-class>
+        <listener-class>com.doctorapp.listener.DatabaseInitListener</listener-class>
     </listener>
 
 </web-app>

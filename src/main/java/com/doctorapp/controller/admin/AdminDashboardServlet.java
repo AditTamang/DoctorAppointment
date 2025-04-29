@@ -77,12 +77,12 @@ public class AdminDashboardServlet extends HttpServlet {
             request.setAttribute("recentAppointments", recentPatientAppointments);
 
             // Show the admin dashboard page
-            request.getRequestDispatcher("/admin/index.jsp").forward(request, response);
+            request.getRequestDispatcher("/admin/adminDashboard.jsp").forward(request, response);
         } catch (Exception e) {
             // Log the error and show error message
             LOGGER.severe("Error retrieving dashboard data: " + e.getMessage());
             request.setAttribute("error", "Error retrieving dashboard data: " + e.getMessage());
-            request.getRequestDispatcher("/admin/index.jsp").forward(request, response);
+            request.getRequestDispatcher("/admin/adminDashboard.jsp").forward(request, response);
         }
     }
 }
