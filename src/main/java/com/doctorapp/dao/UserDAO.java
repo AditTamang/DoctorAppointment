@@ -552,4 +552,94 @@ public class UserDAO {
             return false;
         }
     }
+
+    /**
+     * Check if a doctor is approved
+     * @param userId The user ID of the doctor
+     * @return true if the doctor is approved, false otherwise
+     */
+    public boolean isDoctorApproved(int userId) {
+        if (userId <= 0) {
+            System.out.println("Invalid user ID provided for doctor approval check: " + userId);
+            return false;
+        }
+
+        try {
+            // First check if the user exists and is a doctor
+            User user = getUserById(userId);
+            if (user == null) {
+                System.out.println("User not found with ID: " + userId);
+                return false;
+            }
+
+            if (!"DOCTOR".equals(user.getRole())) {
+                System.out.println("User is not a doctor. User ID: " + userId + ", Role: " + user.getRole());
+                return false;
+            }
+
+            // Check if the doctor has an entry in the doctors table with status APPROVED
+            String query = "SELECT status FROM doctors WHERE user_id = ?";
+
+            try (Connection conn = DBConnection.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+                pstmt.setInt(1, userId);
+
+                try {
+                    // First try a query that doesn't rely on the status column
+                    // This checks if the doctor record exists at all
+                    String checkQuery = "SELECT 1 FROM doctors WHERE user_id = ?";
+                    try (PreparedStatement checkStmt = conn.prepareStatement(checkQuery)) {
+                        checkStmt.setInt(1, userId);
+                        try (ResultSet checkRs = checkStmt.executeQuery()) {
+                            if (!checkRs.next()) {
+                                // No doctor record found
+                                System.out.println("No doctor record found for user ID: " + userId);
+                                return false;
+                            }
+                        }
+                    }
+
+                    // Now try to check the status column
+                    try (ResultSet rs = pstmt.executeQuery()) {
+                        if (rs.next()) {
+                            try {
+                                String status = rs.getString("status");
+                                // If status column exists and is not null, check if it's APPROVED
+                                if (status != null) {
+                                    boolean approved = "APPROVED".equals(status);
+                                    System.out.println("Doctor approval status for user ID " + userId + ": " + approved + " (Status: " + status + ")");
+                                    return approved;
+                                }
+                                // If status is null, assume the doctor is approved (backward compatibility)
+                                System.out.println("Doctor status is null for user ID " + userId + ", assuming approved");
+                                return true;
+                            } catch (SQLException columnEx) {
+                                // If status column doesn't exist, assume the doctor is approved
+                                System.out.println("Status column doesn't exist in doctors table: " + columnEx.getMessage());
+                                return true;
+                            }
+                        } else {
+                            // This shouldn't happen since we already checked if the record exists
+                            System.out.println("Unexpected: No result from status query for user ID: " + userId);
+                            return true; // Assume approved for backward compatibility
+                        }
+                    }
+                } catch (SQLException queryEx) {
+                    // If the query fails completely (e.g., table doesn't exist), log and assume approved
+                    System.out.println("Error querying doctor status: " + queryEx.getMessage());
+                    return true; // Assume approved for backward compatibility
+                }
+
+            } catch (SQLException | ClassNotFoundException e) {
+                System.err.println("Database error checking doctor approval status: " + e.getMessage());
+                // In case of error, default to not approved for safety
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println("Unexpected error checking doctor approval status: " + e.getMessage());
+            // In case of any other error, default to not approved for safety
+            return false;
+        }
+    }
 }

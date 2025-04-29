@@ -283,71 +283,22 @@ package com.doctorapp.dao;
              System.out.println("Creating doctor record for user ID: " + userId);
 
              try {
-                 // First check the structure of the doctors table to see what columns exist
-                 System.out.println("Checking doctors table structure...");
-                 boolean hasEmailColumn = false;
-                 boolean hasPhoneColumn = false;
-                 boolean hasAddressColumn = false;
+                 // Simplify the approach - don't try to modify the table structure
+                 // Just insert the basic doctor record with the required fields
+                 System.out.println("Creating doctor record with basic fields only");
 
-                 try {
-                     // Get metadata about the doctors table
-                     java.sql.DatabaseMetaData dbmd = conn.getMetaData();
-                     try (ResultSet columns = dbmd.getColumns(null, null, "doctors", null)) {
-                         while (columns.next()) {
-                             String columnName = columns.getString("COLUMN_NAME");
-                             System.out.println("Found column: " + columnName);
+                 // Use a simple query with only the essential fields
+                 String basicDoctorQuery = "INSERT INTO doctors (user_id, specialization, qualification, experience) VALUES (?, ?, ?, ?)";
 
-                             if ("email".equalsIgnoreCase(columnName)) {
-                                 hasEmailColumn = true;
-                             } else if ("phone".equalsIgnoreCase(columnName)) {
-                                 hasPhoneColumn = true;
-                             } else if ("address".equalsIgnoreCase(columnName)) {
-                                 hasAddressColumn = true;
-                             }
-                         }
-                     }
-                 } catch (SQLException e) {
-                     System.out.println("Warning: Could not check table structure: " + e.getMessage());
-                     // Continue with minimal columns
-                 }
+                 try (PreparedStatement pstmt = conn.prepareStatement(basicDoctorQuery)) {
+                     pstmt.setInt(1, userId);
+                     pstmt.setString(2, request.getSpecialization() != null ? request.getSpecialization() : "General");
+                     pstmt.setString(3, request.getQualification() != null ? request.getQualification() : "MBBS");
+                     pstmt.setString(4, request.getExperience() != null ? request.getExperience() : "0 years");
 
-                 // Build the SQL query dynamically based on the columns that exist
-                 StringBuilder queryBuilder = new StringBuilder("INSERT INTO doctors (user_id, specialization, qualification, experience");
-                 if (hasEmailColumn) queryBuilder.append(", email");
-                 if (hasPhoneColumn) queryBuilder.append(", phone");
-                 if (hasAddressColumn) queryBuilder.append(", address");
-                 queryBuilder.append(") VALUES (?, ?, ?, ?");
-                 if (hasEmailColumn) queryBuilder.append(", ?");
-                 if (hasPhoneColumn) queryBuilder.append(", ?");
-                 if (hasAddressColumn) queryBuilder.append(", ?");
-                 queryBuilder.append(")");
-
-                 String doctorQuery = queryBuilder.toString();
-                 System.out.println("Using SQL query: " + doctorQuery);
-
-                 try (PreparedStatement pstmt = conn.prepareStatement(doctorQuery)) {
-                     int paramIndex = 1;
-                     pstmt.setInt(paramIndex++, userId);
-
-                     // Set required fields with null checks
-                     pstmt.setString(paramIndex++, request.getSpecialization() != null ? request.getSpecialization() : "General");
-                     pstmt.setString(paramIndex++, request.getQualification() != null ? request.getQualification() : "MBBS");
-                     pstmt.setString(paramIndex++, request.getExperience() != null ? request.getExperience() : "0 years");
-
-                     // Set optional fields if they exist in the table
-                     if (hasEmailColumn) {
-                         pstmt.setString(paramIndex++, request.getEmail() != null ? request.getEmail() : "");
-                     }
-                     if (hasPhoneColumn) {
-                         pstmt.setString(paramIndex++, request.getPhone() != null ? request.getPhone() : "");
-                     }
-                     if (hasAddressColumn) {
-                         pstmt.setString(paramIndex++, request.getAddress() != null ? request.getAddress() : "");
-                     }
-
-                     System.out.println("Executing doctor insert SQL with parameters: " +
-                                       userId + ", " + request.getSpecialization() + ", " +
-                                       request.getQualification() + ", " + request.getExperience());
+                     System.out.println("Executing basic doctor insert SQL with parameters: " +
+                                      userId + ", " + request.getSpecialization() + ", " +
+                                      request.getQualification() + ", " + request.getExperience());
 
                      int rowsAffected = pstmt.executeUpdate();
                      System.out.println("Doctor record created successfully. Rows affected: " + rowsAffected);
@@ -355,63 +306,70 @@ package com.doctorapp.dao;
                      if (rowsAffected <= 0) {
                          throw new SQLException("Failed to insert doctor record. No rows affected.");
                      }
+                 }
 
-                     // Now update the other fields one by one to handle potential schema differences
+                 // Now try to update additional fields one by one
+                 System.out.println("Updating additional doctor fields...");
+
+                 // Try to update email
+                 safeUpdateDoctorField(conn, userId, "email", request.getEmail() != null ? request.getEmail() : "");
+
+                 // Try to update phone
+                 safeUpdateDoctorField(conn, userId, "phone", request.getPhone() != null ? request.getPhone() : "");
+
+                 // Try to update address
+                 safeUpdateDoctorField(conn, userId, "address", request.getAddress() != null ? request.getAddress() : "");
+
+                 // Try to update status - this might fail if the column doesn't exist, but that's okay
+                 try {
+                     safeUpdateDoctorField(conn, userId, "status", "APPROVED");
+                 } catch (Exception e) {
+                     System.out.println("Could not update status field: " + e.getMessage());
+                     System.out.println("This is not critical - the doctor record was created successfully");
+                 }
+
+                 // Now update the other fields one by one to handle potential schema differences
+                 try {
+                     // Try to update each field, but don't fail if a field doesn't exist
+                     safeUpdateDoctorField(conn, userId, "consultation_fee", "1000");
+                     safeUpdateDoctorField(conn, userId, "available_days", "Monday,Tuesday,Wednesday,Thursday,Friday");
+                     safeUpdateDoctorField(conn, userId, "available_time", "09:00 AM - 05:00 PM");
+                     safeUpdateDoctorField(conn, userId, "bio", request.getBio() != null ? request.getBio() : "");
+                     safeUpdateDoctorField(conn, userId, "image_url", "/assets/images/doctors/default-doctor.png");
+                 } catch (Exception e) {
+                     System.out.println("Could not update some doctor fields: " + e.getMessage());
+                     System.out.println("This is not critical - the doctor record was created successfully");
+                 }
+
+                 // After successful doctor creation, update the name field separately
+                 // This is to handle the case where the name column might be added later
+                 try {
+                     String firstName = request.getFirstName() != null ? request.getFirstName() : "";
+                     String lastName = request.getLastName() != null ? request.getLastName() : "";
+                     String fullName = "Dr. " + firstName + " " + lastName;
+
+                     // Check if the name column exists before trying to update it
+                     boolean hasNameColumn = false;
                      try {
-                         // Try to update each field, but don't fail if a field doesn't exist
-                         safeUpdateDoctorField(conn, userId, "consultation_fee", "1000");
-                         safeUpdateDoctorField(conn, userId, "available_days", "Monday,Tuesday,Wednesday,Thursday,Friday");
-                         safeUpdateDoctorField(conn, userId, "available_time", "09:00 AM - 05:00 PM");
-                         safeUpdateDoctorField(conn, userId, "bio", request.getBio() != null ? request.getBio() : "");
-                         safeUpdateDoctorField(conn, userId, "image_url", "/assets/images/doctors/default-doctor.png");
-
-                         // Only update these if they weren't included in the initial INSERT
-                         if (!hasPhoneColumn) {
-                             safeUpdateDoctorField(conn, userId, "phone", request.getPhone() != null ? request.getPhone() : "");
-                         }
-
-                         if (!hasAddressColumn) {
-                             safeUpdateDoctorField(conn, userId, "address", request.getAddress() != null ? request.getAddress() : "");
-                         }
-
-                         if (!hasEmailColumn) {
-                             safeUpdateDoctorField(conn, userId, "email", request.getEmail() != null ? request.getEmail() : "");
-                         }
-                     } catch (Exception e) {
-                         System.out.println("Warning: Some doctor fields could not be updated: " + e.getMessage());
-                         // Continue anyway since the basic doctor record was created
-                     }
-
-                     // After successful doctor creation, update the name field separately
-                     // This is to handle the case where the name column might be added later
-                     try {
-                         String firstName = request.getFirstName() != null ? request.getFirstName() : "";
-                         String lastName = request.getLastName() != null ? request.getLastName() : "";
-                         String fullName = "Dr. " + firstName + " " + lastName;
-
-                         // Check if the name column exists before trying to update it
-                         boolean hasNameColumn = false;
-                         try {
-                             java.sql.DatabaseMetaData dbmd = conn.getMetaData();
-                             try (ResultSet columns = dbmd.getColumns(null, null, "doctors", "name")) {
-                                 if (columns.next()) {
-                                     hasNameColumn = true;
-                                     System.out.println("Found name column in doctors table");
-                                 }
+                         java.sql.DatabaseMetaData dbmd = conn.getMetaData();
+                         try (ResultSet columns = dbmd.getColumns(null, null, "doctors", "name")) {
+                             if (columns.next()) {
+                                 hasNameColumn = true;
+                                 System.out.println("Found name column in doctors table");
                              }
-                         } catch (SQLException e) {
-                             System.out.println("Warning: Could not check if name column exists: " + e.getMessage());
                          }
-
-                         if (hasNameColumn) {
-                             safeUpdateDoctorField(conn, userId, "name", fullName.trim());
-                         } else {
-                             System.out.println("Note: name column does not exist in doctors table, skipping update");
-                         }
-                     } catch (Exception e) {
-                         // If this fails, it's not critical - the doctor record was still created
-                         System.out.println("Note: Could not update doctor name field: " + e.getMessage());
+                     } catch (SQLException e) {
+                         System.out.println("Warning: Could not check if name column exists: " + e.getMessage());
                      }
+
+                     if (hasNameColumn) {
+                         safeUpdateDoctorField(conn, userId, "name", fullName.trim());
+                     } else {
+                         System.out.println("Note: name column does not exist in doctors table, skipping update");
+                     }
+                 } catch (Exception e) {
+                     // If this fails, it's not critical - the doctor record was still created
+                     System.out.println("Note: Could not update doctor name field: " + e.getMessage());
                  }
              } catch (SQLException e) {
                  System.err.println("Error creating doctor record: " + e.getMessage());
@@ -717,16 +675,35 @@ package com.doctorapp.dao;
       * @throws SQLException If a database error occurs
       */
      private void updateDoctorField(Connection conn, int userId, String fieldName, String fieldValue) throws SQLException {
+         // Validate inputs to prevent SQL injection
+         if (!isValidColumnName(fieldName)) {
+             throw new SQLException("Invalid column name: " + fieldName);
+         }
+
          String updateQuery = "UPDATE doctors SET " + fieldName + " = ? WHERE user_id = ?";
          try (PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
              pstmt.setString(1, fieldValue);
              pstmt.setInt(2, userId);
-             pstmt.executeUpdate();
-             System.out.println("Updated doctor field: " + fieldName + " = " + fieldValue);
+             int rowsAffected = pstmt.executeUpdate();
+             System.out.println("Updated doctor field: " + fieldName + " = " + fieldValue + ", rows affected: " + rowsAffected);
+
+             if (rowsAffected <= 0) {
+                 System.out.println("Warning: No rows affected when updating doctor field: " + fieldName);
+             }
          } catch (SQLException e) {
              System.out.println("Failed to update doctor field " + fieldName + ": " + e.getMessage());
              throw e;
          }
+     }
+
+     /**
+      * Helper method to validate a column name to prevent SQL injection
+      * @param columnName The column name to validate
+      * @return true if the column name is valid, false otherwise
+      */
+     private boolean isValidColumnName(String columnName) {
+         // Only allow alphanumeric characters and underscores
+         return columnName != null && columnName.matches("^[a-zA-Z0-9_]+$");
      }
 
      /**
@@ -738,11 +715,41 @@ package com.doctorapp.dao;
       * @param fieldValue The value to set
       */
      private void safeUpdateDoctorField(Connection conn, int userId, String fieldName, String fieldValue) {
+         // Validate the field name first to prevent SQL injection
+         if (!isValidColumnName(fieldName)) {
+             System.out.println("Warning: Invalid column name: " + fieldName + ", skipping update");
+             return;
+         }
+
+         // First check if the field exists in the doctors table
+         boolean fieldExists = false;
          try {
-             updateDoctorField(conn, userId, fieldName, fieldValue);
+             // Check if the column exists in the table
+             java.sql.DatabaseMetaData dbmd = conn.getMetaData();
+             try (ResultSet columns = dbmd.getColumns(null, null, "doctors", fieldName)) {
+                 fieldExists = columns.next(); // Will be true if the column exists
+             }
+
+             if (fieldExists) {
+                 // Field exists, try to update it
+                 try {
+                     updateDoctorField(conn, userId, fieldName, fieldValue);
+                 } catch (SQLException e) {
+                     System.out.println("Note: Could not update doctor field " + fieldName + ": " + e.getMessage());
+                     // Ignore the exception - this is expected for fields that don't exist
+                 }
+             } else {
+                 System.out.println("Note: Field '" + fieldName + "' does not exist in doctors table, skipping update");
+             }
          } catch (SQLException e) {
-             System.out.println("Note: Could not update doctor field " + fieldName + ": " + e.getMessage());
-             // Ignore the exception - this is expected for fields that don't exist
+             System.out.println("Warning: Could not check if field '" + fieldName + "' exists: " + e.getMessage());
+             // Try the update anyway as a fallback
+             try {
+                 updateDoctorField(conn, userId, fieldName, fieldValue);
+             } catch (SQLException updateEx) {
+                 System.out.println("Note: Could not update doctor field " + fieldName + ": " + updateEx.getMessage());
+                 // Ignore the exception - this is expected for fields that don't exist
+             }
          }
      }
 

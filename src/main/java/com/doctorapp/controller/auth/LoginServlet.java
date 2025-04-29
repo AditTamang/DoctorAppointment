@@ -45,19 +45,42 @@ public class LoginServlet extends HttpServlet {
         boolean rememberMe = "on".equals(request.getParameter("rememberMe"));
 
         try {
-            User user = userService.login(email, password);
-
-            if (user != null) {
-                // For doctors, check if there's a pending registration request
-                if ("DOCTOR".equals(user.getRole())) {
-                    // Check if there's a pending doctor registration request for this email
-                    boolean hasPendingRequest = doctorRegistrationService.getPendingRequests().stream()
-                            .anyMatch(req -> req.getEmail().equals(email));
+            // First check if there's a pending doctor registration request for this email
+            // Only check for pending requests if email is not null or empty
+            if (email != null && !email.trim().isEmpty()) {
+                try {
+                    boolean hasPendingRequest = doctorRegistrationService.hasPendingRequest(email);
 
                     if (hasPendingRequest) {
                         request.setAttribute("error", "Your doctor registration request is still pending approval. You will be notified when your account is approved.");
                         request.getRequestDispatcher("/login.jsp").forward(request, response);
                         return;
+                    }
+                } catch (Exception e) {
+                    // Log the error but continue with login attempt
+                    System.err.println("Error checking for pending doctor registration: " + e.getMessage());
+                }
+            }
+
+            User user = userService.login(email, password);
+
+            if (user != null) {
+                // For doctors, verify they are approved
+                if ("DOCTOR".equals(user.getRole())) {
+                    try {
+                        // Check if the doctor has been approved
+                        boolean isDoctorApproved = doctorRegistrationService.isDoctorApproved(user.getId());
+
+                        if (!isDoctorApproved) {
+                            request.setAttribute("error", "Your doctor account has not been approved yet. Please wait for admin approval or contact support.");
+                            request.getRequestDispatcher("/login.jsp").forward(request, response);
+                            return;
+                        }
+                    } catch (Exception e) {
+                        // Log the error but allow login if we can't determine approval status
+                        System.err.println("Error checking doctor approval status: " + e.getMessage());
+                        // For security, we'll assume the doctor is approved if we can't check
+                        // This prevents locking out doctors if the approval system has an error
                     }
                 }
 

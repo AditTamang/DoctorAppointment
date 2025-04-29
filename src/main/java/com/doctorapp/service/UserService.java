@@ -114,4 +114,13 @@ public class UserService {
     public boolean deleteUser(int id) {
         return userDAO.deleteUser(id);
     }
+
+    /**
+     * Check if a doctor is approved
+     * @param userId The user ID of the doctor
+     * @return true if the doctor is approved, false otherwise
+     */
+    public boolean isDoctorApproved(int userId) {
+        return userDAO.isDoctorApproved(userId);
+    }
 }
