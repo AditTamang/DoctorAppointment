@@ -102,7 +102,7 @@ public class LoginServlet extends HttpServlet {
                         response.sendRedirect(request.getContextPath() + "/admin/index.jsp");
                     } else if ("DOCTOR".equals(user.getRole())) {
                         // Redirect doctors to their dashboard
-                        response.sendRedirect(request.getContextPath() + "/dashboard");
+                        response.sendRedirect(request.getContextPath() + "/doctor/dashboard");
                     } else {
                         // Redirect patients to the index page
                         response.sendRedirect(request.getContextPath() + "/index.jsp");

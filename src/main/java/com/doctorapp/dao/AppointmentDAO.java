@@ -747,4 +747,30 @@ public class AppointmentDAO {
 
          return 0;
      }
+
+     /**
+      * Get cancelled appointments by doctor
+      * @param doctorId The doctor's ID
+      * @return Count of cancelled appointments
+      */
+     public int getCancelledAppointmentsByDoctor(int doctorId) {
+         String query = "SELECT COUNT(*) FROM appointments WHERE doctor_id = ? AND status = 'CANCELLED'";
+
+         try (Connection conn = DBConnection.getConnection();
+              PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+             pstmt.setInt(1, doctorId);
+
+             try (ResultSet rs = pstmt.executeQuery()) {
+                 if (rs.next()) {
+                     return rs.getInt(1);
+                 }
+             }
+
+         } catch (SQLException | ClassNotFoundException e) {
+             LOGGER.log(Level.SEVERE, "Error getting cancelled appointments by doctor ID: " + doctorId, e);
+         }
+
+         return 0;
+     }
  }

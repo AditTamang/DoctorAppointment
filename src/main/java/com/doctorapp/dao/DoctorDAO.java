@@ -1370,4 +1370,62 @@ package com.doctorapp.dao;
 
          return 0;
      }
+
+     /**
+      * Get the count of patients consulted by a doctor
+      * @param doctorId The doctor's ID
+      * @return The count of patients consulted
+      */
+     public int getPatientsConsultedByDoctor(int doctorId) {
+         String query = "SELECT COUNT(DISTINCT patient_id) FROM appointments WHERE doctor_id = ? AND status = 'COMPLETED'";
+
+         try (Connection conn = DBConnection.getConnection();
+              PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+             pstmt.setInt(1, doctorId);
+
+             try (ResultSet rs = pstmt.executeQuery()) {
+                 if (rs.next()) {
+                     return rs.getInt(1);
+                 }
+             }
+
+         } catch (SQLException | ClassNotFoundException e) {
+             System.err.println("Error getting patients consulted by doctor: " + e.getMessage());
+             e.printStackTrace();
+         }
+
+         return 0;
+     }
+
+     /**
+      * Add a doctor profile for an existing user
+      * @param doctor The doctor object with user_id set
+      * @return true if successful, false otherwise
+      */
+     public boolean addDoctorProfile(Doctor doctor) {
+         String query = "INSERT INTO doctors (user_id, specialization, qualification, experience, consultation_fee, profile_image, bio, status) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+         try (Connection conn = DBConnection.getConnection();
+              PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+             pstmt.setInt(1, doctor.getUserId());
+             pstmt.setString(2, doctor.getSpecialization());
+             pstmt.setString(3, doctor.getQualification());
+             pstmt.setString(4, doctor.getExperience());
+             pstmt.setString(5, doctor.getConsultationFee());
+             pstmt.setString(6, doctor.getProfileImage());
+             pstmt.setString(7, doctor.getBio());
+             pstmt.setString(8, doctor.getStatus() != null ? doctor.getStatus() : "ACTIVE");
+
+             int rowsAffected = pstmt.executeUpdate();
+             return rowsAffected > 0;
+
+         } catch (SQLException | ClassNotFoundException e) {
+             System.err.println("Error adding doctor profile: " + e.getMessage());
+             e.printStackTrace();
+             return false;
+         }
+     }
  }

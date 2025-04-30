@@ -11,71 +11,65 @@
     <title>Doctor Dashboard - Doctor Appointment System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<<<<<<< HEAD
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/dashboard.css">
     <style>
         <%@include file="./assets/css/style.css"%>
     </style>
-=======
-    <style>
-        <%@include file="./assets/css/style.css"%>
-    </style>
-    <link rel="stylesheet" href="<c:url value='/assets/css/dashboard.css'/>">
->>>>>>> 0ecac4fc45cf226cd4605d77094f1abb4a562254
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/doctor-dashboard.css">
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
+        <!-- Left Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <div class="logo">
-                    <span class="logo-icon"><i class="fas fa-hospital"></i></span>
-                    <span class="logo-text">Med<span>Doc</span></span>
+                <div class="doctor-profile-small">
+                    <img src="${doctor.profileImage != null ? doctor.profileImage : pageContext.request.contextPath.concat('/assets/images/default-doctor.png')}" alt="Doctor Profile" class="profile-pic-small">
+                    <div class="status-indicator ${doctor.status == 'ACTIVE' ? 'active' : 'inactive'}"></div>
                 </div>
-                <button class="sidebar-close" id="sidebarClose">
-                    <i class="fas fa-times"></i>
+                <h3>Dr. ${sessionScope.user.firstName} ${sessionScope.user.lastName}</h3>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
                 </button>
-            </div>
-
-            <div class="sidebar-user">
-                <div class="user-image">
-                    <img src="<c:url value='/assets/images/doctors/d1.png'/>" alt="Doctor">
-                </div>
-                <div class="user-details">
-                    <h4>${doctor != null ? 'Dr. ' + doctor.name : 'Doctor'}</h4>
-                    <p>${doctor != null ? doctor.specialization : 'Specialist'}</p>
-                </div>
             </div>
 
             <nav class="sidebar-nav">
                 <ul>
                     <li class="active">
-                        <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                        <a href="#dashboard-section"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
                     </li>
                     <li>
-                        <a href="#"><i class="fas fa-calendar-alt"></i> Appointments</a>
+                        <a href="#profile-section"><i class="fas fa-user-md"></i> <span>Profile</span></a>
                     </li>
                     <li>
-                        <a href="#"><i class="fas fa-users"></i> My Patients</a>
+                        <a href="#appointments-section"><i class="fas fa-calendar-check"></i> <span>Appointments</span></a>
                     </li>
                     <li>
-                        <a href="#"><i class="fas fa-clock"></i> Schedule</a>
+                        <a href="#patients-section"><i class="fas fa-users"></i> <span>Patients</span></a>
                     </li>
                     <li>
-                        <a href="#"><i class="fas fa-file-medical"></i> Medical Records</a>
+                        <a href="#availability-section"><i class="fas fa-clock"></i> <span>Availability</span></a>
                     </li>
                     <li>
-                        <a href="#"><i class="fas fa-comments"></i> Messages</a>
+                        <a href="#packages-section"><i class="fas fa-medkit"></i> <span>Health Packages</span></a>
                     </li>
                     <li>
-                        <a href="#"><i class="fas fa-user-edit"></i> Profile</a>
-                    </li>
-                    <li class="sidebar-divider"></li>
-                    <li>
-                        <a href="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        <a href="#account-section"><i class="fas fa-cog"></i> <span>Account</span></a>
                     </li>
                 </ul>
             </nav>
+
+            <div class="sidebar-footer">
+                <div class="status-toggle">
+                    <span>Status:</span>
+                    <label class="switch">
+                        <input type="checkbox" id="status-toggle" ${doctor.status == 'ACTIVE' ? 'checked' : ''}>
+                        <span class="slider round"></span>
+                    </label>
+                    <span id="status-text">${doctor.status == 'ACTIVE' ? 'Active' : 'Inactive'}</span>
+                </div>
+                <a href="${pageContext.request.contextPath}/logout" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </a>
+            </div>
         </aside>
 
         <!-- Main Content -->

@@ -130,30 +130,8 @@ package com.doctorapp.controller.servlets;
      }
 
      private void loadDoctorDashboard(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-         // Get the logged-in doctor's ID
-         HttpSession session = request.getSession(false);
-         User user = (User) session.getAttribute("user");
-         int doctorId = doctorDAO.getDoctorIdByUserId(user.getId());
-
-         if (doctorId == 0) {
-             // Doctor profile not found, redirect to complete profile
-             response.sendRedirect(request.getContextPath() + "/complete-profile.jsp");
-             return;
-         }
-
-         // Load doctor dashboard data
-         request.setAttribute("totalPatients", doctorDAO.getTotalPatientsByDoctor(doctorId));
-         request.setAttribute("weeklyAppointments", appointmentDAO.getWeeklyAppointmentsByDoctor(doctorId));
-         request.setAttribute("pendingReports", doctorDAO.getPendingReportsByDoctor(doctorId));
-         request.setAttribute("averageRating", doctorDAO.getAverageRatingByDoctor(doctorId));
-
-         // Get today's appointments
-         request.setAttribute("todayAppointments", appointmentDAO.getTodayAppointmentsByDoctor(doctorId));
-         request.setAttribute("recentPatients", patientDAO.getRecentPatientsByDoctor(doctorId, 4));
-         request.setAttribute("upcomingAppointments", appointmentDAO.getUpcomingAppointmentsByDoctor(doctorId, 4));
-
-         // Forward to doctor dashboard
-         request.getRequestDispatcher("/doctor-dashboard.jsp").forward(request, response);
+         // Redirect to the doctor dashboard servlet which will handle all the logic
+         response.sendRedirect(request.getContextPath() + "/doctor/dashboard");
      }
 
      private void loadPatientDashboard(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

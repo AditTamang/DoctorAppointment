@@ -114,7 +114,7 @@ public class SessionFilter implements Filter {
                     httpResponse.sendRedirect(contextPath + "/admin/index.jsp");
                     return;
                 } else if ("DOCTOR".equals(user.getRole())) {
-                    httpResponse.sendRedirect(contextPath + "/doctor/doctorDashboard.jsp");
+                    httpResponse.sendRedirect(contextPath + "/doctor/dashboard");
                     return;
                 } else if ("PATIENT".equals(user.getRole())) {
                     httpResponse.sendRedirect(contextPath + "/patient/patientDashboard.jsp");
