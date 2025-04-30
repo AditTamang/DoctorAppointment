@@ -18,7 +18,7 @@ public class LogoutServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Use SessionUtil to invalidate the session and remove cookies
+        // Use SessionUtil to the invalidate the session and remove cookies
         SessionUtil.invalidateUserSession(request, response);
 
         // Redirect to login page
