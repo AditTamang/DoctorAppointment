@@ -385,19 +385,14 @@ public class UserDAO {
                     patientResult = pstmt.executeUpdate();
                 }
             } else {
-                // Insert new patient record
-                // Get user details to populate the fields
-                User userDetails = getUserById(userId);
-
-                String insertQuery = "INSERT INTO patients (user_id, first_name, last_name, date_of_birth, gender, phone, address, email, blood_group, allergies) " +
-                                   "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
+                // Insert new patient record with user's first_name and last_name
+                String insertQuery = "INSERT INTO patients (user_id, first_name, last_name, date_of_birth, gender, phone, address, blood_group, allergies) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 try (PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
                     pstmt.setInt(1, userId);
-                    pstmt.setString(2, userDetails.getFirstName());
-                    pstmt.setString(3, userDetails.getLastName());
+                    pstmt.setString(2, user.getFirstName() != null ? user.getFirstName() : "");
+                    pstmt.setString(3, user.getLastName() != null ? user.getLastName() : "");
 
-                    // Handle date_of_birth (DATE type in database)
+                    // Convert dateOfBirth string to SQL Date if not null or empty
                     if (dateOfBirth != null && !dateOfBirth.isEmpty()) {
                         try {
                             java.sql.Date sqlDate = java.sql.Date.valueOf(dateOfBirth);
@@ -411,12 +406,10 @@ public class UserDAO {
                     }
 
                     pstmt.setString(5, gender);
-                    pstmt.setString(6, userDetails.getPhone());
+                    pstmt.setString(6, user.getPhone());
                     pstmt.setString(7, address);
-                    pstmt.setString(8, userDetails.getEmail());
-                    pstmt.setString(9, bloodGroup);
-                    pstmt.setString(10, allergies);
-
+                    pstmt.setString(8, bloodGroup);
+                    pstmt.setString(9, allergies);
                     patientResult = pstmt.executeUpdate();
                 }
             }

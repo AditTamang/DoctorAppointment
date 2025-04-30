@@ -103,14 +103,35 @@ package com.doctorapp.controller.servlets;
      }
 
      private void showDoctorDetails(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-         int id = Integer.parseInt(request.getParameter("id"));
-         Doctor doctor = doctorService.getDoctorById(id);
+         try {
+             int id = Integer.parseInt(request.getParameter("id"));
+             Doctor doctor = doctorService.getDoctorById(id);
 
-         if (doctor != null) {
-             request.setAttribute("doctor", doctor);
-             request.getRequestDispatcher("/doctor-details.jsp").forward(request, response);
-         } else {
-             response.sendRedirect(request.getContextPath() + "/doctors");
+             if (doctor != null) {
+                 // Check if doctor is active
+                 if (doctor.getStatus() != null && doctor.getStatus().equals("ACTIVE")) {
+                     request.setAttribute("doctor", doctor);
+                     request.getRequestDispatcher("/doctor-details.jsp").forward(request, response);
+                 } else {
+                     // Doctor is not active, redirect to doctors list
+                     request.setAttribute("error", "The requested doctor profile is not available.");
+                     request.getRequestDispatcher("/doctors.jsp").forward(request, response);
+                 }
+             } else {
+                 // Doctor not found, redirect to doctors list
+                 request.setAttribute("error", "Doctor not found.");
+                 request.getRequestDispatcher("/doctors.jsp").forward(request, response);
+             }
+         } catch (NumberFormatException e) {
+             // Handle invalid doctor ID
+             System.err.println("Invalid doctor ID: " + e.getMessage());
+             request.setAttribute("error", "Invalid doctor ID.");
+             request.getRequestDispatcher("/doctors.jsp").forward(request, response);
+         } catch (Exception e) {
+             // Log any other errors
+             System.err.println("Error showing doctor details: " + e.getMessage());
+             e.printStackTrace();
+             response.sendRedirect(request.getContextPath() + "/error.jsp");
          }
      }
 

@@ -38,7 +38,7 @@
                     <img src="${pageContext.request.contextPath}/assets/images/patients/p1.png" alt="Patient">
                 </div>
                 <div class="user-details">
-                    <h4>${sessionScope.user != null ? sessionScope.user.firstName.concat(' ').concat(sessionScope.user.lastName) : 'Patient'}</h4>
+                    <h4>John Doe</h4>
                     <p>Patient</p>
                 </div>
             </div>
@@ -46,16 +46,13 @@
             <nav class="sidebar-nav">
                 <ul>
                     <li class="active">
-                        <a href="${pageContext.request.contextPath}/patient/new-dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                        <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
                     </li>
                     <li>
-                        <a href="${pageContext.request.contextPath}/patient/dashboard"><i class="fas fa-home"></i> Regular Dashboard</a>
+                        <a href="#"><i class="fas fa-calendar-alt"></i> Appointments</a>
                     </li>
                     <li>
-                        <a href="${pageContext.request.contextPath}/patient/appointments"><i class="fas fa-calendar-alt"></i> Appointments</a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/doctors"><i class="fas fa-user-md"></i> Find Doctors</a>
+                        <a href="#"><i class="fas fa-user-md"></i> Find Doctors</a>
                     </li>
                     <li>
                         <a href="#"><i class="fas fa-file-medical"></i> Medical Records</a>
@@ -71,7 +68,7 @@
                     </li>
                     <li class="sidebar-divider"></li>
                     <li>
-                        <a href="${pageContext.request.contextPath}/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        <a href="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </li>
                 </ul>
             </nav>
@@ -103,7 +100,7 @@
                     </div>
                     <div class="user-profile">
                         <img src="${pageContext.request.contextPath}/assets/images/patients/p1.png" alt="Patient">
-                        <span>${sessionScope.user != null ? sessionScope.user.firstName.concat(' ').concat(sessionScope.user.lastName) : 'Patient'}</span>
+                        <span>John Doe</span>
                         <i class="fas fa-chevron-down"></i>
                     </div>
                 </div>
@@ -122,7 +119,7 @@
                 <!-- Welcome Banner -->
                 <div class="welcome-banner">
                     <div class="welcome-content">
-                        <h2>Welcome back, ${sessionScope.user != null ? sessionScope.user.firstName : 'Patient'}!</h2>
+                        <h2>Welcome back, ${user != null ? user.username : 'Patient'}!</h2>
                         <c:choose>
                             <c:when test="${nextAppointment != null}">
                                 <p>Your next appointment is scheduled for <strong>${nextAppointment.formattedDateTime}</strong> with <strong>Dr. ${nextAppointment.doctorName}</strong>.</p>

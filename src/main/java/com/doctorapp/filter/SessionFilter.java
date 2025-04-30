@@ -28,7 +28,7 @@ public class SessionFilter implements Filter {
     // List of paths that don't require authentication
     private static final List<String> PUBLIC_PATHS = Arrays.asList(
             "/", "/login", "/register", "/logout", "/index.jsp", "/login.jsp", "/register.jsp",
-            "/about-us", "/contact-us", "/doctors", "/assets/", "/error.jsp", "/404.jsp",
+            "/about-us", "/contact-us", "/doctors", "/doctor/details", "/assets/", "/error.jsp", "/404.jsp",
             "/index", "/home", "/css/", "/js/", "/images/", "/fonts/"
     );
 
@@ -91,7 +91,8 @@ public class SessionFilter implements Filter {
 
             // Doctor area protection
             if (requestURI.contains("/doctor/") || requestURI.startsWith(contextPath + "/doctor/")) {
-                if (!"DOCTOR".equals(user.getRole()) && !"ADMIN".equals(user.getRole())) {
+                // Allow access to doctor/details for all authenticated users
+                if (!requestURI.contains("/doctor/details") && !"DOCTOR".equals(user.getRole()) && !"ADMIN".equals(user.getRole())) {
                     // Redirect to dashboard if not a doctor or admin
                     httpResponse.sendRedirect(contextPath + "/dashboard");
                     return;
@@ -114,7 +115,7 @@ public class SessionFilter implements Filter {
                     httpResponse.sendRedirect(contextPath + "/admin/index.jsp");
                     return;
                 } else if ("DOCTOR".equals(user.getRole())) {
-                    httpResponse.sendRedirect(contextPath + "/doctor/dashboard");
+                    httpResponse.sendRedirect(contextPath + "/doctor/doctorDashboard.jsp");
                     return;
                 } else if ("PATIENT".equals(user.getRole())) {
                     httpResponse.sendRedirect(contextPath + "/patient/patientDashboard.jsp");

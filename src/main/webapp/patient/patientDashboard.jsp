@@ -66,9 +66,9 @@
                      </a>
                  </li>
                  <li>
-                     <a href="${pageContext.request.contextPath}/dashboard?newDashboard=true">
-                         <i class="fas fa-tachometer-alt"></i>
-                         <span>New Dashboard</span>
+                     <a href="${pageContext.request.contextPath}/contact-us">
+                         <i class="fas fa-envelope"></i>
+                         <span>Contact</span>
                      </a>
                  </li>
                  <li>
@@ -78,15 +78,15 @@
                      </a>
                  </li>
                  <li>
-                     <a href="${pageContext.request.contextPath}/patient/profile">
-                         <i class="fas fa-user"></i>
-                         <span>My Profile</span>
+                     <a href="${pageContext.request.contextPath}/about-us.jsp">
+                         <i class="fas fa-info-circle"></i>
+                         <span>About Us</span>
                      </a>
                  </li>
                  <li>
-                     <a href="${pageContext.request.contextPath}/patient/changePassword.jsp">
-                         <i class="fas fa-lock"></i>
-                         <span>Change Password</span>
+                     <a href="${pageContext.request.contextPath}/patient/profile">
+                         <i class="fas fa-user"></i>
+                         <span>My Profile</span>
                      </a>
                  </li>
              </ul>

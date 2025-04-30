@@ -1,548 +1,615 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
- <%@ page import="java.util.List" %>
- <%@ page import="com.doctorapp.model.User" %>
- <%@ page import="com.doctorapp.model.Patient" %>
- <%@ page import="com.doctorapp.model.Appointment" %>
- <%@ page import="com.doctorapp.model.Doctor" %>
- <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
- <%
-     // Check if user is logged in and is a doctor
-     User user = (User) session.getAttribute("user");
-     if (user == null || !"DOCTOR".equals(user.getRole())) {
-         response.sendRedirect(request.getContextPath() + "/login.jsp");
-         return;
-     }
- %>
- <!DOCTYPE html>
- <html lang="en">
- <head>
-     <meta charset="UTF-8">
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>Doctor Dashboard | Doctor Appointment System</title>
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctorDashboard.css">
- </head>
- <body>
-     <div class="dashboard-container">
-         <!-- Sidebar -->
-         <div class="sidebar">
-             <div class="user-profile">
-                 <div class="profile-image">
-                     <% if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) { %>
-                         <div class="profile-initials">AT</div>
-                     <% } else { %>
-                         <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
-                     <% } %>
-                 </div>
-                 <h3 class="user-name"><%= user.getFirstName() + " " + user.getLastName() %></h3>
-                 <p class="user-email"><%= user.getEmail() %></p>
-                 <p class="user-phone"><%= user.getPhone() %></p>
-             </div>
-             
- 
-             <div class="sidebar-menu">
-                 <ul>
-                     <li class="active">
-                         <a href="index.jsp">
-                             <i class="fas fa-tachometer-alt"></i>
-                             <span>Dashboard</span>
-                         </a>
-                     </li>
-                     <li>
-                         <a href="appointments.jsp">
-                             <i class="fas fa-calendar-check"></i>
-                             <span>Appointments</span>
-                         </a>
-                     </li>
-                     <li>
-                         <a href="patients.jsp">
-                             <i class="fas fa-users"></i>
-                             <span>My Patients</span>
-                         </a>
-                     </li>
-                     <li>
-                         <a href="schedule.jsp">
-                             <i class="fas fa-clock"></i>
-                             <span>Schedule</span>
-                         </a>
-                     </li>
-                     <li>
-                         <a href="prescriptions.jsp">
-                             <i class="fas fa-prescription"></i>
-                             <span>Prescriptions</span>
-                         </a>
-                     </li>
-                     <li>
-                         <a href="messages.jsp">
-                             <i class="fas fa-comment-medical"></i>
-                             <span>Messages</span>
-                             <span class="badge">5</span>
-                         </a>
-                     </li>
-                     <li>
-                         <a href="profile.jsp">
-                             <i class="fas fa-user-md"></i>
-                             <span>My Profile</span>
-                         </a>
-                     </li>
-                     <li class="logout">
-                         <a href="../logout">
-                             <i class="fas fa-sign-out-alt"></i>
-                             <span>Logout</span>
-                         </a>
-                     </li>
-                 </ul>
-             </div>
-         </div>
-         
- 
-         <!-- Main Content -->
-         <div class="dashboard-main">
-             <!-- Top Navigation -->
-             <div class="dashboard-nav">
-                 <div class="menu-toggle" id="menuToggle">
-                     <i class="fas fa-bars"></i>
-                 </div>
-                 
- 
-                 <div class="nav-right">
-                     <div class="logout-nav">
-                         <a href="${pageContext.request.contextPath}/logout" class="logout-btn">
-                             <i class="fas fa-sign-out-alt"></i> Logout
-                         </a>
-                     </div>
-                 </div>
-             </div>
-             
- 
-             <!-- Dashboard Content -->
-             <div class="dashboard-content">
-                 <div class="page-header">
-                     <h1>Doctor Dashboard</h1>
-                     <p>Welcome back, Dr. John Smith</p>
-                 </div>
-                 
- 
-                 <!-- Today's Summary -->
-                 <div class="today-summary">
-                     <div class="summary-header">
-                         <h3>Today's Summary</h3>
-                         <p class="date">Monday, April 18, 2023</p>
-                     </div>
-                     
- 
-                     <div class="stats-container">
-                         <div class="stat-card">
-                             <div class="stat-card-icon blue">
-                                 <i class="fas fa-calendar-check"></i>
-                             </div>
-                             <div class="stat-card-info">
-                                 <h3>Today's Appointments</h3>
-                                 <h2>8</h2>
-                                 <p><span class="positive"><i class="fas fa-arrow-up"></i> 2</span> from yesterday</p>
-                             </div>
-                         </div>
-                         
- 
-                         <div class="stat-card">
-                             <div class="stat-card-icon green">
-                                 <i class="fas fa-user-check"></i>
-                             </div>
-                             <div class="stat-card-info">
-                                 <h3>Patients Attended</h3>
-                                 <h2>5</h2>
-                                 <p>3 more to go</p>
-                             </div>
-                         </div>
-                         
- 
-                         <div class="stat-card">
-                             <div class="stat-card-icon purple">
-                                 <i class="fas fa-file-medical"></i>
-                             </div>
-                             <div class="stat-card-info">
-                                 <h3>Prescriptions</h3>
-                                 <h2>12</h2>
-                                 <p><span class="positive"><i class="fas fa-arrow-up"></i> 4</span> from yesterday</p>
-                             </div>
-                         </div>
-                         
- 
-                         <div class="stat-card">
-                             <div class="stat-card-icon orange">
-                                 <i class="fas fa-clock"></i>
-                             </div>
-                             <div class="stat-card-info">
-                                 <h3>Working Hours</h3>
-                                 <h2>6.5</h2>
-                                 <p>of 8 hours</p>
-                             </div>
-                         </div>
-                     </div>
-                 </div>
-                 
- 
-                 <!-- Upcoming Appointments -->
-                 <div class="upcoming-appointments">
-                     <div class="section-header">
-                         <h3>Upcoming Appointments</h3>
-                         <a href="appointments.jsp" class="view-all">View All</a>
-                     </div>
-                     
- 
-                     <div class="appointment-timeline">
-                         <div class="timeline-item current">
-                             <div class="timeline-time">
-                                 <h4>10:30 AM</h4>
-                                 <p>Current</p>
-                             </div>
-                             <div class="timeline-content">
-                                 <div class="appointment-card">
-                                     <div class="appointment-info">
-                                         <div class="patient-info">
-                                             <img src="../images/patients/patient1.jpg" alt="Patient">
-                                             <div>
-                                                 <h4>Robert Wilson</h4>
-                                                 <p>42 years, Male</p>
-                                                 <span class="appointment-type new">New Patient</span>
-                                             </div>
-                                         </div>
-                                         <div class="appointment-details">
-                                             <div class="detail-item">
-                                                 <i class="fas fa-heartbeat"></i>
-                                                 <span>Heart Checkup</span>
-                                             </div>
-                                             <div class="detail-item">
-                                                 <i class="fas fa-phone"></i>
-                                                 <span>+1 234 567 890</span>
-                                             </div>
-                                         </div>
-                                     </div>
-                                     <div class="appointment-actions">
-                                         <button class="btn btn-primary"><i class="fas fa-check-circle"></i> Start Session</button>
-                                         <button class="btn btn-outline"><i class="fas fa-times-circle"></i> Cancel</button>
-                                     </div>
-                                 </div>
-                             </div>
-                         </div>
-                         
- 
-                         <div class="timeline-item">
-                             <div class="timeline-time">
-                                 <h4>11:15 AM</h4>
-                                 <p>In 45 min</p>
-                             </div>
-                             <div class="timeline-content">
-                                 <div class="appointment-card">
-                                     <div class="appointment-info">
-                                         <div class="patient-info">
-                                             <img src="../images/patients/patient2.jpg" alt="Patient">
-                                             <div>
-                                                 <h4>Emily Parker</h4>
-                                                 <p>35 years, Female</p>
-                                                 <span class="appointment-type followup">Follow-up</span>
-                                             </div>
-                                         </div>
-                                         <div class="appointment-details">
-                                             <div class="detail-item">
-                                                 <i class="fas fa-heartbeat"></i>
-                                                 <span>Blood Pressure Check</span>
-                                             </div>
-                                             <div class="detail-item">
-                                                 <i class="fas fa-phone"></i>
-                                                 <span>+1 987 654 321</span>
-                                             </div>
-                                         </div>
-                                     </div>
-                                     <div class="appointment-actions">
-                                         <button class="btn btn-outline"><i class="fas fa-file-medical"></i> View Records</button>
-                                         <button class="btn btn-outline"><i class="fas fa-times-circle"></i> Cancel</button>
-                                     </div>
-                                 </div>
-                             </div>
-                         </div>
-                         
- 
-                         <div class="timeline-item">
-                             <div class="timeline-time">
-                                 <h4>1:30 PM</h4>
-                                 <p>In 3 hours</p>
-                             </div>
-                             <div class="timeline-content">
-                                 <div class="appointment-card">
-                                     <div class="appointment-info">
-                                         <div class="patient-info">
-                                             <img src="../images/patients/patient3.jpg" alt="Patient">
-                                             <div>
-                                                 <h4>David Thompson</h4>
-                                                 <p>58 years, Male</p>
-                                                 <span class="appointment-type emergency">Emergency</span>
-                                             </div>
-                                         </div>
-                                         <div class="appointment-details">
-                                             <div class="detail-item">
-                                                 <i class="fas fa-heartbeat"></i>
-                                                 <span>Chest Pain</span>
-                                             </div>
-                                             <div class="detail-item">
-                                                 <i class="fas fa-phone"></i>
-                                                 <span>+1 456 789 012</span>
-                                             </div>
-                                         </div>
-                                     </div>
-                                     <div class="appointment-actions">
-                                         <button class="btn btn-outline"><i class="fas fa-file-medical"></i> View Records</button>
-                                         <button class="btn btn-outline"><i class="fas fa-times-circle"></i> Cancel</button>
-                                     </div>
-                                 </div>
-                             </div>
-                         </div>
-                     </div>
-                 </div>
-                 
- 
-                 <!-- Charts and Patient Stats -->
-                 <div class="charts-container">
-                     <div class="chart-card">
-                         <div class="chart-header">
-                             <h3>Appointment Statistics</h3>
-                             <div class="chart-actions">
-                                 <select>
-                                     <option>This Week</option>
-                                     <option>This Month</option>
-                                     <option>This Year</option>
-                                 </select>
-                             </div>
-                         </div>
-                         <div class="chart-body">
-                             <canvas id="appointmentChart"></canvas>
-                         </div>
-                     </div>
-                     
- 
-                     <div class="chart-card">
-                         <div class="chart-header">
-                             <h3>Patient Demographics</h3>
-                             <div class="chart-actions">
-                                 <select>
-                                     <option>Age</option>
-                                     <option>Gender</option>
-                                     <option>Condition</option>
-                                 </select>
-                             </div>
-                         </div>
-                         <div class="chart-body">
-                             <canvas id="demographicsChart"></canvas>
-                         </div>
-                     </div>
-                 </div>
-                 
- 
-                 <!-- Recent Patients -->
-                 <div class="recent-patients">
-                     <div class="section-header">
-                         <h3>Recent Patients</h3>
-                         <a href="patients.jsp" class="view-all">View All</a>
-                     </div>
-                     
- 
-                     <div class="table-responsive">
-                         <table>
-                             <thead>
-                                 <tr>
-                                     <th>Patient</th>
-                                     <th>Last Visit</th>
-                                     <th>Diagnosis</th>
-                                     <th>Status</th>
-                                     <th>Action</th>
-                                 </tr>
-                             </thead>
-                             <tbody>
-                                 <tr>
-                                     <td>
-                                         <div class="user-info">
-                                             <img src="../images/patients/patient1.jpg" alt="Patient">
-                                             <div>
-                                                 <h4>Robert Wilson</h4>
-                                                 <p>42 years, Male</p>
-                                             </div>
-                                         </div>
-                                     </td>
-                                     <td>Today, 10:30 AM</td>
-                                     <td>Hypertension</td>
-                                     <td><span class="status-badge active">Active</span></td>
-                                     <td>
-                                         <div class="action-buttons">
-                                             <a href="#" class="btn-icon view"><i class="fas fa-eye"></i></a>
-                                             <a href="#" class="btn-icon edit"><i class="fas fa-file-medical"></i></a>
-                                             <a href="#" class="btn-icon message"><i class="fas fa-comment-medical"></i></a>
-                                         </div>
-                                     </td>
-                                 </tr>
-                                 <tr>
-                                     <td>
-                                         <div class="user-info">
-                                             <img src="../images/patients/patient2.jpg" alt="Patient">
-                                             <div>
-                                                 <h4>Emily Parker</h4>
-                                                 <p>35 years, Female</p>
-                                             </div>
-                                         </div>
-                                     </td>
-                                     <td>Yesterday, 2:15 PM</td>
-                                     <td>Arrhythmia</td>
-                                     <td><span class="status-badge active">Active</span></td>
-                                     <td>
-                                         <div class="action-buttons">
-                                             <a href="#" class="btn-icon view"><i class="fas fa-eye"></i></a>
-                                             <a href="#" class="btn-icon edit"><i class="fas fa-file-medical"></i></a>
-                                             <a href="#" class="btn-icon message"><i class="fas fa-comment-medical"></i></a>
-                                         </div>
-                                     </td>
-                                 </tr>
-                                 <tr>
-                                     <td>
-                                         <div class="user-info">
-                                             <img src="../images/patients/patient3.jpg" alt="Patient">
-                                             <div>
-                                                 <h4>David Thompson</h4>
-                                                 <p>58 years, Male</p>
-                                             </div>
-                                         </div>
-                                     </td>
-                                     <td>Apr 15, 2023</td>
-                                     <td>Coronary Artery Disease</td>
-                                     <td><span class="status-badge pending">Pending</span></td>
-                                     <td>
-                                         <div class="action-buttons">
-                                             <a href="#" class="btn-icon view"><i class="fas fa-eye"></i></a>
-                                             <a href="#" class="btn-icon edit"><i class="fas fa-file-medical"></i></a>
-                                             <a href="#" class="btn-icon message"><i class="fas fa-comment-medical"></i></a>
-                                         </div>
-                                     </td>
-                                 </tr>
-                                 <tr>
-                                     <td>
-                                         <div class="user-info">
-                                             <img src="../images/patients/patient4.jpg" alt="Patient">
-                                             <div>
-                                                 <h4>Jennifer Adams</h4>
-                                                 <p>29 years, Female</p>
-                                             </div>
-                                         </div>
-                                     </td>
-                                     <td>Apr 12, 2023</td>
-                                     <td>Mitral Valve Prolapse</td>
-                                     <td><span class="status-badge completed">Completed</span></td>
-                                     <td>
-                                         <div class="action-buttons">
-                                             <a href="#" class="btn-icon view"><i class="fas fa-eye"></i></a>
-                                             <a href="#" class="btn-icon edit"><i class="fas fa-file-medical"></i></a>
-                                             <a href="#" class="btn-icon message"><i class="fas fa-comment-medical"></i></a>
-                                         </div>
-                                     </td>
-                                 </tr>
-                             </tbody>
-                         </table>
-                     </div>
-                 </div>
-             </div>
-             
- 
-             <!-- Footer -->
-             <div class="dashboard-footer">
-                 <p>&copy; 2023 HealthCare. All Rights Reserved.</p>
-                 <p>Version 1.0.0</p>
-             </div>
-         </div>
-     </div>
-     
- 
-     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-     <script>
-         // Toggle sidebar on mobile
-         document.getElementById('menuToggle').addEventListener('click', function() {
-             document.querySelector('.dashboard-sidebar').classList.toggle('active');
-         });
-         
- 
-         document.getElementById('sidebarClose').addEventListener('click', function() {
-             document.querySelector('.dashboard-sidebar').classList.remove('active');
-         });
-         
- 
-         // Charts
-         const appointmentCtx = document.getElementById('appointmentChart').getContext('2d');
-         const appointmentChart = new Chart(appointmentCtx, {
-             type: 'line',
-             data: {
-                 labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                 datasets: [{
-                     label: 'Appointments',
-                     data: [8, 10, 6, 12, 8, 5, 8],
-                     backgroundColor: 'rgba(78, 84, 200, 0.1)',
-                     borderColor: '#4e54c8',
-                     borderWidth: 2,
-                     tension: 0.4,
-                     fill: true
-                 }]
-             },
-             options: {
-                 responsive: true,
-                 maintainAspectRatio: false,
-                 plugins: {
-                     legend: {
-                         display: false
-                     }
-                 },
-                 scales: {
-                     y: {
-                         beginAtZero: true,
-                         grid: {
-                             display: true,
-                             color: 'rgba(0, 0, 0, 0.05)'
-                         }
-                     },
-                     x: {
-                         grid: {
-                             display: false
-                         }
-                     }
-                 }
-             }
-         });
-         
- 
-         const demographicsCtx = document.getElementById('demographicsChart').getContext('2d');
-         const demographicsChart = new Chart(demographicsCtx, {
-             type: 'doughnut',
-             data: {
-                 labels: ['0-18', '19-35', '36-50', '51-65', '65+'],
-                 datasets: [{
-                     data: [15, 30, 25, 20, 10],
-                     backgroundColor: [
-                         '#4e54c8',
-                         '#00d2ff',
-                         '#ff6b6b',
-                         '#2ecc71',
-                         '#f39c12'
-                     ],
-                     borderWidth: 0
-                 }]
-             },
-             options: {
-                 responsive: true,
-                 maintainAspectRatio: false,
-                 plugins: {
-                     legend: {
-                         position: 'right'
-                     }
-                 },
-                 cutout: '70%'
-             }
-         });
-     </script>
- </body>
- </html>
+<%@ page import="java.util.List" %>
+<%@ page import="com.doctorapp.model.User" %>
+<%@ page import="com.doctorapp.model.Patient" %>
+<%@ page import="com.doctorapp.model.Appointment" %>
+<%@ page import="com.doctorapp.model.Doctor" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%
+    // Check if user is logged in and is a doctor
+    User user = (User) session.getAttribute("user");
+    if (user == null || !"DOCTOR".equals(user.getRole())) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        return;
+    }
+
+    // Get doctor information
+    String doctorName = "Dr. " + user.getFirstName() + " " + user.getLastName();
+    String specialty = "Cardiologist"; // This should be fetched from the database
+    String university = "Harvard University"; // This should be fetched from the database
+    String qualification = "MD, PHD"; // This should be fetched from the database
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Profile | HealthPro Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-profile-dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="HealthPro Logo">
+                <h2>HealthPro Portal</h2>
+            </div>
+
+            <div class="profile-overview">
+                <h3><i class="fas fa-user-md"></i> <span>Profile Overview</span></h3>
+            </div>
+
+            <div class="sidebar-menu">
+                <ul>
+                    <li class="active">
+                        <a href="index.jsp">
+                            <i class="fas fa-user"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="appointments.jsp">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Appointment Management</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="patients.jsp">
+                            <i class="fas fa-user-injured"></i>
+                            <span>Patient Details</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="availability.jsp">
+                            <i class="fas fa-clock"></i>
+                            <span>Set Availability</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="health-packages.jsp">
+                            <i class="fas fa-box-open"></i>
+                            <span>Health Packages</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="preferences.jsp">
+                            <i class="fas fa-cog"></i>
+                            <span>UI Preferences</span>
+                        </a>
+                    </li>
+                    <li class="logout">
+                        <a href="../logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Header -->
+            <div class="top-header">
+                <div class="top-header-left">
+                    <a href="index.jsp" class="active">Profile</a>
+                    <a href="appointments.jsp">Appointment Management</a>
+                    <a href="patients.jsp">Patient Details</a>
+                </div>
+
+                <div class="top-header-right">
+                    <div class="search-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="user-profile-icon">
+                        <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div class="profile-section">
+                <div class="profile-header">
+                    <div class="profile-image">
+                        <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
+                    </div>
+                    <div class="profile-info">
+                        <h2><%= doctorName %></h2>
+                        <p><%= specialty %></p>
+                        <p><%= university %></p>
+                        <p><%= qualification %></p>
+                    </div>
+                    <div class="profile-actions">
+                        <a href="edit-profile.jsp" class="btn btn-primary">Edit Profile</a>
+                        <button class="btn btn-danger">Delete Profile</button>
+                        <button class="btn btn-outline">Set Active Off</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appointment Management Section -->
+            <div class="appointment-section">
+                <div class="appointment-header">
+                    <h2>Appointment Management</h2>
+                </div>
+
+                <div class="appointment-tabs">
+                    <div class="appointment-tab active" data-tab="upcoming">Upcoming</div>
+                    <div class="appointment-tab" data-tab="past">Past</div>
+                    <div class="appointment-tab" data-tab="pending">Pending</div>
+                </div>
+
+                <div class="appointment-filter">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search">
+                    </div>
+                    <button class="filter-btn">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                </div>
+
+                <div class="appointment-content">
+                    <table class="appointment-table">
+                        <thead>
+                            <tr>
+                                <th>Appointment ID</th>
+                                <th>Patient Name</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Assigned Doctor</th>
+                                <th>Action</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>001</td>
+                                <td class="patient-name">John Doe</td>
+                                <td class="appointment-date">2023-10-10</td>
+                                <td><span class="status-badge active">Active</span></td>
+                                <td>
+                                    <div class="assigned-doctor">
+                                        <div class="doctor-avatar">
+                                            <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="#" class="action-btn view" title="View Details"><i class="fas fa-eye"></i></a>
+                                    <a href="#" class="action-btn reschedule" title="Reschedule"><i class="fas fa-calendar-alt"></i></a>
+                                </td>
+                                <td>
+                                    <span class="notes-badge">Follow-up required</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>002</td>
+                                <td class="patient-name">Jane Smith</td>
+                                <td class="appointment-date">2023-10-11</td>
+                                <td><span class="status-badge active">Active</span></td>
+                                <td>
+                                    <div class="assigned-doctor">
+                                        <div class="doctor-avatar">
+                                            <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="#" class="action-btn view" title="View Details"><i class="fas fa-eye"></i></a>
+                                    <a href="#" class="action-btn reschedule" title="Reschedule"><i class="fas fa-calendar-alt"></i></a>
+                                </td>
+                                <td>
+                                    <span class="notes-badge">First consultation</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>003</td>
+                                <td class="patient-name">Emily Brown</td>
+                                <td class="appointment-date">2023-10-12</td>
+                                <td><span class="status-badge pending">Pending</span></td>
+                                <td>
+                                    <div class="assigned-doctor">
+                                        <div class="doctor-avatar">
+                                            <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="#" class="action-btn view" title="View Details"><i class="fas fa-eye"></i></a>
+                                    <a href="#" class="action-btn approve" title="Approve"><i class="fas fa-check"></i></a>
+                                    <a href="#" class="action-btn reject" title="Reject"><i class="fas fa-times"></i></a>
+                                </td>
+                                <td>
+                                    <span class="notes-badge">No-show</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>004</td>
+                                <td class="patient-name">David Wilson</td>
+                                <td class="appointment-date">2023-10-13</td>
+                                <td><span class="status-badge completed">Completed</span></td>
+                                <td>
+                                    <div class="assigned-doctor">
+                                        <div class="doctor-avatar">
+                                            <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="#" class="action-btn view" title="View Details"><i class="fas fa-eye"></i></a>
+                                </td>
+                                <td>
+                                    <span class="notes-badge">Routine check-up</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>005</td>
+                                <td class="patient-name">Sarah White</td>
+                                <td class="appointment-date">2023-10-14</td>
+                                <td><span class="status-badge active">Active</span></td>
+                                <td>
+                                    <div class="assigned-doctor">
+                                        <div class="doctor-avatar">
+                                            <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="#" class="action-btn view" title="View Details"><i class="fas fa-eye"></i></a>
+                                    <a href="#" class="action-btn reschedule" title="Reschedule"><i class="fas fa-calendar-alt"></i></a>
+                                </td>
+                                <td>
+                                    <span class="notes-badge">Follow-up in 2 weeks</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.appointment-tab');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+
+                    // Here you would typically show/hide content based on the selected tab
+                    // For now, we're just showing the same content for all tabs
+                    const tabName = this.getAttribute('data-tab');
+                    console.log('Switched to tab:', tabName);
+
+                    // In a real implementation, you would fetch data for the selected tab
+                    // and update the table content
+                });
+            });
+
+            // Profile button functionality
+            const deleteProfileBtn = document.querySelector('.btn-danger');
+            if (deleteProfileBtn) {
+                deleteProfileBtn.addEventListener('click', function() {
+                    if (confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
+                        // Send delete request to server
+                        console.log('Profile deletion requested');
+                    }
+                });
+            }
+
+            const setActiveBtn = document.querySelector('.btn-outline');
+            if (setActiveBtn) {
+                setActiveBtn.addEventListener('click', function() {
+                    const isActive = this.textContent.includes('Off');
+                    if (isActive) {
+                        this.textContent = 'Set Active On';
+                        // Update status on server
+                    } else {
+                        this.textContent = 'Set Active Off';
+                        // Update status on server
+                    }
+                });
+            }
+
+            // Appointment action buttons functionality
+            const viewButtons = document.querySelectorAll('.action-btn.view');
+            viewButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const appointmentId = this.closest('tr').querySelector('td:first-child').textContent;
+                    window.location.href = 'appointment-details.jsp?id=' + appointmentId;
+                });
+            });
+
+            // Reschedule appointment functionality
+            const rescheduleButtons = document.querySelectorAll('.action-btn.reschedule');
+            rescheduleButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const appointmentId = this.closest('tr').querySelector('td:first-child').textContent;
+                    const patientName = this.closest('tr').querySelector('.patient-name').textContent;
+
+                    // Create a modal for rescheduling
+                    const modal = document.createElement('div');
+                    modal.className = 'modal';
+                    modal.innerHTML = `
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3>Reschedule Appointment</h3>
+                                <span class="close">&times;</span>
+                            </div>
+                            <div class="modal-body">
+                                <p>Reschedule appointment for <strong>${patientName}</strong></p>
+                                <div class="form-group">
+                                    <label for="reschedule-date">New Date</label>
+                                    <input type="date" id="reschedule-date">
+                                </div>
+                                <div class="form-group">
+                                    <label for="reschedule-time">New Time</label>
+                                    <input type="time" id="reschedule-time">
+                                </div>
+                                <div class="form-group">
+                                    <label for="reschedule-reason">Reason for Rescheduling</label>
+                                    <textarea id="reschedule-reason" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-outline modal-cancel">Cancel</button>
+                                <button class="btn btn-primary modal-save">Save Changes</button>
+                            </div>
+                        </div>
+                    `;
+
+                    document.body.appendChild(modal);
+
+                    // Set minimum date to today
+                    const today = new Date().toISOString().split('T')[0];
+                    modal.querySelector('#reschedule-date').min = today;
+
+                    // Add modal styles if not already in CSS
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .modal {
+                            display: block;
+                            position: fixed;
+                            z-index: 1000;
+                            left: 0;
+                            top: 0;
+                            width: 100%;
+                            height: 100%;
+                            background-color: rgba(0,0,0,0.5);
+                        }
+                        .modal-content {
+                            background-color: #fff;
+                            margin: 10% auto;
+                            padding: 20px;
+                            border-radius: 8px;
+                            width: 500px;
+                            max-width: 90%;
+                        }
+                        .modal-header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            margin-bottom: 15px;
+                            padding-bottom: 10px;
+                            border-bottom: 1px solid #e0e0e0;
+                        }
+                        .modal-footer {
+                            display: flex;
+                            justify-content: flex-end;
+                            gap: 10px;
+                            margin-top: 20px;
+                            padding-top: 15px;
+                            border-top: 1px solid #e0e0e0;
+                        }
+                        .close {
+                            font-size: 24px;
+                            font-weight: bold;
+                            cursor: pointer;
+                        }
+                        .form-group {
+                            margin-bottom: 15px;
+                        }
+                        .form-group label {
+                            display: block;
+                            margin-bottom: 5px;
+                            font-weight: 500;
+                        }
+                        .form-group input, .form-group textarea {
+                            width: 100%;
+                            padding: 8px;
+                            border: 1px solid #ddd;
+                            border-radius: 4px;
+                        }
+                    `;
+                    document.head.appendChild(style);
+
+                    // Close modal functionality
+                    const closeModal = () => {
+                        document.body.removeChild(modal);
+                    };
+
+                    modal.querySelector('.close').addEventListener('click', closeModal);
+                    modal.querySelector('.modal-cancel').addEventListener('click', closeModal);
+
+                    // Save changes functionality
+                    modal.querySelector('.modal-save').addEventListener('click', function() {
+                        const newDate = modal.querySelector('#reschedule-date').value;
+                        const newTime = modal.querySelector('#reschedule-time').value;
+                        const reason = modal.querySelector('#reschedule-reason').value;
+
+                        if (!newDate || !newTime) {
+                            alert('Please select both date and time for rescheduling.');
+                            return;
+                        }
+
+                        // Here you would send the data to the server
+                        console.log('Rescheduling appointment', {
+                            appointmentId,
+                            newDate,
+                            newTime,
+                            reason
+                        });
+
+                        // Update the UI to reflect the change
+                        const dateCell = btn.closest('tr').querySelector('.appointment-date');
+                        dateCell.textContent = newDate;
+
+                        // Close the modal
+                        closeModal();
+
+                        // Show success message
+                        alert('Appointment rescheduled successfully!');
+                    });
+                });
+            });
+
+            // Approve appointment functionality
+            const approveButtons = document.querySelectorAll('.action-btn.approve');
+            approveButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const appointmentId = this.closest('tr').querySelector('td:first-child').textContent;
+                    const patientName = this.closest('tr').querySelector('.patient-name').textContent;
+
+                    if (confirm(`Are you sure you want to approve the appointment for ${patientName}?`)) {
+                        // Here you would send the approval to the server
+                        console.log('Approving appointment', appointmentId);
+
+                        // Update the UI to reflect the change
+                        const statusCell = btn.closest('tr').querySelector('.status-badge');
+                        statusCell.className = 'status-badge active';
+                        statusCell.textContent = 'Active';
+
+                        // Replace approve/reject buttons with reschedule button
+                        const actionCell = btn.closest('td');
+                        actionCell.innerHTML = `
+                            <a href="#" class="action-btn view" title="View Details"><i class="fas fa-eye"></i></a>
+                            <a href="#" class="action-btn reschedule" title="Reschedule"><i class="fas fa-calendar-alt"></i></a>
+                        `;
+
+                        // Show success message
+                        alert('Appointment approved successfully!');
+
+                        // Add event listener to the new reschedule button
+                        const newRescheduleBtn = actionCell.querySelector('.action-btn.reschedule');
+                        newRescheduleBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            // Trigger click on an existing reschedule button to reuse the code
+                            document.querySelector('.action-btn.reschedule').click();
+                        });
+                    }
+                });
+            });
+
+            // Reject appointment functionality
+            const rejectButtons = document.querySelectorAll('.action-btn.reject');
+            rejectButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const appointmentId = this.closest('tr').querySelector('td:first-child').textContent;
+                    const patientName = this.closest('tr').querySelector('.patient-name').textContent;
+
+                    // Create a modal for rejection reason
+                    const modal = document.createElement('div');
+                    modal.className = 'modal';
+                    modal.innerHTML = `
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3>Reject Appointment</h3>
+                                <span class="close">&times;</span>
+                            </div>
+                            <div class="modal-body">
+                                <p>Reject appointment for <strong>${patientName}</strong></p>
+                                <div class="form-group">
+                                    <label for="reject-reason">Reason for Rejection</label>
+                                    <textarea id="reject-reason" rows="3" placeholder="Please provide a reason for rejecting this appointment"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-outline modal-cancel">Cancel</button>
+                                <button class="btn btn-danger modal-reject">Reject Appointment</button>
+                            </div>
+                        </div>
+                    `;
+
+                    document.body.appendChild(modal);
+
+                    // Close modal functionality
+                    const closeModal = () => {
+                        document.body.removeChild(modal);
+                    };
+
+                    modal.querySelector('.close').addEventListener('click', closeModal);
+                    modal.querySelector('.modal-cancel').addEventListener('click', closeModal);
+
+                    // Reject functionality
+                    modal.querySelector('.modal-reject').addEventListener('click', function() {
+                        const reason = modal.querySelector('#reject-reason').value;
+
+                        if (!reason) {
+                            alert('Please provide a reason for rejecting the appointment.');
+                            return;
+                        }
+
+                        // Here you would send the data to the server
+                        console.log('Rejecting appointment', {
+                            appointmentId,
+                            reason
+                        });
+
+                        // Update the UI to reflect the change
+                        const statusCell = btn.closest('tr').querySelector('.status-badge');
+                        statusCell.className = 'status-badge cancelled';
+                        statusCell.textContent = 'Rejected';
+
+                        // Update the action buttons
+                        const actionCell = btn.closest('td');
+                        actionCell.innerHTML = `
+                            <a href="#" class="action-btn view" title="View Details"><i class="fas fa-eye"></i></a>
+                        `;
+
+                        // Close the modal
+                        closeModal();
+
+                        // Show success message
+                        alert('Appointment rejected successfully!');
+                    });
+                });
+            });
+
+            // Search functionality
+            const searchInput = document.querySelector('.search-box input');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const rows = document.querySelectorAll('.appointment-table tbody tr');
+
+                    rows.forEach(row => {
+                        const patientName = row.querySelector('.patient-name').textContent.toLowerCase();
+                        const appointmentId = row.querySelector('td:first-child').textContent.toLowerCase();
+
+                        if (patientName.includes(searchTerm) || appointmentId.includes(searchTerm)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

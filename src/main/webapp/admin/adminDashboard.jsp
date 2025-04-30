@@ -7,12 +7,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Doctor Appointment System</title>
     <!-- Include CSS files -->
-    <!-- Bootstrap CSS -->
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-<!-- Custom CSS -->
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom Framework CSS (Bootstrap Replacement) -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/custom-framework.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
     <style>
         .card {
             border-radius: 10px;
@@ -484,11 +486,8 @@
 
     <!-- Include JavaScript files -->
     <!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<!-- Custom JS -->
-<script src="${pageContext.request.contextPath}/js/script.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom JS -->
+    <script src="${pageContext.request.contextPath}/assets/js/script.js"></script>
 </body>
 </html>

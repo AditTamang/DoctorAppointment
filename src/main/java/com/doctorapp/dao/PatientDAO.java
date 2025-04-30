@@ -43,17 +43,15 @@ public class PatientDAO {
         }
 
         // Insert new patient
-        String query = "INSERT INTO patients (user_id, first_name, last_name, date_of_birth, gender, phone, address, email, blood_group, allergies) " +
+        String query = "INSERT INTO patients (user_id, first_name, last_name, date_of_birth, gender, phone, address, blood_group, allergies, medical_history) " +
                       "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 
-            // Set parameters for the query
             pstmt.setInt(1, patient.getUserId());
-            pstmt.setString(2, patient.getFirstName());
-            pstmt.setString(3, patient.getLastName());
+            pstmt.setString(2, patient.getFirstName() != null ? patient.getFirstName() : "");
+            pstmt.setString(3, patient.getLastName() != null ? patient.getLastName() : "");
 
             // Handle date_of_birth (DATE type in database)
             if (patient.getDateOfBirth() != null && !patient.getDateOfBirth().isEmpty()) {
@@ -71,9 +69,9 @@ public class PatientDAO {
             pstmt.setString(5, patient.getGender());
             pstmt.setString(6, patient.getPhone());
             pstmt.setString(7, patient.getAddress());
-            pstmt.setString(8, patient.getEmail());
-            pstmt.setString(9, patient.getBloodGroup());
-            pstmt.setString(10, patient.getAllergies());
+            pstmt.setString(8, patient.getBloodGroup());
+            pstmt.setString(9, patient.getAllergies());
+            pstmt.setString(10, patient.getMedicalHistory());
 
             int rowsAffected = pstmt.executeUpdate();
 
@@ -95,7 +93,7 @@ public class PatientDAO {
 
     // Get patient by user ID
     public Patient getPatientByUserId(int userId) {
-        String query = "SELECT p.*, u.email FROM patients p JOIN users u ON p.user_id = u.id WHERE p.user_id = ?";
+        String query = "SELECT p.*, u.email, u.first_name, u.last_name, u.date_of_birth, u.gender, u.phone, u.address FROM patients p JOIN users u ON p.user_id = u.id WHERE p.user_id = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -107,24 +105,37 @@ public class PatientDAO {
                     Patient patient = new Patient();
                     patient.setId(rs.getInt("id"));
                     patient.setUserId(rs.getInt("user_id"));
-                    patient.setFirstName(rs.getString("first_name"));
-                    patient.setLastName(rs.getString("last_name"));
+
+                    // Get first_name and last_name from users table first, then fall back to patients table if needed
+                    String firstName = rs.getString("u.first_name");
+                    if (firstName == null || firstName.isEmpty()) {
+                        firstName = rs.getString("p.first_name");
+                    }
+                    patient.setFirstName(firstName);
+
+                    String lastName = rs.getString("u.last_name");
+                    if (lastName == null || lastName.isEmpty()) {
+                        lastName = rs.getString("p.last_name");
+                    }
+                    patient.setLastName(lastName);
+
+                    // Get date_of_birth from users table
                     patient.setDateOfBirth(rs.getString("date_of_birth"));
+
+                    // Get gender from users table
                     patient.setGender(rs.getString("gender"));
+
+                    // Get phone from users table
                     patient.setPhone(rs.getString("phone"));
+
+                    // Get address from users table
                     patient.setAddress(rs.getString("address"));
+
+                    // Get patient-specific fields
                     patient.setBloodGroup(rs.getString("blood_group"));
                     patient.setAllergies(rs.getString("allergies"));
                     patient.setMedicalHistory(rs.getString("medical_history"));
                     patient.setEmail(rs.getString("email"));
-
-                    // Set status if available
-                    try {
-                        patient.setStatus(rs.getString("status"));
-                    } catch (SQLException e) {
-                        // Status field might not exist in all database schemas
-                        patient.setStatus("ACTIVE"); // Default to active
-                    }
 
                     return patient;
                 }
@@ -151,8 +162,7 @@ public class PatientDAO {
                           "phone = ?, address = ? WHERE id = ?";
 
         // Then update the patient-specific information
-        String patientQuery = "UPDATE patients SET first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, " +
-                             "phone = ?, address = ?, email = ?, blood_group = ?, allergies = ?, medical_history = ? " +
+        String patientQuery = "UPDATE patients SET blood_group = ?, allergies = ?, medical_history = ? " +
                              "WHERE id = ?";
 
         Connection conn = null;
@@ -196,71 +206,18 @@ public class PatientDAO {
             // Then update patient information, only if the fields are provided
             try (PreparedStatement patientStmt = conn.prepareStatement(patientQuery)) {
                 patientStmt.setString(1,
-                    (patient.getFirstName() != null && !patient.getFirstName().isEmpty()) ?
-                    patient.getFirstName() : existingPatient.getFirstName());
-
-                patientStmt.setString(2,
-                    (patient.getLastName() != null && !patient.getLastName().isEmpty()) ?
-                    patient.getLastName() : existingPatient.getLastName());
-
-                // Handle date_of_birth (DATE type in database)
-                if (patient.getDateOfBirth() != null && !patient.getDateOfBirth().isEmpty()) {
-                    try {
-                        java.sql.Date sqlDate = java.sql.Date.valueOf(patient.getDateOfBirth());
-                        patientStmt.setDate(3, sqlDate);
-                    } catch (IllegalArgumentException e) {
-                        // If date format is invalid, use existing value or null
-                        if (existingPatient.getDateOfBirth() != null && !existingPatient.getDateOfBirth().isEmpty()) {
-                            try {
-                                java.sql.Date sqlDate = java.sql.Date.valueOf(existingPatient.getDateOfBirth());
-                                patientStmt.setDate(3, sqlDate);
-                            } catch (IllegalArgumentException ex) {
-                                patientStmt.setNull(3, java.sql.Types.DATE);
-                            }
-                        } else {
-                            patientStmt.setNull(3, java.sql.Types.DATE);
-                        }
-                    }
-                } else if (existingPatient.getDateOfBirth() != null && !existingPatient.getDateOfBirth().isEmpty()) {
-                    try {
-                        java.sql.Date sqlDate = java.sql.Date.valueOf(existingPatient.getDateOfBirth());
-                        patientStmt.setDate(3, sqlDate);
-                    } catch (IllegalArgumentException e) {
-                        patientStmt.setNull(3, java.sql.Types.DATE);
-                    }
-                } else {
-                    patientStmt.setNull(3, java.sql.Types.DATE);
-                }
-
-                patientStmt.setString(4,
-                    (patient.getGender() != null && !patient.getGender().isEmpty()) ?
-                    patient.getGender() : existingPatient.getGender());
-
-                patientStmt.setString(5,
-                    (patient.getPhone() != null && !patient.getPhone().isEmpty()) ?
-                    patient.getPhone() : existingPatient.getPhone());
-
-                patientStmt.setString(6,
-                    (patient.getAddress() != null && !patient.getAddress().isEmpty()) ?
-                    patient.getAddress() : existingPatient.getAddress());
-
-                patientStmt.setString(7,
-                    (patient.getEmail() != null && !patient.getEmail().isEmpty()) ?
-                    patient.getEmail() : existingPatient.getEmail());
-
-                patientStmt.setString(8,
                     (patient.getBloodGroup() != null && !patient.getBloodGroup().isEmpty()) ?
                     patient.getBloodGroup() : existingPatient.getBloodGroup());
 
-                patientStmt.setString(9,
+                patientStmt.setString(2,
                     (patient.getAllergies() != null && !patient.getAllergies().isEmpty()) ?
                     patient.getAllergies() : existingPatient.getAllergies());
 
-                patientStmt.setString(10,
+                patientStmt.setString(3,
                     (patient.getMedicalHistory() != null && !patient.getMedicalHistory().isEmpty()) ?
                     patient.getMedicalHistory() : existingPatient.getMedicalHistory());
 
-                patientStmt.setInt(11, patient.getId());
+                patientStmt.setInt(4, patient.getId());
 
                 patientStmt.executeUpdate();
             }
@@ -336,7 +293,7 @@ public class PatientDAO {
 
     // Get patient by ID
     public Patient getPatientById(int patientId) {
-        String query = "SELECT p.*, u.email FROM patients p JOIN users u ON p.user_id = u.id WHERE p.id = ?";
+        String query = "SELECT p.*, u.email, u.first_name, u.last_name, u.date_of_birth, u.gender, u.phone, u.address FROM patients p JOIN users u ON p.user_id = u.id WHERE p.id = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -348,24 +305,37 @@ public class PatientDAO {
                     Patient patient = new Patient();
                     patient.setId(rs.getInt("id"));
                     patient.setUserId(rs.getInt("user_id"));
-                    patient.setFirstName(rs.getString("first_name"));
-                    patient.setLastName(rs.getString("last_name"));
+
+                    // Get first_name and last_name from users table first, then fall back to patients table if needed
+                    String firstName = rs.getString("u.first_name");
+                    if (firstName == null || firstName.isEmpty()) {
+                        firstName = rs.getString("p.first_name");
+                    }
+                    patient.setFirstName(firstName);
+
+                    String lastName = rs.getString("u.last_name");
+                    if (lastName == null || lastName.isEmpty()) {
+                        lastName = rs.getString("p.last_name");
+                    }
+                    patient.setLastName(lastName);
+
+                    // Get date_of_birth from users table
                     patient.setDateOfBirth(rs.getString("date_of_birth"));
+
+                    // Get gender from users table
                     patient.setGender(rs.getString("gender"));
+
+                    // Get phone from users table
                     patient.setPhone(rs.getString("phone"));
+
+                    // Get address from users table
                     patient.setAddress(rs.getString("address"));
+
+                    // Get patient-specific fields
                     patient.setBloodGroup(rs.getString("blood_group"));
                     patient.setAllergies(rs.getString("allergies"));
                     patient.setMedicalHistory(rs.getString("medical_history"));
                     patient.setEmail(rs.getString("email"));
-
-                    // Set status if available
-                    try {
-                        patient.setStatus(rs.getString("status"));
-                    } catch (SQLException e) {
-                        // Status field might not exist in all database schemas
-                        patient.setStatus("ACTIVE"); // Default to active
-                    }
 
                     return patient;
                 }
@@ -381,7 +351,7 @@ public class PatientDAO {
     // Get recent patients by doctor
     public List<Patient> getRecentPatientsByDoctor(int doctorId, int limit) {
         List<Patient> patients = new ArrayList<>();
-        String query = "SELECT DISTINCT p.*, u.email, MAX(a.appointment_date) as last_visit " +
+        String query = "SELECT DISTINCT p.*, u.email, u.first_name, u.last_name, u.date_of_birth, u.gender, u.phone, u.address, MAX(a.appointment_date) as last_visit " +
                       "FROM patients p " +
                       "JOIN appointments a ON p.id = a.patient_id " +
                       "JOIN users u ON p.user_id = u.id " +
@@ -401,12 +371,33 @@ public class PatientDAO {
                     Patient patient = new Patient();
                     patient.setId(rs.getInt("id"));
                     patient.setUserId(rs.getInt("user_id"));
-                    patient.setFirstName(rs.getString("first_name"));
-                    patient.setLastName(rs.getString("last_name"));
+
+                    // Get first_name and last_name from users table first, then fall back to patients table if needed
+                    String firstName = rs.getString("u.first_name");
+                    if (firstName == null || firstName.isEmpty()) {
+                        firstName = rs.getString("p.first_name");
+                    }
+                    patient.setFirstName(firstName);
+
+                    String lastName = rs.getString("u.last_name");
+                    if (lastName == null || lastName.isEmpty()) {
+                        lastName = rs.getString("p.last_name");
+                    }
+                    patient.setLastName(lastName);
+
+                    // Get date_of_birth from users table
                     patient.setDateOfBirth(rs.getString("date_of_birth"));
+
+                    // Get gender from users table
                     patient.setGender(rs.getString("gender"));
+
+                    // Get phone from users table
                     patient.setPhone(rs.getString("phone"));
+
+                    // Get address from users table
                     patient.setAddress(rs.getString("address"));
+
+                    // Get patient-specific fields
                     patient.setBloodGroup(rs.getString("blood_group"));
                     patient.setAllergies(rs.getString("allergies"));
                     patient.setEmail(rs.getString("email"));
@@ -480,8 +471,20 @@ public class PatientDAO {
                 Patient patient = new Patient();
                 patient.setId(rs.getInt("id"));
                 patient.setUserId(rs.getInt("user_id"));
-                patient.setFirstName(rs.getString("first_name"));
-                patient.setLastName(rs.getString("last_name"));
+
+                // Get first_name and last_name from users table first, then fall back to patients table if needed
+                String firstName = rs.getString("u.first_name");
+                if (firstName == null || firstName.isEmpty()) {
+                    firstName = rs.getString("p.first_name");
+                }
+                patient.setFirstName(firstName);
+
+                String lastName = rs.getString("u.last_name");
+                if (lastName == null || lastName.isEmpty()) {
+                    lastName = rs.getString("p.last_name");
+                }
+                patient.setLastName(lastName);
+
                 patient.setEmail(rs.getString("email"));
                 patient.setPhone(rs.getString("phone"));
                 patient.setAddress(rs.getString("address"));
@@ -528,8 +531,6 @@ public class PatientDAO {
         }
     }
 
-
-
     // Get recent patients
     public List<Patient> getRecentPatients(int limit) {
         List<Patient> patients = new ArrayList<>();
@@ -550,8 +551,20 @@ public class PatientDAO {
                     Patient patient = new Patient();
                     patient.setId(rs.getInt("id"));
                     patient.setUserId(rs.getInt("user_id"));
-                    patient.setFirstName(rs.getString("first_name"));
-                    patient.setLastName(rs.getString("last_name"));
+
+                    // Get first_name and last_name from users table first, then fall back to patients table if needed
+                    String firstName = rs.getString("u.first_name");
+                    if (firstName == null || firstName.isEmpty()) {
+                        firstName = rs.getString("p.first_name");
+                    }
+                    patient.setFirstName(firstName);
+
+                    String lastName = rs.getString("u.last_name");
+                    if (lastName == null || lastName.isEmpty()) {
+                        lastName = rs.getString("p.last_name");
+                    }
+                    patient.setLastName(lastName);
+
                     patient.setEmail(rs.getString("email"));
                     patient.setPhone(rs.getString("phone"));
                     patient.setAddress(rs.getString("address"));

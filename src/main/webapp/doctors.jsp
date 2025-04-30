@@ -16,31 +16,29 @@
  </head>
  <body>
      <!-- Header -->
-     <header class="header">
-         <div class="container">
-             <nav class="navbar">
-                 <a href="index.jsp" class="logo">Med<span>Doc</span></a>
-                 <ul class="nav-links">
-                     <li><a href="index.jsp">Home</a></li>
-                     <li><a href="doctors" class="active">Find Doctors</a></li>
-                     <li><a href="about-us.jsp">About Us</a></li>
-                     <li><a href="index.jsp#services">Services</a></li>
-                     <li><a href="index.jsp#contact">Contact</a></li>
-                     <% if(session.getAttribute("user") != null) { %>
-                         <li><a href="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                         <li><a href="appointments">Appointments</a></li>
-                         <li><a href="profile">Profile</a></li>
-                         <li><a href="logout" class="btn btn-primary">Logout</a></li>
-                     <% } else { %>
+     <% if(session.getAttribute("user") != null) { %>
+         <!-- Include logged-in header for authenticated users -->
+         <jsp:include page="includes/logged-in-header.jsp" />
+     <% } else { %>
+         <!-- Regular header for non-authenticated users -->
+         <header class="header">
+             <div class="container">
+                 <nav class="navbar">
+                     <a href="index.jsp" class="logo">Med<span>Doc</span></a>
+                     <ul class="nav-links">
+                         <li><a href="index.jsp">Home</a></li>
+                         <li><a href="doctors" class="active">Find Doctors</a></li>
+                         <li><a href="about-us.jsp">About Us</a></li>
+                         <li><a href="contact-us">Contact</a></li>
                          <li><a href="login" class="login-btn"><i class="fas fa-user"></i></a></li>
-                     <% } %>
-                 </ul>
-                 <div class="mobile-menu">
-                     <i class="fas fa-bars"></i>
-                 </div>
-             </nav>
-         </div>
-     </header>
+                     </ul>
+                     <div class="mobile-menu">
+                         <i class="fas fa-bars"></i>
+                     </div>
+                 </nav>
+             </div>
+         </header>
+     <% } %>
 
      <!-- Hero Banner -->
      <section class="page-banner">
@@ -162,6 +160,14 @@
                      <span>Gynecology</span>
                  </a>
              </div>
+
+             <!-- Error Messages -->
+             <% if(request.getAttribute("error") != null) { %>
+             <div class="alert alert-danger" style="margin-bottom: 20px; padding: 15px; border-radius: 5px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;">
+                 <i class="fas fa-exclamation-circle" style="margin-right: 10px;"></i>
+                 <%= request.getAttribute("error") %>
+             </div>
+             <% } %>
 
              <!-- Doctor Count -->
              <%

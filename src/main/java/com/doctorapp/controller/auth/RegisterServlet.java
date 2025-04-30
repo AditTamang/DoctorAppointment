@@ -3,10 +3,8 @@ package com.doctorapp.controller.auth;
 import java.io.IOException;
 
 import com.doctorapp.model.DoctorRegistrationRequest;
-import com.doctorapp.model.Patient;
 import com.doctorapp.model.User;
 import com.doctorapp.service.DoctorRegistrationService;
-import com.doctorapp.service.PatientService;
 import com.doctorapp.service.UserService;
 import com.doctorapp.util.PasswordValidator;
 
@@ -146,36 +144,11 @@ public class RegisterServlet extends HttpServlet {
                         String bloodGroup = request.getParameter("bloodGroup");
                         String allergies = request.getParameter("allergies");
 
-                        // Create a patient object
-                        Patient patient = new Patient();
-                        patient.setUserId(userId);
-                        patient.setFirstName(firstName);
-                        patient.setLastName(lastName);
-                        patient.setDateOfBirth(dateOfBirth);
-                        patient.setGender(gender);
-                        patient.setPhone(phone);
-                        patient.setAddress(address);
-                        patient.setBloodGroup(bloodGroup);
-                        patient.setAllergies(allergies);
-                        patient.setEmail(email);
+                        // Save patient details to database
+                        detailsSaved = userService.savePatientDetails(userId, dateOfBirth, gender, address, bloodGroup, allergies);
 
-                        // Use PatientService to add the patient
-                        PatientService patientService = new PatientService();
-                        boolean patientAdded = patientService.addPatient(patient);
-
-                        if (!patientAdded) {
-                            System.out.println("Failed to add patient record for user ID: " + userId);
-                            // Try the older method as a fallback
-                            detailsSaved = userService.savePatientDetails(userId, dateOfBirth, gender, address, bloodGroup, allergies);
-
-                            if (!detailsSaved) {
-                                System.out.println("Failed to save patient details using fallback method for user ID: " + userId);
-                            } else {
-                                System.out.println("Successfully saved patient details using fallback method for user ID: " + userId);
-                            }
-                        } else {
-                            System.out.println("Successfully added patient record for user ID: " + userId);
-                            detailsSaved = true;
+                        if (!detailsSaved) {
+                            System.out.println("Failed to save patient details for user ID: " + userId);
                         }
                     }
 

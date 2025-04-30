@@ -459,7 +459,8 @@
         });
 
         // Set min date for appointment date picker
-        document.getElementById('appointmentDate').min = new Date().toISOString().split('T')[0];
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('appointmentDate').min = today;
 
         // Check if doctor is available on selected date
         document.getElementById('appointmentDate').addEventListener('change', function() {
