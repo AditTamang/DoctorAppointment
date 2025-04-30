@@ -135,9 +135,16 @@ package com.doctorapp.controller.servlets;
      }
 
      private void loadPatientDashboard(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-         // Always redirect to the patient dashboard servlet which will handle all the logic
-         // Using the controller.patient.PatientDashboardServlet
-         response.sendRedirect(request.getContextPath() + "/patient/dashboard");
+         // Check if the user wants to use the new dashboard
+         String useNewDashboard = request.getParameter("newDashboard");
+
+         if ("true".equals(useNewDashboard)) {
+             // Redirect to the new patient dashboard
+             response.sendRedirect(request.getContextPath() + "/patient/new-dashboard");
+         } else {
+             // Redirect to the regular patient dashboard
+             response.sendRedirect(request.getContextPath() + "/patient/dashboard");
+         }
      }
 
      protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

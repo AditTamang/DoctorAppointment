@@ -706,6 +706,8 @@ package com.doctorapp.dao;
          return columnName != null && columnName.matches("^[a-zA-Z0-9_]+$");
      }
 
+
+
      /**
       * Helper method to safely update a single field in the doctors table
       * This method doesn't throw an exception if the update fails

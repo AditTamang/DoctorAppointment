@@ -66,6 +66,12 @@
                      </a>
                  </li>
                  <li>
+                     <a href="${pageContext.request.contextPath}/dashboard?newDashboard=true">
+                         <i class="fas fa-tachometer-alt"></i>
+                         <span>New Dashboard</span>
+                     </a>
+                 </li>
+                 <li>
                      <a href="${pageContext.request.contextPath}/doctors">
                          <i class="fas fa-user-md"></i>
                          <span>Find Doctors</span>

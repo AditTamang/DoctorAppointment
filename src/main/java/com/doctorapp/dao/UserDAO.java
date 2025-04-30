@@ -386,11 +386,37 @@ public class UserDAO {
                 }
             } else {
                 // Insert new patient record
-                String insertQuery = "INSERT INTO patients (user_id, blood_group, allergies) VALUES (?, ?, ?)";
+                // Get user details to populate the fields
+                User userDetails = getUserById(userId);
+
+                String insertQuery = "INSERT INTO patients (user_id, first_name, last_name, date_of_birth, gender, phone, address, email, blood_group, allergies) " +
+                                   "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
                 try (PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
                     pstmt.setInt(1, userId);
-                    pstmt.setString(2, bloodGroup);
-                    pstmt.setString(3, allergies);
+                    pstmt.setString(2, userDetails.getFirstName());
+                    pstmt.setString(3, userDetails.getLastName());
+
+                    // Handle date_of_birth (DATE type in database)
+                    if (dateOfBirth != null && !dateOfBirth.isEmpty()) {
+                        try {
+                            java.sql.Date sqlDate = java.sql.Date.valueOf(dateOfBirth);
+                            pstmt.setDate(4, sqlDate);
+                        } catch (IllegalArgumentException e) {
+                            // If date format is invalid, set it to null
+                            pstmt.setNull(4, java.sql.Types.DATE);
+                        }
+                    } else {
+                        pstmt.setNull(4, java.sql.Types.DATE);
+                    }
+
+                    pstmt.setString(5, gender);
+                    pstmt.setString(6, userDetails.getPhone());
+                    pstmt.setString(7, address);
+                    pstmt.setString(8, userDetails.getEmail());
+                    pstmt.setString(9, bloodGroup);
+                    pstmt.setString(10, allergies);
+
                     patientResult = pstmt.executeUpdate();
                 }
             }

@@ -43,16 +43,37 @@ public class PatientDAO {
         }
 
         // Insert new patient
-        String query = "INSERT INTO patients (user_id, blood_group, allergies, medical_history) " +
-                      "VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO patients (user_id, first_name, last_name, date_of_birth, gender, phone, address, email, blood_group, allergies) " +
+                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 
+            // Set parameters for the query
             pstmt.setInt(1, patient.getUserId());
-            pstmt.setString(2, patient.getBloodGroup());
-            pstmt.setString(3, patient.getAllergies());
-            pstmt.setString(4, patient.getMedicalHistory());
+            pstmt.setString(2, patient.getFirstName());
+            pstmt.setString(3, patient.getLastName());
+
+            // Handle date_of_birth (DATE type in database)
+            if (patient.getDateOfBirth() != null && !patient.getDateOfBirth().isEmpty()) {
+                try {
+                    java.sql.Date sqlDate = java.sql.Date.valueOf(patient.getDateOfBirth());
+                    pstmt.setDate(4, sqlDate);
+                } catch (IllegalArgumentException e) {
+                    // If date format is invalid, set it to null
+                    pstmt.setNull(4, java.sql.Types.DATE);
+                }
+            } else {
+                pstmt.setNull(4, java.sql.Types.DATE);
+            }
+
+            pstmt.setString(5, patient.getGender());
+            pstmt.setString(6, patient.getPhone());
+            pstmt.setString(7, patient.getAddress());
+            pstmt.setString(8, patient.getEmail());
+            pstmt.setString(9, patient.getBloodGroup());
+            pstmt.setString(10, patient.getAllergies());
 
             int rowsAffected = pstmt.executeUpdate();
 
@@ -97,6 +118,14 @@ public class PatientDAO {
                     patient.setMedicalHistory(rs.getString("medical_history"));
                     patient.setEmail(rs.getString("email"));
 
+                    // Set status if available
+                    try {
+                        patient.setStatus(rs.getString("status"));
+                    } catch (SQLException e) {
+                        // Status field might not exist in all database schemas
+                        patient.setStatus("ACTIVE"); // Default to active
+                    }
+
                     return patient;
                 }
             }
@@ -122,7 +151,8 @@ public class PatientDAO {
                           "phone = ?, address = ? WHERE id = ?";
 
         // Then update the patient-specific information
-        String patientQuery = "UPDATE patients SET blood_group = ?, allergies = ?, medical_history = ? " +
+        String patientQuery = "UPDATE patients SET first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, " +
+                             "phone = ?, address = ?, email = ?, blood_group = ?, allergies = ?, medical_history = ? " +
                              "WHERE id = ?";
 
         Connection conn = null;
@@ -166,18 +196,71 @@ public class PatientDAO {
             // Then update patient information, only if the fields are provided
             try (PreparedStatement patientStmt = conn.prepareStatement(patientQuery)) {
                 patientStmt.setString(1,
+                    (patient.getFirstName() != null && !patient.getFirstName().isEmpty()) ?
+                    patient.getFirstName() : existingPatient.getFirstName());
+
+                patientStmt.setString(2,
+                    (patient.getLastName() != null && !patient.getLastName().isEmpty()) ?
+                    patient.getLastName() : existingPatient.getLastName());
+
+                // Handle date_of_birth (DATE type in database)
+                if (patient.getDateOfBirth() != null && !patient.getDateOfBirth().isEmpty()) {
+                    try {
+                        java.sql.Date sqlDate = java.sql.Date.valueOf(patient.getDateOfBirth());
+                        patientStmt.setDate(3, sqlDate);
+                    } catch (IllegalArgumentException e) {
+                        // If date format is invalid, use existing value or null
+                        if (existingPatient.getDateOfBirth() != null && !existingPatient.getDateOfBirth().isEmpty()) {
+                            try {
+                                java.sql.Date sqlDate = java.sql.Date.valueOf(existingPatient.getDateOfBirth());
+                                patientStmt.setDate(3, sqlDate);
+                            } catch (IllegalArgumentException ex) {
+                                patientStmt.setNull(3, java.sql.Types.DATE);
+                            }
+                        } else {
+                            patientStmt.setNull(3, java.sql.Types.DATE);
+                        }
+                    }
+                } else if (existingPatient.getDateOfBirth() != null && !existingPatient.getDateOfBirth().isEmpty()) {
+                    try {
+                        java.sql.Date sqlDate = java.sql.Date.valueOf(existingPatient.getDateOfBirth());
+                        patientStmt.setDate(3, sqlDate);
+                    } catch (IllegalArgumentException e) {
+                        patientStmt.setNull(3, java.sql.Types.DATE);
+                    }
+                } else {
+                    patientStmt.setNull(3, java.sql.Types.DATE);
+                }
+
+                patientStmt.setString(4,
+                    (patient.getGender() != null && !patient.getGender().isEmpty()) ?
+                    patient.getGender() : existingPatient.getGender());
+
+                patientStmt.setString(5,
+                    (patient.getPhone() != null && !patient.getPhone().isEmpty()) ?
+                    patient.getPhone() : existingPatient.getPhone());
+
+                patientStmt.setString(6,
+                    (patient.getAddress() != null && !patient.getAddress().isEmpty()) ?
+                    patient.getAddress() : existingPatient.getAddress());
+
+                patientStmt.setString(7,
+                    (patient.getEmail() != null && !patient.getEmail().isEmpty()) ?
+                    patient.getEmail() : existingPatient.getEmail());
+
+                patientStmt.setString(8,
                     (patient.getBloodGroup() != null && !patient.getBloodGroup().isEmpty()) ?
                     patient.getBloodGroup() : existingPatient.getBloodGroup());
 
-                patientStmt.setString(2,
+                patientStmt.setString(9,
                     (patient.getAllergies() != null && !patient.getAllergies().isEmpty()) ?
                     patient.getAllergies() : existingPatient.getAllergies());
 
-                patientStmt.setString(3,
+                patientStmt.setString(10,
                     (patient.getMedicalHistory() != null && !patient.getMedicalHistory().isEmpty()) ?
                     patient.getMedicalHistory() : existingPatient.getMedicalHistory());
 
-                patientStmt.setInt(4, patient.getId());
+                patientStmt.setInt(11, patient.getId());
 
                 patientStmt.executeUpdate();
             }
@@ -273,7 +356,16 @@ public class PatientDAO {
                     patient.setAddress(rs.getString("address"));
                     patient.setBloodGroup(rs.getString("blood_group"));
                     patient.setAllergies(rs.getString("allergies"));
+                    patient.setMedicalHistory(rs.getString("medical_history"));
                     patient.setEmail(rs.getString("email"));
+
+                    // Set status if available
+                    try {
+                        patient.setStatus(rs.getString("status"));
+                    } catch (SQLException e) {
+                        // Status field might not exist in all database schemas
+                        patient.setStatus("ACTIVE"); // Default to active
+                    }
 
                     return patient;
                 }
@@ -435,6 +527,8 @@ public class PatientDAO {
             return false;
         }
     }
+
+
 
     // Get recent patients
     public List<Patient> getRecentPatients(int limit) {
