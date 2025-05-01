@@ -34,248 +34,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patientDashboard.css">
-    <style>
-        .booking-container {
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
-
-        .booking-header {
-            background: linear-gradient(135deg, #1977cc, #3fbbc0);
-            color: white;
-            padding: 30px;
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .doctor-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 5px solid rgba(255, 255, 255, 0.7);
-            overflow: hidden;
-            margin-right: 30px;
-            background-color: #fff;
-        }
-
-        .doctor-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .doctor-info h2 {
-            margin: 0 0 5px 0;
-            font-size: 24px;
-        }
-
-        .doctor-info p {
-            margin: 0 0 10px 0;
-            opacity: 0.9;
-            font-size: 16px;
-        }
-
-        .booking-body {
-            padding: 30px;
-        }
-
-        .booking-section {
-            margin-bottom: 30px;
-        }
-
-        .booking-section h3 {
-            color: #333;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            font-size: 18px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 500;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 15px;
-            transition: border-color 0.3s;
-        }
-
-        .form-control:focus {
-            border-color: #1977cc;
-            outline: none;
-            box-shadow: 0 0 5px rgba(25, 119, 204, 0.2);
-        }
-
-        .form-group-full {
-            grid-column: span 2;
-        }
-
-        textarea.form-control {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .form-error {
-            color: #dc3545;
-            font-size: 13px;
-            margin-top: 5px;
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: 500;
-            cursor: pointer;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-
-        .btn-primary {
-            background-color: #1977cc;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #1565c0;
-        }
-
-        .btn-secondary {
-            background-color: #f8f9fa;
-            color: #333;
-            border: 1px solid #ddd;
-        }
-
-        .btn-secondary:hover {
-            background-color: #e9ecef;
-        }
-
-        .time-slots {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .time-slot {
-            position: relative;
-        }
-
-        .time-slot input[type="radio"] {
-            position: absolute;
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .time-slot label {
-            display: inline-block;
-            padding: 10px 15px;
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .time-slot input[type="radio"]:checked + label {
-            background-color: #1977cc;
-            color: white;
-            border-color: #1977cc;
-        }
-
-        .time-slot input[type="radio"]:disabled + label {
-            background-color: #f1f1f1;
-            color: #999;
-            cursor: not-allowed;
-            text-decoration: line-through;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-        }
-
-        .alert i {
-            margin-right: 10px;
-            font-size: 18px;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        @media (max-width: 768px) {
-            .booking-header {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .doctor-avatar {
-                margin-right: 0;
-                margin-bottom: 20px;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .form-group-full {
-                grid-column: span 1;
-            }
-
-            .form-actions {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-booking.css">
 </head>
 <body>
     <div class="dashboard-container">
@@ -476,6 +235,63 @@
             if (!isDoctorAvailable) {
                 alert(`Dr. <%= doctor.getName() %> is not available on ${dayOfWeek}s. Please select another date.`);
                 this.value = '';
+            }
+        });
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(event) {
+            let isValid = true;
+            const appointmentDate = document.getElementById('appointmentDate').value;
+            const appointmentTime = document.querySelector('input[name="appointmentTime"]:checked');
+            const reason = document.getElementById('reason').value;
+
+            // Check if date is selected
+            if (!appointmentDate) {
+                isValid = false;
+                if (!document.querySelector('.date-error')) {
+                    const dateField = document.getElementById('appointmentDate');
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'form-error date-error';
+                    errorDiv.textContent = 'Please select an appointment date';
+                    dateField.parentNode.appendChild(errorDiv);
+                }
+            } else {
+                const dateError = document.querySelector('.date-error');
+                if (dateError) dateError.remove();
+            }
+
+            // Check if time is selected
+            if (!appointmentTime) {
+                isValid = false;
+                if (!document.querySelector('.time-error')) {
+                    const timeSlots = document.querySelector('.time-slots');
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'form-error time-error';
+                    errorDiv.textContent = 'Please select an appointment time';
+                    timeSlots.parentNode.appendChild(errorDiv);
+                }
+            } else {
+                const timeError = document.querySelector('.time-error');
+                if (timeError) timeError.remove();
+            }
+
+            // Check if reason is provided
+            if (!reason.trim()) {
+                isValid = false;
+                if (!document.querySelector('.reason-error')) {
+                    const reasonField = document.getElementById('reason');
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'form-error reason-error';
+                    errorDiv.textContent = 'Please provide a reason for your visit';
+                    reasonField.parentNode.appendChild(errorDiv);
+                }
+            } else {
+                const reasonError = document.querySelector('.reason-error');
+                if (reasonError) reasonError.remove();
+            }
+
+            if (!isValid) {
+                event.preventDefault();
             }
         });
     </script>

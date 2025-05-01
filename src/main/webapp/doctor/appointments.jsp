@@ -12,9 +12,9 @@
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
-    
+
     // Get doctor information
-    String doctorName = "Dr. " + user.getFirstName() + " " + user.getLastName();
+    String doctorName = "Dr. Harlan Drake";
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -35,11 +35,11 @@
                 <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="HealthPro Logo">
                 <h2>HealthPro Portal</h2>
             </div>
-            
+
             <div class="profile-overview">
                 <h3><i class="fas fa-user-md"></i> <span>Profile Overview</span></h3>
             </div>
-            
+
             <div class="sidebar-menu">
                 <ul>
                     <li>
@@ -87,7 +87,7 @@
                 </ul>
             </div>
         </div>
-        
+
         <!-- Main Content -->
         <div class="main-content">
             <!-- Top Header -->
@@ -97,7 +97,7 @@
                     <a href="appointments.jsp" class="active">Appointment Management</a>
                     <a href="patients.jsp">Patient Details</a>
                 </div>
-                
+
                 <div class="top-header-right">
                     <div class="search-icon">
                         <i class="fas fa-search"></i>
@@ -107,19 +107,19 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Appointment Management Section -->
             <div class="appointment-section">
                 <div class="appointment-header">
                     <h2>Appointment Management</h2>
                 </div>
-                
+
                 <div class="appointment-tabs">
                     <div class="appointment-tab active" data-tab="upcoming">Upcoming</div>
                     <div class="appointment-tab" data-tab="past">Past</div>
                     <div class="appointment-tab" data-tab="pending">Pending</div>
                 </div>
-                
+
                 <div class="appointment-filter">
                     <div class="search-box">
                         <i class="fas fa-search"></i>
@@ -129,7 +129,7 @@
                         <i class="fas fa-filter"></i> Filter
                     </button>
                 </div>
-                
+
                 <div class="appointment-content">
                     <table class="appointment-table">
                         <thead>
@@ -160,9 +160,9 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <a href="appointment-details.jsp?id=001" class="action-btn view"><i class="fas fa-eye"></i></a>
-                                    <a href="edit-appointment.jsp?id=001" class="action-btn edit"><i class="fas fa-edit"></i></a>
-                                    <a href="#" class="action-btn delete" data-id="001"><i class="fas fa-trash"></i></a>
+                                    <a href="#" class="action-btn view"><i class="fas fa-eye"></i></a>
+                                    <a href="#" class="action-btn edit"><i class="fas fa-edit"></i></a>
+                                    <a href="#" class="action-btn delete"><i class="fas fa-trash"></i></a>
                                 </td>
                                 <td>
                                     <span class="notes-badge">Follow-up required</span>
@@ -184,9 +184,9 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <a href="appointment-details.jsp?id=002" class="action-btn view"><i class="fas fa-eye"></i></a>
-                                    <a href="edit-appointment.jsp?id=002" class="action-btn edit"><i class="fas fa-edit"></i></a>
-                                    <a href="#" class="action-btn delete" data-id="002"><i class="fas fa-trash"></i></a>
+                                    <a href="#" class="action-btn view"><i class="fas fa-eye"></i></a>
+                                    <a href="#" class="action-btn edit"><i class="fas fa-edit"></i></a>
+                                    <a href="#" class="action-btn delete"><i class="fas fa-trash"></i></a>
                                 </td>
                                 <td>
                                     <span class="notes-badge">First consultation</span>
@@ -208,9 +208,9 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <a href="appointment-details.jsp?id=003" class="action-btn view"><i class="fas fa-eye"></i></a>
-                                    <a href="edit-appointment.jsp?id=003" class="action-btn edit"><i class="fas fa-edit"></i></a>
-                                    <a href="#" class="action-btn delete" data-id="003"><i class="fas fa-trash"></i></a>
+                                    <a href="#" class="action-btn view"><i class="fas fa-eye"></i></a>
+                                    <a href="#" class="action-btn edit"><i class="fas fa-edit"></i></a>
+                                    <a href="#" class="action-btn delete"><i class="fas fa-trash"></i></a>
                                 </td>
                                 <td>
                                     <span class="notes-badge">No-show</span>
@@ -232,9 +232,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <a href="appointment-details.jsp?id=004" class="action-btn view"><i class="fas fa-eye"></i></a>
-                                    <a href="edit-appointment.jsp?id=004" class="action-btn edit"><i class="fas fa-edit"></i></a>
-                                    <a href="#" class="action-btn delete" data-id="004"><i class="fas fa-trash"></i></a>
+                                    <a href="#" class="action-btn view"><i class="fas fa-eye"></i></a>
                                 </td>
                                 <td>
                                     <span class="notes-badge">Routine check-up</span>
@@ -256,9 +254,8 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <a href="appointment-details.jsp?id=005" class="action-btn view"><i class="fas fa-eye"></i></a>
-                                    <a href="edit-appointment.jsp?id=005" class="action-btn edit"><i class="fas fa-edit"></i></a>
-                                    <a href="#" class="action-btn delete" data-id="005"><i class="fas fa-trash"></i></a>
+                                    <a href="#" class="action-btn view"><i class="fas fa-eye"></i></a>
+                                    <a href="#" class="action-btn edit"><i class="fas fa-edit"></i></a>
                                 </td>
                                 <td>
                                     <span class="notes-badge">Follow-up in 2 weeks</span>
@@ -270,41 +267,41 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Tab switching functionality
             const tabs = document.querySelectorAll('.appointment-tab');
-            
+
             tabs.forEach(tab => {
                 tab.addEventListener('click', function() {
                     // Remove active class from all tabs
                     tabs.forEach(t => t.classList.remove('active'));
-                    
+
                     // Add active class to clicked tab
                     this.classList.add('active');
-                    
+
                     // Here you would typically show/hide content based on the selected tab
                     // For now, we're just showing the same content for all tabs
                     const tabName = this.getAttribute('data-tab');
                     console.log('Switched to tab:', tabName);
-                    
+
                     // In a real implementation, you would fetch data for the selected tab
                     // and update the table content
                 });
             });
-            
+
             // Search functionality
             const searchInput = document.querySelector('.search-box input');
             if (searchInput) {
                 searchInput.addEventListener('input', function() {
                     const searchTerm = this.value.toLowerCase();
                     const rows = document.querySelectorAll('.appointment-table tbody tr');
-                    
+
                     rows.forEach(row => {
                         const patientName = row.querySelector('.patient-name').textContent.toLowerCase();
                         const appointmentId = row.querySelector('td:first-child').textContent.toLowerCase();
-                        
+
                         if (patientName.includes(searchTerm) || appointmentId.includes(searchTerm)) {
                             row.style.display = '';
                         } else {
@@ -313,14 +310,14 @@
                     });
                 });
             }
-            
+
             // Delete appointment functionality
             const deleteButtons = document.querySelectorAll('.action-btn.delete');
             deleteButtons.forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
                     const appointmentId = this.getAttribute('data-id');
-                    
+
                     if (confirm('Are you sure you want to delete this appointment?')) {
                         // In a real application, you would send a request to the server
                         alert('Appointment deleted successfully!');

@@ -1,0 +1,234 @@
+/* Appointment Confirmation Styles */
+.confirmation-container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.confirmation-header {
+    background: linear-gradient(135deg, #4e73df, #36b9cc);
+    color: white;
+    padding: 40px 30px;
+    position: relative;
+}
+
+.confirmation-icon {
+    width: 100px;
+    height: 100px;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: #4e73df;
+    font-size: 50px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.confirmation-header h2 {
+    margin: 0 0 10px 0;
+    font-size: 28px;
+}
+
+.confirmation-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 16px;
+}
+
+.confirmation-body {
+    padding: 30px;
+}
+
+.appointment-details {
+    background-color: #f8f9fc;
+    border-radius: 10px;
+    padding: 30px;
+    margin-bottom: 30px;
+    text-align: left;
+    border: 1px solid #e3e6f0;
+}
+
+.detail-row {
+    display: flex;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #e3e6f0;
+    padding-bottom: 15px;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.detail-label {
+    flex: 0 0 150px;
+    font-weight: 600;
+    color: #5a5c69;
+}
+
+.detail-value {
+    flex: 1;
+    color: #333;
+}
+
+.doctor-info {
+    display: flex;
+    align-items: center;
+    background-color: #eaecf4;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+    border: 1px solid #e3e6f0;
+}
+
+.doctor-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 20px;
+    background-color: #fff;
+    border: 3px solid #fff;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.doctor-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.doctor-details {
+    flex: 1;
+    text-align: left;
+}
+
+.doctor-details h3 {
+    margin: 0 0 5px 0;
+    color: #333;
+    font-size: 1.2rem;
+}
+
+.doctor-details p {
+    margin: 0 0 5px 0;
+    color: #666;
+    display: flex;
+    align-items: center;
+}
+
+.doctor-details p i {
+    margin-right: 8px;
+    color: #4e73df;
+    width: 16px;
+    text-align: center;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.status-pending {
+    background-color: #f6c23e;
+    color: #856404;
+}
+
+.status-confirmed {
+    background-color: #1cc88a;
+    color: #155724;
+}
+
+.status-cancelled {
+    background-color: #e74a3b;
+    color: #721c24;
+}
+
+.status-completed {
+    background-color: #4e73df;
+    color: #fff;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.instructions {
+    background-color: #fff3cd;
+    border-left: 4px solid #f6c23e;
+    padding: 15px 20px;
+    margin-top: 30px;
+    text-align: left;
+    border-radius: 5px;
+}
+
+.instructions h3 {
+    margin-top: 0;
+    color: #856404;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+}
+
+.instructions h3 i {
+    margin-right: 10px;
+}
+
+.instructions ul {
+    margin: 10px 0 0 0;
+    padding-left: 20px;
+    color: #856404;
+}
+
+.instructions li {
+    margin-bottom: 8px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .detail-row {
+        flex-direction: column;
+    }
+    
+    .detail-label {
+        margin-bottom: 5px;
+    }
+    
+    .doctor-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .doctor-avatar {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    
+    .doctor-details {
+        text-align: center;
+    }
+    
+    .doctor-details p {
+        justify-content: center;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

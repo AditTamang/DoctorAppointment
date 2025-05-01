@@ -10,11 +10,11 @@
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
-    
+
     // Get appointment and doctor data from request attributes
     Appointment appointment = (Appointment) request.getAttribute("appointment");
     Doctor doctor = (Doctor) request.getAttribute("doctor");
-    
+
     if (appointment == null || doctor == null) {
         response.sendRedirect(request.getContextPath() + "/patient/dashboard");
         return;
@@ -30,219 +30,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patientDashboard.css">
-    <style>
-        .confirmation-container {
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        
-        .confirmation-header {
-            background: linear-gradient(135deg, #1977cc, #3fbbc0);
-            color: white;
-            padding: 40px 30px;
-            position: relative;
-        }
-        
-        .confirmation-icon {
-            width: 100px;
-            height: 100px;
-            background-color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            color: #1977cc;
-            font-size: 50px;
-        }
-        
-        .confirmation-header h2 {
-            margin: 0 0 10px 0;
-            font-size: 28px;
-        }
-        
-        .confirmation-header p {
-            margin: 0;
-            opacity: 0.9;
-            font-size: 16px;
-        }
-        
-        .confirmation-body {
-            padding: 30px;
-        }
-        
-        .appointment-details {
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            padding: 30px;
-            margin-bottom: 30px;
-            text-align: left;
-        }
-        
-        .detail-row {
-            display: flex;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
-        }
-        
-        .detail-row:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        
-        .detail-label {
-            flex: 0 0 150px;
-            font-weight: 600;
-            color: #555;
-        }
-        
-        .detail-value {
-            flex: 1;
-            color: #333;
-        }
-        
-        .doctor-info {
-            display: flex;
-            align-items: center;
-            background-color: #e6f7ff;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .doctor-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin-right: 20px;
-            background-color: #fff;
-        }
-        
-        .doctor-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .doctor-details {
-            flex: 1;
-            text-align: left;
-        }
-        
-        .doctor-details h3 {
-            margin: 0 0 5px 0;
-            color: #333;
-        }
-        
-        .doctor-details p {
-            margin: 0 0 5px 0;
-            color: #666;
-        }
-        
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
-        }
-        
-        .btn {
-            padding: 12px 25px;
-            border-radius: 5px;
-            font-weight: 500;
-            cursor: pointer;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-        
-        .btn-primary {
-            background-color: #1977cc;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: #1565c0;
-        }
-        
-        .btn-secondary {
-            background-color: #f8f9fa;
-            color: #333;
-            border: 1px solid #ddd;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #e9ecef;
-        }
-        
-        .instructions {
-            background-color: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px 20px;
-            margin-top: 30px;
-            text-align: left;
-            border-radius: 5px;
-        }
-        
-        .instructions h3 {
-            margin-top: 0;
-            color: #856404;
-            font-size: 18px;
-        }
-        
-        .instructions ul {
-            margin: 10px 0 0 0;
-            padding-left: 20px;
-            color: #856404;
-        }
-        
-        .instructions li {
-            margin-bottom: 8px;
-        }
-        
-        @media (max-width: 768px) {
-            .detail-row {
-                flex-direction: column;
-            }
-            
-            .detail-label {
-                margin-bottom: 5px;
-            }
-            
-            .doctor-info {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .doctor-avatar {
-                margin-right: 0;
-                margin-bottom: 15px;
-            }
-            
-            .doctor-details {
-                text-align: center;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-confirmation.css">
 </head>
 <body>
     <div class="dashboard-container">
@@ -307,7 +95,7 @@
                 <div class="menu-toggle" id="menuToggle">
                     <i class="fas fa-bars"></i>
                 </div>
-                
+
                 <div class="nav-right">
                     <div class="nav-user">
                         <div class="user-image">
@@ -342,10 +130,11 @@
                                 <img src="${pageContext.request.contextPath}${doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty() ? doctor.getImageUrl() : '/assets/images/doctors/default.jpg'}" alt="Doctor Profile">
                             </div>
                             <div class="doctor-details">
-                                <h3>Dr. <%= doctor.getName() %></h3>
+                                <h3><%= doctor.getName().startsWith("Dr.") ? doctor.getName() : "Dr. " + doctor.getName() %></h3>
                                 <p><i class="fas fa-stethoscope"></i> <%= doctor.getSpecialization() %></p>
                                 <p><i class="fas fa-graduation-cap"></i> <%= doctor.getQualification() != null ? doctor.getQualification() : "Qualified Professional" %></p>
                                 <p><i class="fas fa-phone"></i> <%= doctor.getPhone() != null ? doctor.getPhone() : "Contact details will be shared" %></p>
+                                <p><i class="fas fa-map-marker-alt"></i> <%= doctor.getAddress() != null ? doctor.getAddress() : "Clinic address will be provided" %></p>
                             </div>
                         </div>
 
@@ -365,7 +154,7 @@
                             <div class="detail-row">
                                 <div class="detail-label">Status</div>
                                 <div class="detail-value">
-                                    <span style="background-color: #ffc107; color: #856404; padding: 5px 10px; border-radius: 20px; font-size: 14px;">
+                                    <span class="status-badge status-<%= appointment.getStatus().toLowerCase() %>">
                                         <%= appointment.getStatus() %>
                                     </span>
                                 </div>

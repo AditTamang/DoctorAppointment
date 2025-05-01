@@ -1,9 +1,10 @@
 package com.doctorapp.service;
 
 
+ import java.util.List;
+
  import com.doctorapp.dao.AppointmentDAO;
  import com.doctorapp.model.Appointment;
- import java.util.List;
 
  /**
   * Service layer for Appointment-related operations.
@@ -217,5 +218,53 @@ package com.doctorapp.service;
          // This would check the doctor's schedule and return only available slots
 
          return timeSlots;
+     }
+
+     /**
+      * Check if a time slot is available for a doctor on a specific date
+      * @param doctorId Doctor ID
+      * @param date Appointment date
+      * @param time Appointment time
+      * @return true if the time slot is available, false otherwise
+      */
+     public boolean isTimeSlotAvailable(int doctorId, String date, String time) {
+         // In a real implementation, this would check the database for existing appointments
+         // For now, we'll assume all time slots are available
+
+         try {
+             // Convert date string to java.sql.Date for database comparison
+             java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+             java.util.Date parsedDate = dateFormat.parse(date);
+             java.sql.Date sqlDate = new java.sql.Date(parsedDate.getTime());
+
+             // Check if there's an existing appointment for this doctor at this date and time
+             List<Appointment> doctorAppointments = appointmentDAO.getAppointmentsByDoctorId(doctorId);
+
+             for (Appointment appointment : doctorAppointments) {
+                 // Skip cancelled appointments
+                 if ("CANCELLED".equals(appointment.getStatus())) {
+                     continue;
+                 }
+
+                 // Check if the appointment is on the same date
+                 java.util.Date appointmentDate = appointment.getAppointmentDate();
+                 if (appointmentDate != null) {
+                     java.sql.Date appointmentSqlDate = new java.sql.Date(appointmentDate.getTime());
+
+                     // If same date and same time, the slot is not available
+                     if (sqlDate.equals(appointmentSqlDate) &&
+                         time.equals(appointment.getAppointmentTime())) {
+                         return false;
+                     }
+                 }
+             }
+
+             // If we get here, the time slot is available
+             return true;
+         } catch (Exception e) {
+             System.err.println("Error checking time slot availability: " + e.getMessage());
+             // In case of error, assume the slot is available to avoid blocking appointments
+             return true;
+         }
      }
  }

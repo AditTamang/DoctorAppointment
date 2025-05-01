@@ -12,9 +12,9 @@
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
-    
+
     // Get doctor information
-    String doctorName = "Dr. " + user.getFirstName() + " " + user.getLastName();
+    String doctorName = "Dr. Harlan Drake";
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,7 +34,7 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
-        
+
         .availability-header {
             display: flex;
             justify-content: space-between;
@@ -43,121 +43,121 @@
             padding-bottom: 10px;
             border-bottom: 1px solid #e0e0e0;
         }
-        
+
         .availability-header h2 {
             font-size: 20px;
             font-weight: 600;
         }
-        
+
         .availability-content {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
         }
-        
+
         .availability-section {
             background-color: #f8f9fa;
             border-radius: 10px;
             padding: 20px;
         }
-        
+
         .availability-section h3 {
             font-size: 18px;
             font-weight: 600;
             margin-bottom: 15px;
             color: #333;
         }
-        
+
         .day-item {
             display: flex;
             align-items: center;
             margin-bottom: 15px;
         }
-        
+
         .day-checkbox {
             margin-right: 10px;
         }
-        
+
         .day-label {
             font-weight: 500;
             width: 100px;
         }
-        
+
         .time-inputs {
             display: flex;
             align-items: center;
             flex: 1;
         }
-        
+
         .time-inputs input {
             width: 100px;
             padding: 8px;
             border: 1px solid #ced4da;
             border-radius: 5px;
         }
-        
+
         .time-separator {
             margin: 0 10px;
             color: #6c757d;
         }
-        
+
         .break-time {
             margin-top: 20px;
         }
-        
+
         .break-time h4 {
             font-size: 16px;
             font-weight: 500;
             margin-bottom: 10px;
             color: #333;
         }
-        
+
         .slot-duration {
             margin-top: 20px;
         }
-        
+
         .slot-duration h4 {
             font-size: 16px;
             font-weight: 500;
             margin-bottom: 10px;
             color: #333;
         }
-        
+
         .slot-duration select {
             width: 100%;
             padding: 10px;
             border: 1px solid #ced4da;
             border-radius: 5px;
         }
-        
+
         .vacation-section {
             margin-top: 20px;
         }
-        
+
         .vacation-section h4 {
             font-size: 16px;
             font-weight: 500;
             margin-bottom: 10px;
             color: #333;
         }
-        
+
         .vacation-inputs {
             display: flex;
             gap: 10px;
             margin-bottom: 10px;
         }
-        
+
         .vacation-inputs input {
             flex: 1;
             padding: 10px;
             border: 1px solid #ced4da;
             border-radius: 5px;
         }
-        
+
         .vacation-list {
             margin-top: 15px;
         }
-        
+
         .vacation-item {
             display: flex;
             justify-content: space-between;
@@ -167,16 +167,16 @@
             border-radius: 5px;
             margin-bottom: 10px;
         }
-        
+
         .vacation-item-dates {
             font-weight: 500;
         }
-        
+
         .vacation-item-remove {
             color: #dc3545;
             cursor: pointer;
         }
-        
+
         .availability-actions {
             grid-column: span 2;
             display: flex;
@@ -184,12 +184,12 @@
             gap: 10px;
             margin-top: 20px;
         }
-        
+
         @media (max-width: 768px) {
             .availability-content {
                 grid-template-columns: 1fr;
             }
-            
+
             .availability-actions {
                 grid-column: span 1;
             }
@@ -204,11 +204,11 @@
                 <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="HealthPro Logo">
                 <h2>HealthPro Portal</h2>
             </div>
-            
+
             <div class="profile-overview">
                 <h3><i class="fas fa-user-md"></i> <span>Profile Overview</span></h3>
             </div>
-            
+
             <div class="sidebar-menu">
                 <ul>
                     <li>
@@ -256,7 +256,7 @@
                 </ul>
             </div>
         </div>
-        
+
         <!-- Main Content -->
         <div class="main-content">
             <!-- Top Header -->
@@ -266,7 +266,7 @@
                     <a href="appointments.jsp">Appointment Management</a>
                     <a href="patients.jsp">Patient Details</a>
                 </div>
-                
+
                 <div class="top-header-right">
                     <div class="search-icon">
                         <i class="fas fa-search"></i>
@@ -276,21 +276,18 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Availability Settings -->
             <div class="availability-container">
                 <div class="availability-header">
                     <h2>Set Availability</h2>
-                    <button class="btn btn-primary" id="save-availability">
-                        <i class="fas fa-save"></i> Save Changes
-                    </button>
                 </div>
-                
+
                 <form id="availability-form">
                     <div class="availability-content">
                         <div class="availability-section">
                             <h3>Weekly Schedule</h3>
-                            
+
                             <div class="day-item">
                                 <input type="checkbox" id="monday" class="day-checkbox" checked>
                                 <label for="monday" class="day-label">Monday</label>
@@ -300,7 +297,7 @@
                                     <input type="time" value="17:00" class="end-time">
                                 </div>
                             </div>
-                            
+
                             <div class="day-item">
                                 <input type="checkbox" id="tuesday" class="day-checkbox" checked>
                                 <label for="tuesday" class="day-label">Tuesday</label>
@@ -310,7 +307,7 @@
                                     <input type="time" value="17:00" class="end-time">
                                 </div>
                             </div>
-                            
+
                             <div class="day-item">
                                 <input type="checkbox" id="wednesday" class="day-checkbox" checked>
                                 <label for="wednesday" class="day-label">Wednesday</label>
@@ -320,7 +317,7 @@
                                     <input type="time" value="17:00" class="end-time">
                                 </div>
                             </div>
-                            
+
                             <div class="day-item">
                                 <input type="checkbox" id="thursday" class="day-checkbox" checked>
                                 <label for="thursday" class="day-label">Thursday</label>
@@ -330,7 +327,7 @@
                                     <input type="time" value="17:00" class="end-time">
                                 </div>
                             </div>
-                            
+
                             <div class="day-item">
                                 <input type="checkbox" id="friday" class="day-checkbox" checked>
                                 <label for="friday" class="day-label">Friday</label>
@@ -340,7 +337,7 @@
                                     <input type="time" value="17:00" class="end-time">
                                 </div>
                             </div>
-                            
+
                             <div class="day-item">
                                 <input type="checkbox" id="saturday" class="day-checkbox">
                                 <label for="saturday" class="day-label">Saturday</label>
@@ -350,7 +347,7 @@
                                     <input type="time" value="14:00" class="end-time" disabled>
                                 </div>
                             </div>
-                            
+
                             <div class="day-item">
                                 <input type="checkbox" id="sunday" class="day-checkbox">
                                 <label for="sunday" class="day-label">Sunday</label>
@@ -360,7 +357,7 @@
                                     <input type="time" value="14:00" class="end-time" disabled>
                                 </div>
                             </div>
-                            
+
                             <div class="break-time">
                                 <h4>Break Time</h4>
                                 <div class="time-inputs">
@@ -370,10 +367,10 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="availability-section">
                             <h3>Appointment Settings</h3>
-                            
+
                             <div class="slot-duration">
                                 <h4>Appointment Duration</h4>
                                 <select id="slot-duration">
@@ -383,7 +380,7 @@
                                     <option value="60">60 minutes</option>
                                 </select>
                             </div>
-                            
+
                             <div class="vacation-section">
                                 <h4>Vacation/Time Off</h4>
                                 <div class="vacation-inputs">
@@ -393,7 +390,7 @@
                                         <i class="fas fa-plus"></i> Add
                                     </button>
                                 </div>
-                                
+
                                 <div class="vacation-list">
                                     <div class="vacation-item">
                                         <span class="vacation-item-dates">Dec 24, 2023 - Jan 2, 2024</span>
@@ -406,13 +403,13 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="availability-actions">
-                            <button type="button" class="btn btn-outline" id="reset-availability">
-                                <i class="fas fa-undo"></i> Reset
+                            <button type="button" class="btn btn-outline" id="cancel-btn">
+                                <i class="fas fa-times"></i> Cancel
                             </button>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Save Changes
+                                <i class="fas fa-save"></i> Upload Changes
                             </button>
                         </div>
                     </div>
@@ -420,7 +417,7 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Day checkbox functionality
@@ -433,44 +430,44 @@
                     });
                 });
             });
-            
+
             // Add vacation functionality
             const addVacationBtn = document.getElementById('add-vacation');
             const vacationStart = document.getElementById('vacation-start');
             const vacationEnd = document.getElementById('vacation-end');
             const vacationList = document.querySelector('.vacation-list');
-            
+
             if (addVacationBtn) {
                 addVacationBtn.addEventListener('click', function() {
                     if (!vacationStart.value || !vacationEnd.value) {
                         alert('Please select both start and end dates.');
                         return;
                     }
-                    
+
                     const startDate = new Date(vacationStart.value);
                     const endDate = new Date(vacationEnd.value);
-                    
+
                     if (endDate < startDate) {
                         alert('End date cannot be before start date.');
                         return;
                     }
-                    
+
                     const startFormatted = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                     const endFormatted = endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                    
+
                     const vacationItem = document.createElement('div');
                     vacationItem.className = 'vacation-item';
                     vacationItem.innerHTML = `
                         <span class="vacation-item-dates">${startFormatted} - ${endFormatted}</span>
                         <span class="vacation-item-remove"><i class="fas fa-times"></i></span>
                     `;
-                    
+
                     vacationList.appendChild(vacationItem);
-                    
+
                     // Clear inputs
                     vacationStart.value = '';
                     vacationEnd.value = '';
-                    
+
                     // Add remove functionality
                     const removeBtn = vacationItem.querySelector('.vacation-item-remove');
                     removeBtn.addEventListener('click', function() {
@@ -478,7 +475,7 @@
                     });
                 });
             }
-            
+
             // Remove vacation functionality
             const removeVacationBtns = document.querySelectorAll('.vacation-item-remove');
             removeVacationBtns.forEach(btn => {
@@ -486,54 +483,26 @@
                     this.closest('.vacation-item').remove();
                 });
             });
-            
-            // Reset functionality
-            const resetBtn = document.getElementById('reset-availability');
-            if (resetBtn) {
-                resetBtn.addEventListener('click', function() {
-                    if (confirm('Are you sure you want to reset all availability settings?')) {
-                        // Reset day checkboxes and time inputs
-                        dayCheckboxes.forEach(checkbox => {
-                            if (checkbox.id === 'monday' || checkbox.id === 'tuesday' || checkbox.id === 'wednesday' || checkbox.id === 'thursday' || checkbox.id === 'friday') {
-                                checkbox.checked = true;
-                                const timeInputs = checkbox.parentElement.querySelectorAll('.time-inputs input');
-                                timeInputs[0].value = '09:00';
-                                timeInputs[1].value = '17:00';
-                                timeInputs.forEach(input => {
-                                    input.disabled = false;
-                                });
-                            } else {
-                                checkbox.checked = false;
-                                const timeInputs = checkbox.parentElement.querySelectorAll('.time-inputs input');
-                                timeInputs[0].value = '10:00';
-                                timeInputs[1].value = '14:00';
-                                timeInputs.forEach(input => {
-                                    input.disabled = true;
-                                });
-                            }
-                        });
-                        
-                        // Reset break time
-                        document.getElementById('break-start').value = '12:00';
-                        document.getElementById('break-end').value = '13:00';
-                        
-                        // Reset slot duration
-                        document.getElementById('slot-duration').value = '30';
-                        
-                        // Clear vacation list
-                        vacationList.innerHTML = '';
+
+            // Cancel button functionality
+            const cancelBtn = document.getElementById('cancel-btn');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', function() {
+                    if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+                        window.location.href = 'index.jsp';
                     }
                 });
             }
-            
+
             // Form submission
             const form = document.getElementById('availability-form');
             if (form) {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    
+
                     // In a real application, you would collect all the form data and send it to the server
                     alert('Availability settings saved successfully!');
+                    window.location.href = 'index.jsp';
                 });
             }
         });

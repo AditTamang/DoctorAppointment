@@ -104,34 +104,54 @@ package com.doctorapp.controller.servlets;
 
      private void showDoctorDetails(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
          try {
-             int id = Integer.parseInt(request.getParameter("id"));
+             String idParam = request.getParameter("id");
+             System.out.println("Received request to show doctor details with ID: " + idParam);
+
+             if (idParam == null || idParam.trim().isEmpty()) {
+                 System.err.println("Doctor ID parameter is missing or empty");
+                 request.setAttribute("error", "Doctor ID is required.");
+                 request.getRequestDispatcher("/doctors.jsp").forward(request, response);
+                 return;
+             }
+
+             int id = Integer.parseInt(idParam);
+             System.out.println("Fetching doctor with ID: " + id);
              Doctor doctor = doctorService.getDoctorById(id);
 
              if (doctor != null) {
-                 // Check if doctor is active
-                 if (doctor.getStatus() != null && doctor.getStatus().equals("ACTIVE")) {
-                     request.setAttribute("doctor", doctor);
-                     request.getRequestDispatcher("/doctor-details.jsp").forward(request, response);
-                 } else {
-                     // Doctor is not active, redirect to doctors list
-                     request.setAttribute("error", "The requested doctor profile is not available.");
-                     request.getRequestDispatcher("/doctors.jsp").forward(request, response);
+                 System.out.println("Doctor found: " + doctor.getName());
+
+                 // Always set doctor as active to ensure profile is viewable
+                 // This is a temporary fix until the status column is properly added to the database
+                 if (doctor.getStatus() == null) {
+                     System.out.println("Doctor status is null, setting to ACTIVE by default");
+                     doctor.setStatus("ACTIVE");
                  }
+
+                 // Always show the doctor profile regardless of status
+                 // We'll assume all doctors in the system are active
+                 System.out.println("Forwarding to doctor-details.jsp");
+                 request.setAttribute("doctor", doctor);
+                 request.getRequestDispatcher("/doctor-details.jsp").forward(request, response);
              } else {
                  // Doctor not found, redirect to doctors list
+                 System.err.println("No doctor found with ID: " + id);
                  request.setAttribute("error", "Doctor not found.");
                  request.getRequestDispatcher("/doctors.jsp").forward(request, response);
              }
          } catch (NumberFormatException e) {
              // Handle invalid doctor ID
-             System.err.println("Invalid doctor ID: " + e.getMessage());
-             request.setAttribute("error", "Invalid doctor ID.");
+             System.err.println("Invalid doctor ID format: " + e.getMessage());
+             request.setAttribute("error", "Invalid doctor ID format.");
              request.getRequestDispatcher("/doctors.jsp").forward(request, response);
          } catch (Exception e) {
              // Log any other errors
              System.err.println("Error showing doctor details: " + e.getMessage());
              e.printStackTrace();
-             response.sendRedirect(request.getContextPath() + "/error.jsp");
+
+             // Add error information to request for better debugging
+             request.setAttribute("errorMessage", "An error occurred while retrieving doctor details: " + e.getMessage());
+             request.getRequestDispatcher("/error.jsp").forward(request, response);
          }
      }
 

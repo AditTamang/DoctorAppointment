@@ -14,8 +14,8 @@
     }
 
     // Get doctor information
-    String doctorName = "Dr. " + user.getFirstName() + " " + user.getLastName();
-    String specialty = "Cardiologist"; // This should be fetched from the database
+    String doctorName = "Dr. Harlan Drake";
+    String specialty = "Dermatologist"; // This should be fetched from the database
     String university = "Harvard University"; // This should be fetched from the database
     String qualification = "MD, PHD"; // This should be fetched from the database
 %>
@@ -114,8 +114,8 @@
             <!-- Profile Section -->
             <div class="profile-section">
                 <div class="profile-header">
-                    <div class="profile-image">
-                        <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
+                    <div class="doctor-image">
+                        <img src="${pageContext.request.contextPath}/assets/images/doctor.png" alt="Doctor">
                     </div>
                     <div class="profile-info">
                         <h2><%= doctorName %></h2>
@@ -177,6 +177,9 @@
                                         <div class="doctor-avatar">
                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
                                         </div>
+                                        <div class="assigned-doctor-info">
+                                            <span class="assigned-doctor-name"><%= doctorName %></span>
+                                        </div>
                                     </div>
                                 </td>
                                 <td>
@@ -197,6 +200,9 @@
                                         <div class="doctor-avatar">
                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
                                         </div>
+                                        <div class="assigned-doctor-info">
+                                            <span class="assigned-doctor-name"><%= doctorName %></span>
+                                        </div>
                                     </div>
                                 </td>
                                 <td>
@@ -216,6 +222,9 @@
                                     <div class="assigned-doctor">
                                         <div class="doctor-avatar">
                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
+                                        </div>
+                                        <div class="assigned-doctor-info">
+                                            <span class="assigned-doctor-name"><%= doctorName %></span>
                                         </div>
                                     </div>
                                 </td>
@@ -238,6 +247,9 @@
                                         <div class="doctor-avatar">
                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
                                         </div>
+                                        <div class="assigned-doctor-info">
+                                            <span class="assigned-doctor-name"><%= doctorName %></span>
+                                        </div>
                                     </div>
                                 </td>
                                 <td>
@@ -256,6 +268,9 @@
                                     <div class="assigned-doctor">
                                         <div class="doctor-avatar">
                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
+                                        </div>
+                                        <div class="assigned-doctor-info">
+                                            <span class="assigned-doctor-name"><%= doctorName %></span>
                                         </div>
                                     </div>
                                 </td>

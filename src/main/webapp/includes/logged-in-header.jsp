@@ -15,6 +15,7 @@
                         <li><a href="${pageContext.request.contextPath}/doctor/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                     </c:when>
                     <c:when test="${sessionScope.user.role == 'PATIENT'}">
+                        <li><a href="${pageContext.request.contextPath}/patient/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                         <li><a href="${pageContext.request.contextPath}/contact-us"><i class="fas fa-envelope"></i> Contact</a></li>
                         <li><a href="${pageContext.request.contextPath}/doctors"><i class="fas fa-user-md"></i> Find Doctors</a></li>
                         <li><a href="${pageContext.request.contextPath}/about-us.jsp"><i class="fas fa-info-circle"></i> About Us</a></li>

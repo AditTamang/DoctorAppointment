@@ -237,6 +237,32 @@ public class AppointmentBookingServlet extends HttpServlet {
         appointment.setSymptoms(symptoms);
         appointment.setStatus("PENDING");
 
+        // Check if the time slot is already booked
+        boolean isTimeSlotAvailable = appointmentService.isTimeSlotAvailable(doctorId, appointmentDate, appointmentTime);
+
+        if (!isTimeSlotAvailable) {
+            // Time slot is already booked
+            request.setAttribute("timeError", "This time slot is no longer available. Please select another time.");
+
+            // Get doctor details again
+            Doctor doctor = doctorService.getDoctorById(doctorId);
+
+            // Get available time slots for the doctor (refresh the list)
+            List<String> availableTimeSlots = appointmentService.getAvailableTimeSlots(doctorId);
+
+            // Set attributes for the booking form
+            request.setAttribute("doctor", doctor);
+            request.setAttribute("patientId", patientId);
+            request.setAttribute("availableTimeSlots", availableTimeSlots);
+            request.setAttribute("appointmentDate", appointmentDate);
+            request.setAttribute("reason", reason);
+            request.setAttribute("symptoms", symptoms);
+
+            // Forward back to booking form
+            request.getRequestDispatcher("/patient/bookAppointment.jsp").forward(request, response);
+            return;
+        }
+
         // Book appointment
         boolean booked = appointmentService.bookAppointment(appointment);
 
@@ -244,10 +270,20 @@ public class AppointmentBookingServlet extends HttpServlet {
             // Update doctor's patient count
             doctorService.incrementPatientCount(doctorId);
 
+            // Get doctor details for confirmation page
+            Doctor doctor = doctorService.getDoctorById(doctorId);
+
+            // Set doctor name in appointment for display
+            appointment.setDoctorName(doctor.getName());
+
+            // Set patient name in appointment for display
+            String patientName = user.getFirstName() + " " + user.getLastName();
+            appointment.setPatientName(patientName);
+
             // Redirect to success page
             request.setAttribute("successMessage", "Appointment booked successfully");
             request.setAttribute("appointment", appointment);
-            request.setAttribute("doctor", doctorService.getDoctorById(doctorId));
+            request.setAttribute("doctor", doctor);
             request.getRequestDispatcher("/patient/appointmentConfirmation.jsp").forward(request, response);
         } else {
             // Redirect back to booking form with error

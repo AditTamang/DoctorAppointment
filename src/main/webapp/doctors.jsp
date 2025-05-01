@@ -212,8 +212,8 @@
                          <img src="${pageContext.request.contextPath}${doctor.imageUrl != null && !doctor.imageUrl.isEmpty() ? (doctor.imageUrl.startsWith('/') ? doctor.imageUrl : '/assets/images/doctors/'.concat(doctor.imageUrl)) : '/assets/images/doctors/d1.png'}" alt="${doctor.name}">
                          <div class="doctor-rating">
                              <i class="fas fa-star"></i>
-                             <span>4.8</span>
-                             <span>(120)</span>
+                             <span><%= doctor.getRating() > 0 ? String.format("%.1f", doctor.getRating()) : "4.8" %></span>
+                             <span>(<%= doctor.getPatientCount() > 0 ? doctor.getPatientCount() : "120" %>)</span>
                          </div>
                      </div>
                      <div class="doctor-info">

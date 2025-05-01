@@ -68,8 +68,10 @@ package com.doctorapp.dao;
              }
 
              // Now create the doctor record
+             // For simplicity, we'll just try to insert without the status column
+             // This is a temporary fix until the status column is properly added to the database
              String doctorQuery = "INSERT INTO doctors (user_id, department_id, name, specialization, qualification, experience, email, phone, address, " +
-                                "consultation_fee, available_days, available_time, image_url, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                                "consultation_fee, available_days, available_time, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
              try (PreparedStatement doctorStmt = conn.prepareStatement(doctorQuery)) {
                  doctorStmt.setInt(1, userId);
@@ -85,7 +87,6 @@ package com.doctorapp.dao;
                  doctorStmt.setString(11, doctor.getAvailableDays());
                  doctorStmt.setString(12, doctor.getAvailableTime());
                  doctorStmt.setString(13, doctor.getImageUrl());
-                 doctorStmt.setString(14, doctor.getStatus() != null ? doctor.getStatus() : "ACTIVE");
 
                  doctorStmt.executeUpdate();
              }
@@ -152,7 +153,19 @@ package com.doctorapp.dao;
                      doctor.setSpecialization(rs.getString("specialization"));
                      doctor.setQualification(rs.getString("qualification"));
                      doctor.setExperience(rs.getString("experience"));
-                     doctor.setStatus(rs.getString("status"));
+
+                     // Set status to ACTIVE by default since the column might not exist
+                     try {
+                         String status = rs.getString("status");
+                         if (status == null || status.isEmpty()) {
+                             status = "ACTIVE";
+                         }
+                         doctor.setStatus(status);
+                     } catch (SQLException e) {
+                         // Status column doesn't exist, set default value
+                         doctor.setStatus("ACTIVE");
+                         System.out.println("Status column not found in getDoctorById, using default ACTIVE status");
+                     }
 
                      // Get email from doctors table or users table
                      String email = rs.getString("email");
@@ -247,7 +260,19 @@ package com.doctorapp.dao;
                      doctor.setSpecialization(rs.getString("specialization"));
                      doctor.setQualification(rs.getString("qualification"));
                      doctor.setExperience(rs.getString("experience"));
-                     doctor.setStatus(rs.getString("status"));
+
+                     // Set status to ACTIVE by default since the column might not exist
+                     try {
+                         String status = rs.getString("status");
+                         if (status == null || status.isEmpty()) {
+                             status = "ACTIVE";
+                         }
+                         doctor.setStatus(status);
+                     } catch (SQLException e) {
+                         // Status column doesn't exist, set default value
+                         doctor.setStatus("ACTIVE");
+                         System.out.println("Status column not found in getDoctorByUserId, using default ACTIVE status");
+                     }
 
                      // Get email from doctors table or users table
                      String email = rs.getString("email");
@@ -342,7 +367,18 @@ package com.doctorapp.dao;
                  doctor.setSpecialization(rs.getString("specialization"));
                  doctor.setQualification(rs.getString("qualification"));
                  doctor.setExperience(rs.getString("experience"));
-                 doctor.setStatus(rs.getString("status"));
+
+                 // Set status to ACTIVE by default since the column might not exist
+                 try {
+                     String status = rs.getString("status");
+                     if (status == null || status.isEmpty()) {
+                         status = "ACTIVE";
+                     }
+                     doctor.setStatus(status);
+                 } catch (SQLException e) {
+                     // Status column doesn't exist, set default value
+                     doctor.setStatus("ACTIVE");
+                 }
 
                  // Get email from doctors table or users table
                  String email = rs.getString("email");
@@ -447,7 +483,18 @@ package com.doctorapp.dao;
                      doctor.setSpecialization(rs.getString("specialization"));
                      doctor.setQualification(rs.getString("qualification"));
                      doctor.setExperience(rs.getString("experience"));
-                     doctor.setStatus(rs.getString("status"));
+
+                     // Set status to ACTIVE by default since the column might not exist
+                     try {
+                         String status = rs.getString("status");
+                         if (status == null || status.isEmpty()) {
+                             status = "ACTIVE";
+                         }
+                         doctor.setStatus(status);
+                     } catch (SQLException e) {
+                         // Status column doesn't exist, set default value
+                         doctor.setStatus("ACTIVE");
+                     }
 
                      // Get email from doctors table or users table
                      String email = rs.getString("email");
@@ -847,7 +894,7 @@ package com.doctorapp.dao;
 
      // Get average rating by doctor
      public double getAverageRatingByDoctor(int doctorId) {
-         String query = "SELECT rating FROM doctors WHERE id = ?";
+         String query = "SELECT AVG(rating) FROM doctor_ratings WHERE doctor_id = ?";
 
          try (Connection conn = DBConnection.getConnection();
               PreparedStatement pstmt = conn.prepareStatement(query)) {

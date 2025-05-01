@@ -17,7 +17,7 @@
     <!-- Header -->
     <% if(session.getAttribute("user") != null) { %>
         <!-- Include logged-in header for authenticated users -->
-        <jsp:include page="../includes/logged-in-header.jsp" />
+        <jsp:include page="includes/logged-in-header.jsp" />
     <% } else { %>
         <!-- Regular header for non-authenticated users -->
         <header class="header">
@@ -64,8 +64,8 @@
                     <!-- Doctor Rating -->
                     <div style="position: absolute; bottom: 20px; left: 20px; background: rgba(255, 255, 255, 0.9); padding: 0.5rem 1rem; border-radius: 50px; display: flex; align-items: center; z-index: 2;">
                         <i class="fas fa-star" style="color: #ffc107; margin-right: 5px;"></i>
-                        <span style="font-weight: 600;">4.8</span>
-                        <span style="color: #666; margin-left: 5px; font-size: 0.9rem;">(120 reviews)</span>
+                        <span style="font-weight: 600;"><%= doctor.getRating() > 0 ? String.format("%.1f", doctor.getRating()) : "4.8" %></span>
+                        <span style="color: #666; margin-left: 5px; font-size: 0.9rem;">(<%= doctor.getPatientCount() > 0 ? doctor.getPatientCount() : "120" %> patients)</span>
                     </div>
                 </div>
 

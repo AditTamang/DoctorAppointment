@@ -2,16 +2,16 @@ package com.doctorapp.controller.doctor;
 
 import java.io.IOException;
 
-import com.doctorapp.dao.DoctorDAO;
-import com.doctorapp.model.Doctor;
-import com.doctorapp.model.User;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
+import com.doctorapp.model.User;
+import com.doctorapp.model.Doctor;
+import com.doctorapp.dao.DoctorDAO;
 
 /**
  * Servlet to handle doctor profile completion
@@ -22,12 +22,10 @@ public class CompleteProfileServlet extends HttpServlet {
 
     private DoctorDAO doctorDAO;
 
-    @Override
     public void init() {
         doctorDAO = new DoctorDAO();
     }
 
-    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Check if user is logged in
         HttpSession session = request.getSession(false);
@@ -40,19 +38,13 @@ public class CompleteProfileServlet extends HttpServlet {
 
         // Check if user is a doctor
         if (!"DOCTOR".equals(user.getRole())) {
-            String redirectPath;
-            switch (user.getRole()) {
-                case "ADMIN":
-                    redirectPath = "/admin/dashboard";
-                    break;
-                case "PATIENT":
-                    redirectPath = "/patient/dashboard";
-                    break;
-                default:
-                    redirectPath = "/index.jsp";
-                    break;
+            if ("ADMIN".equals(user.getRole())) {
+                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+            } else if ("PATIENT".equals(user.getRole())) {
+                response.sendRedirect(request.getContextPath() + "/patient/dashboard");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/index.jsp");
             }
-            response.sendRedirect(request.getContextPath() + redirectPath);
             return;
         }
 
@@ -60,7 +52,6 @@ public class CompleteProfileServlet extends HttpServlet {
         request.getRequestDispatcher("/doctor/complete-profile.jsp").forward(request, response);
     }
 
-    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Check if user is logged in
         HttpSession session = request.getSession(false);
@@ -73,19 +64,7 @@ public class CompleteProfileServlet extends HttpServlet {
 
         // Check if user is a doctor
         if (!"DOCTOR".equals(user.getRole())) {
-            String redirectPath;
-            switch (user.getRole()) {
-                case "ADMIN":
-                    redirectPath = "/admin/dashboard";
-                    break;
-                case "PATIENT":
-                    redirectPath = "/patient/dashboard";
-                    break;
-                default:
-                    redirectPath = "/index.jsp";
-                    break;
-            }
-            response.sendRedirect(request.getContextPath() + redirectPath);
+            response.sendRedirect(request.getContextPath() + "/index.jsp");
             return;
         }
 
@@ -93,8 +72,8 @@ public class CompleteProfileServlet extends HttpServlet {
             // Get form data
             String specialization = request.getParameter("specialization");
             String qualification = request.getParameter("qualification");
-            String experience = request.getParameter("experience");
-            String consultationFee = request.getParameter("consultationFee");
+            int experience = Integer.parseInt(request.getParameter("experience"));
+            double consultationFee = Double.parseDouble(request.getParameter("consultationFee"));
             String bio = request.getParameter("bio");
             String profileImage = request.getParameter("profileImage");
 
@@ -132,11 +111,12 @@ public class CompleteProfileServlet extends HttpServlet {
                 request.setAttribute("error", "Failed to save doctor profile. Please try again.");
                 request.getRequestDispatcher("/doctor/complete-profile.jsp").forward(request, response);
             }
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "Invalid input. Please check your form data.");
+            request.getRequestDispatcher("/doctor/complete-profile.jsp").forward(request, response);
         } catch (Exception e) {
-            // Log the error
-            System.err.println("Error in CompleteProfileServlet: " + e.getMessage());
-            // Set error message for the user
-            request.setAttribute("error", "An error occurred while saving your profile. Please try again.");
+            e.printStackTrace();
+            request.setAttribute("error", "An error occurred: " + e.getMessage());
             request.getRequestDispatcher("/doctor/complete-profile.jsp").forward(request, response);
         }
     }

@@ -66,27 +66,21 @@
                      </a>
                  </li>
                  <li>
-                     <a href="${pageContext.request.contextPath}/contact-us">
-                         <i class="fas fa-envelope"></i>
-                         <span>Contact</span>
-                     </a>
-                 </li>
-                 <li>
                      <a href="${pageContext.request.contextPath}/doctors">
                          <i class="fas fa-user-md"></i>
                          <span>Find Doctors</span>
                      </a>
                  </li>
                  <li>
-                     <a href="${pageContext.request.contextPath}/about-us.jsp">
-                         <i class="fas fa-info-circle"></i>
-                         <span>About Us</span>
-                     </a>
-                 </li>
-                 <li>
                      <a href="${pageContext.request.contextPath}/patient/profile">
                          <i class="fas fa-user"></i>
                          <span>My Profile</span>
+                     </a>
+                 </li>
+                 <li>
+                     <a href="${pageContext.request.contextPath}/patient/changePassword.jsp">
+                         <i class="fas fa-lock"></i>
+                         <span>Change Password</span>
                      </a>
                  </li>
              </ul>
@@ -108,15 +102,15 @@
                      <p>Here's an overview of your health appointments</p>
                  </div>
 
-                 <a href="${pageContext.request.contextPath}/doctors" class="new-appointment-btn">
-                     <i class="fas fa-plus"></i> New Appointment
+                 <a href="${pageContext.request.contextPath}/doctors" class="new-appointment-btn" style="background-color: #4CAF50; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; display: inline-flex; align-items: center;">
+                     <i class="fas fa-plus" style="margin-right: 8px;"></i> New Appointment
                  </a>
              </div>
 
              <!-- Stats Cards -->
              <div class="stats-container">
                  <div class="stat-card">
-                     <div class="stat-icon">
+                     <div class="stat-icon" style="background-color: rgba(76, 175, 80, 0.1); color: #4CAF50;">
                          <i class="fas fa-calendar-check"></i>
                      </div>
                      <div class="stat-content">
@@ -126,7 +120,7 @@
                  </div>
 
                  <div class="stat-card">
-                     <div class="stat-icon">
+                     <div class="stat-icon" style="background-color: rgba(33, 150, 243, 0.1); color: #2196F3;">
                          <i class="fas fa-calendar-alt"></i>
                      </div>
                      <div class="stat-content">
@@ -136,7 +130,7 @@
                  </div>
 
                  <div class="stat-card">
-                     <div class="stat-icon">
+                     <div class="stat-icon" style="background-color: rgba(255, 152, 0, 0.1); color: #FF9800;">
                          <i class="fas fa-user-md"></i>
                      </div>
                      <div class="stat-content">
@@ -148,24 +142,30 @@
 
              <!-- Appointment Section -->
              <div class="appointment-section">
-                 <h3>Latest Appointments</h3>
+                 <h3 style="font-size: 1.5rem; margin-bottom: 15px; color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+                     <i class="fas fa-calendar-check" style="color: #4CAF50; margin-right: 10px;"></i>Latest Appointments
+                 </h3>
 
                  <!-- Appointment Tabs -->
-                 <div class="appointment-tabs">
-                     <button class="tab-button active" data-tab="upcoming">Upcoming</button>
-                     <button class="tab-button" data-tab="past">Past</button>
-                     <button class="tab-button" data-tab="cancelled">Cancelled</button>
+                 <div class="appointment-tabs" style="display: flex; margin-bottom: 20px; border-bottom: 1px solid #eee;">
+                     <button class="tab-button active" data-tab="upcoming" style="padding: 10px 20px; background: none; border: none; cursor: pointer; font-weight: 600; color: #4CAF50; border-bottom: 2px solid #4CAF50;">Upcoming</button>
+                     <button class="tab-button" data-tab="past" style="padding: 10px 20px; background: none; border: none; cursor: pointer; font-weight: 600; color: #666;">Past</button>
+                     <button class="tab-button" data-tab="cancelled" style="padding: 10px 20px; background: none; border: none; cursor: pointer; font-weight: 600; color: #666;">Cancelled</button>
                  </div>
 
                  <!-- Appointment Lists -->
                  <div class="appointment-list" id="upcoming-appointments">
                      <% if (upcomingAppointments.isEmpty()) { %>
-                         <div class="no-appointments">
-                             <p>No upcoming appointments. <a href="${pageContext.request.contextPath}/doctors">Book an appointment</a> with a doctor.</p>
+                         <div class="no-appointments" style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+                             <i class="fas fa-calendar-times" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
+                             <p style="margin-bottom: 15px;">No upcoming appointments.</p>
+                             <a href="${pageContext.request.contextPath}/doctors" style="background-color: #4CAF50; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; display: inline-flex; align-items: center;">
+                                 <i class="fas fa-plus" style="margin-right: 8px;"></i> Book an appointment
+                             </a>
                          </div>
                      <% } else { %>
                          <% for (Appointment appointment : upcomingAppointments) { %>
-                             <div class="appointment-card">
+                             <div class="appointment-card" style="background-color: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); padding: 20px; margin-bottom: 20px; transition: transform 0.3s ease;">
                                  <div class="appointment-header">
                                      <div class="appointment-date">
                                          <div class="date-box">
@@ -183,7 +183,19 @@
                                          </div>
                                          <div class="time"><%= appointment.getAppointmentTime() %></div>
                                      </div>
-                                     <div class="appointment-status <%= appointment.getStatus().toLowerCase() %>">
+                                     <div class="appointment-status" style="
+                                        <%
+                                        String status = appointment.getStatus();
+                                        if (status.equalsIgnoreCase("CONFIRMED") || status.equalsIgnoreCase("APPROVED")) { %>
+                                            background-color: rgba(76, 175, 80, 0.1); color: #4CAF50;
+                                        <% } else if (status.equalsIgnoreCase("PENDING")) { %>
+                                            background-color: rgba(255, 152, 0, 0.1); color: #FF9800;
+                                        <% } else if (status.equalsIgnoreCase("CANCELLED")) { %>
+                                            background-color: rgba(244, 67, 54, 0.1); color: #F44336;
+                                        <% } else if (status.equalsIgnoreCase("COMPLETED")) { %>
+                                            background-color: rgba(33, 150, 243, 0.1); color: #2196F3;
+                                        <% } %>
+                                        ">
                                          <%= appointment.getStatus() %>
                                      </div>
                                  </div>
@@ -214,10 +226,10 @@
                                          <% } %>
                                      </div>
                                      <div class="appointment-actions">
-                                         <a href="${pageContext.request.contextPath}/appointment/details?id=<%= appointment.getId() %>" class="action-btn reschedule-btn">
+                                         <a href="${pageContext.request.contextPath}/appointment/details?id=<%= appointment.getId() %>" class="action-btn" style="background-color: #4CAF50; color: white; padding: 8px 12px; border-radius: 4px; text-decoration: none; margin-right: 5px;">
                                              <i class="fas fa-calendar-alt"></i> Reschedule
                                          </a>
-                                         <a href="javascript:void(0);" onclick="confirmCancel(<%= appointment.getId() %>)" class="action-btn cancel-btn">
+                                         <a href="javascript:void(0);" onclick="confirmCancel(<%= appointment.getId() %>)" class="action-btn" style="background-color: #F44336; color: white; padding: 8px 12px; border-radius: 4px; text-decoration: none;">
                                              <i class="fas fa-times"></i> Cancel
                                          </a>
                                      </div>
@@ -229,12 +241,13 @@
 
                  <div class="appointment-list" id="past-appointments" style="display: none;">
                      <% if (pastAppointments.isEmpty()) { %>
-                         <div class="no-appointments">
+                         <div class="no-appointments" style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+                             <i class="fas fa-history" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
                              <p>No past appointments found.</p>
                          </div>
                      <% } else { %>
                          <% for (Appointment appointment : pastAppointments) { %>
-                             <div class="appointment-card">
+                             <div class="appointment-card" style="background-color: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); padding: 20px; margin-bottom: 20px; transition: transform 0.3s ease;">
                                  <div class="appointment-header">
                                      <div class="appointment-date">
                                          <div class="date-box">
@@ -252,7 +265,7 @@
                                          </div>
                                          <div class="time"><%= appointment.getAppointmentTime() %></div>
                                      </div>
-                                     <div class="appointment-status completed">
+                                     <div class="appointment-status" style="background-color: rgba(33, 150, 243, 0.1); color: #2196F3;">
                                          COMPLETED
                                      </div>
                                  </div>
@@ -283,7 +296,7 @@
                                          <% } %>
                                      </div>
                                      <div class="appointment-actions">
-                                         <a href="${pageContext.request.contextPath}/appointment/details?id=<%= appointment.getId() %>" class="action-btn reschedule-btn">
+                                         <a href="${pageContext.request.contextPath}/appointment/details?id=<%= appointment.getId() %>" class="action-btn" style="background-color: #2196F3; color: white; padding: 8px 12px; border-radius: 4px; text-decoration: none;">
                                              <i class="fas fa-eye"></i> View Details
                                          </a>
                                      </div>
@@ -295,12 +308,13 @@
 
                  <div class="appointment-list" id="cancelled-appointments" style="display: none;">
                      <% if (cancelledAppointments.isEmpty()) { %>
-                         <div class="no-appointments">
+                         <div class="no-appointments" style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+                             <i class="fas fa-ban" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
                              <p>No cancelled appointments found.</p>
                          </div>
                      <% } else { %>
                          <% for (Appointment appointment : cancelledAppointments) { %>
-                             <div class="appointment-card">
+                             <div class="appointment-card" style="background-color: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); padding: 20px; margin-bottom: 20px; transition: transform 0.3s ease;">
                                  <div class="appointment-header">
                                      <div class="appointment-date">
                                          <div class="date-box">
@@ -318,7 +332,7 @@
                                          </div>
                                          <div class="time"><%= appointment.getAppointmentTime() %></div>
                                      </div>
-                                     <div class="appointment-status cancelled">
+                                     <div class="appointment-status" style="background-color: rgba(244, 67, 54, 0.1); color: #F44336;">
                                          CANCELLED
                                      </div>
                                  </div>
@@ -349,7 +363,7 @@
                                          <% } %>
                                      </div>
                                      <div class="appointment-actions">
-                                         <a href="${pageContext.request.contextPath}/doctors" class="action-btn reschedule-btn">
+                                         <a href="${pageContext.request.contextPath}/doctors" class="action-btn" style="background-color: #FF9800; color: white; padding: 8px 12px; border-radius: 4px; text-decoration: none;">
                                              <i class="fas fa-redo"></i> Book Again
                                          </a>
                                      </div>
@@ -365,17 +379,36 @@
      <!-- JavaScript for Tab Switching -->
      <script>
          document.addEventListener('DOMContentLoaded', function() {
+             // Add hover effect to appointment cards
+             const appointmentCards = document.querySelectorAll('.appointment-card');
+             appointmentCards.forEach(card => {
+                 card.addEventListener('mouseenter', function() {
+                     this.style.transform = 'translateY(-5px)';
+                     this.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+                 });
+                 card.addEventListener('mouseleave', function() {
+                     this.style.transform = 'translateY(0)';
+                     this.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+                 });
+             });
+
              // Tab switching functionality
              const tabButtons = document.querySelectorAll('.tab-button');
              const appointmentLists = document.querySelectorAll('.appointment-list');
 
              tabButtons.forEach(button => {
                  button.addEventListener('click', function() {
-                     // Remove active class from all buttons
-                     tabButtons.forEach(btn => btn.classList.remove('active'));
+                     // Remove active class and styling from all buttons
+                     tabButtons.forEach(btn => {
+                         btn.classList.remove('active');
+                         btn.style.color = '#666';
+                         btn.style.borderBottom = 'none';
+                     });
 
-                     // Add active class to clicked button
+                     // Add active class and styling to clicked button
                      this.classList.add('active');
+                     this.style.color = '#4CAF50';
+                     this.style.borderBottom = '2px solid #4CAF50';
 
                      // Hide all appointment lists
                      appointmentLists.forEach(list => list.style.display = 'none');

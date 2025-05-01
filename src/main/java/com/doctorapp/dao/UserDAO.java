@@ -385,31 +385,12 @@ public class UserDAO {
                     patientResult = pstmt.executeUpdate();
                 }
             } else {
-                // Insert new patient record with user's first_name and last_name
-                String insertQuery = "INSERT INTO patients (user_id, first_name, last_name, date_of_birth, gender, phone, address, blood_group, allergies) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                // Insert new patient record
+                String insertQuery = "INSERT INTO patients (user_id, blood_group, allergies) VALUES (?, ?, ?)";
                 try (PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
                     pstmt.setInt(1, userId);
-                    pstmt.setString(2, user.getFirstName() != null ? user.getFirstName() : "");
-                    pstmt.setString(3, user.getLastName() != null ? user.getLastName() : "");
-
-                    // Convert dateOfBirth string to SQL Date if not null or empty
-                    if (dateOfBirth != null && !dateOfBirth.isEmpty()) {
-                        try {
-                            java.sql.Date sqlDate = java.sql.Date.valueOf(dateOfBirth);
-                            pstmt.setDate(4, sqlDate);
-                        } catch (IllegalArgumentException e) {
-                            // If date format is invalid, set it to null
-                            pstmt.setNull(4, java.sql.Types.DATE);
-                        }
-                    } else {
-                        pstmt.setNull(4, java.sql.Types.DATE);
-                    }
-
-                    pstmt.setString(5, gender);
-                    pstmt.setString(6, user.getPhone());
-                    pstmt.setString(7, address);
-                    pstmt.setString(8, bloodGroup);
-                    pstmt.setString(9, allergies);
+                    pstmt.setString(2, bloodGroup);
+                    pstmt.setString(3, allergies);
                     patientResult = pstmt.executeUpdate();
                 }
             }
