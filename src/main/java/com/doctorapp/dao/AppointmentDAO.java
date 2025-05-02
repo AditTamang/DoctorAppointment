@@ -388,20 +388,51 @@ public class AppointmentDAO {
                      appointment.setId(rs.getInt("id"));
                      appointment.setPatientId(rs.getInt("patient_id"));
                      appointment.setDoctorId(rs.getInt("doctor_id"));
-                     appointment.setAppointmentDate(rs.getDate("appointment_date"));
+
+                     // Safely handle date conversion
+                     try {
+                         java.sql.Date sqlDate = rs.getDate("appointment_date");
+                         if (sqlDate != null) {
+                             appointment.setAppointmentDate(new java.util.Date(sqlDate.getTime()));
+                         }
+                     } catch (Exception e) {
+                         LOGGER.log(Level.WARNING, "Error converting appointment date: {0}", e.getMessage());
+                     }
+
                      appointment.setAppointmentTime(rs.getString("appointment_time"));
                      appointment.setStatus(rs.getString("status"));
                      appointment.setReason(rs.getString("reason"));
                      appointment.setNotes(rs.getString("notes"));
                      appointment.setFee(rs.getDouble("fee"));
-                     appointment.setPatientName(rs.getString("patient_first_name") + " " + rs.getString("patient_last_name"));
+
+                     // Safely handle patient name
+                     String firstName = rs.getString("patient_first_name");
+                     String lastName = rs.getString("patient_last_name");
+                     String patientName = "";
+
+                     if (firstName != null) {
+                         patientName += firstName;
+                     }
+
+                     if (lastName != null) {
+                         if (!patientName.isEmpty()) {
+                             patientName += " ";
+                         }
+                         patientName += lastName;
+                     }
+
+                     if (patientName.isEmpty()) {
+                         patientName = "Unknown";
+                     }
+
+                     appointment.setPatientName(patientName);
 
                      appointments.add(appointment);
                  }
              }
 
          } catch (SQLException | ClassNotFoundException e) {
-             e.printStackTrace();
+             LOGGER.log(Level.SEVERE, "Error getting today's appointments by doctor ID: {0}", doctorId);
          }
 
          return appointments;
@@ -453,13 +484,44 @@ public class AppointmentDAO {
                      appointment.setId(rs.getInt("id"));
                      appointment.setPatientId(rs.getInt("patient_id"));
                      appointment.setDoctorId(rs.getInt("doctor_id"));
-                     appointment.setAppointmentDate(rs.getDate("appointment_date"));
+
+                     // Safely handle date conversion
+                     try {
+                         java.sql.Date sqlDate = rs.getDate("appointment_date");
+                         if (sqlDate != null) {
+                             appointment.setAppointmentDate(new java.util.Date(sqlDate.getTime()));
+                         }
+                     } catch (Exception e) {
+                         LOGGER.log(Level.WARNING, "Error converting appointment date: {0}", e.getMessage());
+                     }
+
                      appointment.setAppointmentTime(rs.getString("appointment_time"));
                      appointment.setStatus(rs.getString("status"));
                      appointment.setReason(rs.getString("reason"));
                      appointment.setNotes(rs.getString("notes"));
                      appointment.setFee(rs.getDouble("fee"));
-                     appointment.setPatientName(rs.getString("patient_first_name") + " " + rs.getString("patient_last_name"));
+
+                     // Safely handle patient name
+                     String firstName = rs.getString("patient_first_name");
+                     String lastName = rs.getString("patient_last_name");
+                     String patientName = "";
+
+                     if (firstName != null) {
+                         patientName += firstName;
+                     }
+
+                     if (lastName != null) {
+                         if (!patientName.isEmpty()) {
+                             patientName += " ";
+                         }
+                         patientName += lastName;
+                     }
+
+                     if (patientName.isEmpty()) {
+                         patientName = "Unknown";
+                     }
+
+                     appointment.setPatientName(patientName);
 
                      appointments.add(appointment);
                  }

@@ -209,4 +209,14 @@ public class Appointment {
         java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MMM dd, yyyy");
         return dateFormat.format(appointmentDate) + " at " + appointmentTime;
     }
+
+    // Helper method to format just the date
+    public String getFormattedDate() {
+        if (appointmentDate == null) {
+            return "";
+        }
+
+        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+        return dateFormat.format(appointmentDate);
+    }
 }

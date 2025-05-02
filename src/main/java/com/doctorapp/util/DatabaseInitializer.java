@@ -7,75 +7,36 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Database initializer that loads and executes SQL scripts to set up the database.
+ * Simple database initializer that loads and executes the schema.sql script.
  * This class is automatically loaded when the application starts.
  */
 public class DatabaseInitializer {
 
     private static final Logger LOGGER = Logger.getLogger(DatabaseInitializer.class.getName());
+    private static boolean initialized = false;
 
     /**
-     * Execute a list of SQL statements
-     * @param conn Database connection
-     * @param statements List of SQL statements to execute
+     * Initialize the database by executing the schema.sql script
      */
-    private static void executeStatements(Connection conn, List<String> statements) {
-        try {
-            // Disable auto-commit for batch operations
-            conn.setAutoCommit(false);
-
-            try (Statement stmt = conn.createStatement()) {
-                for (String statement : statements) {
-                    try {
-                        LOGGER.info("Executing SQL: " + statement);
-                        stmt.execute(statement);
-                    } catch (SQLException e) {
-                        LOGGER.log(Level.WARNING, "Error executing SQL statement: " + statement, e);
-                        // Continue with other statements
-                    }
-                }
-
-                // Commit the transaction
-                conn.commit();
-            } catch (SQLException e) {
-                // Rollback on error
-                try {
-                    conn.rollback();
-                } catch (SQLException rollbackEx) {
-                    LOGGER.log(Level.SEVERE, "Error rolling back transaction", rollbackEx);
-                }
-                LOGGER.log(Level.SEVERE, "Error executing SQL statements", e);
-            } finally {
-                // Restore auto-commit
-                conn.setAutoCommit(true);
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error managing transaction", e);
+    public static synchronized void initialize() {
+        if (initialized) {
+            LOGGER.fine("Database already initialized.");
+            return;
         }
-    }
 
-    /**
-     * Initialize the database by executing SQL scripts
-     */
-    public static void initialize() {
         LOGGER.info("Initializing database...");
 
         try {
-            // First try to create the appointments table
-            createAppointmentsTable();
+            // Load the schema.sql script
+            InputStream is = DatabaseInitializer.class.getClassLoader().getResourceAsStream("schema.sql");
 
-            // Load the SQL script
-            InputStream is = DatabaseInitializer.class.getClassLoader().getResourceAsStream("doctor_appointment_tables.sql");
-
-            // If still not found, log an error
+            // If not found, log an error
             if (is == null) {
-                LOGGER.warning("doctor_appointment_tables.sql not found in classpath. Will continue with minimal initialization.");
+                LOGGER.warning("schema.sql not found in classpath. Database initialization failed.");
                 return;
             }
 
@@ -97,95 +58,48 @@ public class DatabaseInitializer {
                 }
             }
 
-            // Process the script to separate DDL (table creation) and DML (data insertion) statements
-            List<String> ddlStatements = new ArrayList<>();
-            List<String> dmlStatements = new ArrayList<>();
-
             // Split the script into individual statements
-            String[] allStatements = sqlScript.toString().split(";\\s*\n");
+            String[] statements = sqlScript.toString().split(";\\s*\n");
 
-            // Categorize statements
-            for (String statement : allStatements) {
-                statement = statement.trim();
-                if (statement.isEmpty()) {
-                    continue;
-                }
-
-                // Skip CREATE DATABASE and USE statements
-                if (statement.toUpperCase().startsWith("CREATE DATABASE") ||
-                    statement.toUpperCase().startsWith("USE ")) {
-                    LOGGER.info("Skipping database statement: " + statement);
-                    continue;
-                }
-
-                // Add to appropriate list
-                if (statement.toUpperCase().startsWith("CREATE TABLE") ||
-                    statement.toUpperCase().startsWith("DROP TABLE") ||
-                    statement.toUpperCase().startsWith("ALTER TABLE")) {
-                    ddlStatements.add(statement);
-                } else {
-                    dmlStatements.add(statement);
-                }
-            }
-
-            // Execute statements in proper order
+            // Execute each statement
             try (Connection conn = DBConnection.getConnection()) {
-                // First execute all DDL statements to create tables
-                LOGGER.info("Executing DDL statements to create tables...");
-                executeStatements(conn, ddlStatements);
+                conn.setAutoCommit(false);
 
-                // Then execute all DML statements to insert data
-                LOGGER.info("Executing DML statements to insert data...");
-                executeStatements(conn, dmlStatements);
+                try (Statement stmt = conn.createStatement()) {
+                    for (String statement : statements) {
+                        statement = statement.trim();
+                        if (statement.isEmpty()) {
+                            continue;
+                        }
 
-                LOGGER.info("Database initialization completed successfully.");
-            } catch (SQLException | ClassNotFoundException e) {
-                LOGGER.log(Level.SEVERE, "Database connection error", e);
+                        try {
+                            LOGGER.fine("Executing SQL: " + statement);
+                            stmt.execute(statement);
+                        } catch (SQLException e) {
+                            LOGGER.log(Level.WARNING, "Error executing SQL statement: " + e.getMessage());
+                            // Continue with other statements
+                        }
+                    }
+
+                    // Commit the transaction
+                    conn.commit();
+                    LOGGER.info("Database initialization completed successfully.");
+                    initialized = true;
+                } catch (SQLException e) {
+                    // Rollback on error
+                    try {
+                        conn.rollback();
+                    } catch (SQLException rollbackEx) {
+                        LOGGER.log(Level.SEVERE, "Error rolling back transaction", rollbackEx);
+                    }
+                    LOGGER.log(Level.SEVERE, "Error executing SQL statements", e);
+                } finally {
+                    // Restore auto-commit
+                    conn.setAutoCommit(true);
+                }
             }
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error reading SQL script", e);
-        }
-    }
-
-    // Database initialization is now handled by AppInitializer
-
-    /**
-     * Create the appointments table if it doesn't exist
-     */
-    private static void createAppointmentsTable() {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS `appointments` (\n" +
-            "  `id` int(11) NOT NULL AUTO_INCREMENT,\n" +
-            "  `patient_id` int(11) NOT NULL,\n" +
-            "  `doctor_id` int(11) NOT NULL,\n" +
-            "  `patient_name` varchar(100),\n" +
-            "  `doctor_name` varchar(100),\n" +
-            "  `appointment_date` date NOT NULL,\n" +
-            "  `appointment_time` varchar(20) NOT NULL,\n" +
-            "  `status` ENUM('PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED') DEFAULT 'PENDING',\n" +
-            "  `reason` varchar(255),\n" +
-            "  `symptoms` text,\n" +
-            "  `prescription` text,\n" +
-            "  `notes` text,\n" +
-            "  `fee` double,\n" +
-            "  `medical_report` text,\n" +
-            "  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n" +
-            "  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n" +
-            "  PRIMARY KEY (`id`),\n" +
-            "  KEY `patient_id` (`patient_id`),\n" +
-            "  KEY `doctor_id` (`doctor_id`),\n" +
-            "  FOREIGN KEY (`patient_id`) REFERENCES `patients`(`id`) ON DELETE CASCADE,\n" +
-            "  FOREIGN KEY (`doctor_id`) REFERENCES `doctors`(`id`) ON DELETE CASCADE\n" +
-            ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
-
-        try (Connection conn = DBConnection.getConnection();
-             Statement stmt = conn.createStatement()) {
-
-            LOGGER.info("Creating appointments table if it doesn't exist...");
-            stmt.execute(createTableSQL);
-            LOGGER.info("Appointments table created or already exists.");
-
-        } catch (SQLException | ClassNotFoundException e) {
-            LOGGER.log(Level.SEVERE, "Error creating appointments table", e);
+        } catch (IOException | SQLException | ClassNotFoundException e) {
+            LOGGER.log(Level.SEVERE, "Error initializing database", e);
         }
     }
 }

@@ -24,9 +24,10 @@ package com.doctorapp.dao;
       * @return true if the request was created successfully, false otherwise
       */
      public boolean createRequest(DoctorRegistrationRequest request) {
-         String query = "INSERT INTO doctor_registration_requests (name, email, password, phone, " +
-                 "specialization, qualification, experience, address, status) " +
-                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'PENDING')";
+         // Include username field in the query
+         String query = "INSERT INTO doctor_registration_requests (username, email, password, phone, " +
+                 "first_name, last_name, specialization, qualification, experience, address, status) " +
+                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING')";
 
          try (Connection conn = DBConnection.getConnection();
               PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -34,29 +35,22 @@ package com.doctorapp.dao;
              // Hash the password
              String hashedPassword = PasswordHasher.hashPassword(request.getPassword());
 
-             // Create full name from first and last name
-             String fullName = "";
-             if (request.getFirstName() != null && !request.getFirstName().isEmpty()) {
-                 fullName += request.getFirstName();
-             }
-             if (request.getLastName() != null && !request.getLastName().isEmpty()) {
-                 if (!fullName.isEmpty()) {
-                     fullName += " ";
-                 }
-                 fullName += request.getLastName();
-             }
-             if (fullName.isEmpty() && request.getUsername() != null) {
-                 fullName = request.getUsername();
+             // Generate username from email if not provided
+             String username = request.getUsername();
+             if (username == null || username.isEmpty()) {
+                 username = request.getEmail().split("@")[0];
              }
 
-             pstmt.setString(1, fullName);
+             pstmt.setString(1, username);
              pstmt.setString(2, request.getEmail());
              pstmt.setString(3, hashedPassword);
              pstmt.setString(4, request.getPhone());
-             pstmt.setString(5, request.getSpecialization());
-             pstmt.setString(6, request.getQualification());
-             pstmt.setString(7, request.getExperience());
-             pstmt.setString(8, request.getAddress());
+             pstmt.setString(5, request.getFirstName() != null ? request.getFirstName() : "");
+             pstmt.setString(6, request.getLastName() != null ? request.getLastName() : "");
+             pstmt.setString(7, request.getSpecialization());
+             pstmt.setString(8, request.getQualification());
+             pstmt.setString(9, request.getExperience());
+             pstmt.setString(10, request.getAddress());
 
              int rowsAffected = pstmt.executeUpdate();
 
@@ -763,17 +757,42 @@ package com.doctorapp.dao;
          DoctorRegistrationRequest request = new DoctorRegistrationRequest();
          request.setId(rs.getInt("id"));
 
-         // Get the name from the database and split it into first and last name
-         String name = rs.getString("name");
-         if (name != null && !name.isEmpty()) {
-             String[] nameParts = name.split(" ", 2);
-             if (nameParts.length > 0) {
-                 request.setFirstName(nameParts[0]);
-                 if (nameParts.length > 1) {
-                     request.setLastName(nameParts[1]);
-                 }
+         // Get username directly from the database
+         try {
+             String username = rs.getString("username");
+             if (username != null && !username.isEmpty()) {
+                 request.setUsername(username);
              }
-             request.setUsername(name); // Use name as username if not available
+         } catch (SQLException e) {
+             // Username field might not exist in older records
+             System.out.println("Note: username field not found in result set");
+         }
+
+         // Get first_name and last_name directly
+         try {
+             String firstName = rs.getString("first_name");
+             if (firstName != null && !firstName.isEmpty()) {
+                 request.setFirstName(firstName);
+             }
+         } catch (SQLException e) {
+             // first_name field might not exist in older records
+         }
+
+         try {
+             String lastName = rs.getString("last_name");
+             if (lastName != null && !lastName.isEmpty()) {
+                 request.setLastName(lastName);
+             }
+         } catch (SQLException e) {
+             // last_name field might not exist in older records
+         }
+
+         // If we don't have a username yet, use email as a fallback
+         if (request.getUsername() == null || request.getUsername().isEmpty()) {
+             String email = rs.getString("email");
+             if (email != null && !email.isEmpty()) {
+                 request.setUsername(email.split("@")[0]);
+             }
          }
 
          request.setEmail(rs.getString("email"));

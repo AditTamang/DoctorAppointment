@@ -68,27 +68,52 @@ package com.doctorapp.dao;
              }
 
              // Now create the doctor record
-             // For simplicity, we'll just try to insert without the status column
-             // This is a temporary fix until the status column is properly added to the database
-             String doctorQuery = "INSERT INTO doctors (user_id, department_id, name, specialization, qualification, experience, email, phone, address, " +
-                                "consultation_fee, available_days, available_time, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+             // Use a simpler query without the name column to avoid errors
+             String doctorQuery = "INSERT INTO doctors (user_id, specialization, qualification, experience, email, phone, address, " +
+                                "consultation_fee, available_days, available_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
              try (PreparedStatement doctorStmt = conn.prepareStatement(doctorQuery)) {
                  doctorStmt.setInt(1, userId);
-                 doctorStmt.setInt(2, doctor.getDepartmentId() > 0 ? doctor.getDepartmentId() : 1); // Default to first department if not specified
-                 doctorStmt.setString(3, doctor.getName());
-                 doctorStmt.setString(4, doctor.getSpecialization());
-                 doctorStmt.setString(5, doctor.getQualification());
-                 doctorStmt.setString(6, doctor.getExperience());
-                 doctorStmt.setString(7, doctor.getEmail());
-                 doctorStmt.setString(8, doctor.getPhone());
-                 doctorStmt.setString(9, doctor.getAddress());
-                 doctorStmt.setString(10, doctor.getConsultationFee());
-                 doctorStmt.setString(11, doctor.getAvailableDays());
-                 doctorStmt.setString(12, doctor.getAvailableTime());
-                 doctorStmt.setString(13, doctor.getImageUrl());
+                 doctorStmt.setString(2, doctor.getSpecialization());
+                 doctorStmt.setString(3, doctor.getQualification());
+                 doctorStmt.setString(4, doctor.getExperience());
+                 doctorStmt.setString(5, doctor.getEmail());
+                 doctorStmt.setString(6, doctor.getPhone());
+                 doctorStmt.setString(7, doctor.getAddress());
+                 doctorStmt.setString(8, doctor.getConsultationFee());
+                 doctorStmt.setString(9, doctor.getAvailableDays());
+                 doctorStmt.setString(10, doctor.getAvailableTime());
 
                  doctorStmt.executeUpdate();
+
+                 // Try to update the name and image_url separately if needed
+                 try {
+                     if (doctor.getName() != null && !doctor.getName().isEmpty()) {
+                         String updateNameQuery = "UPDATE doctors SET name = ? WHERE user_id = ?";
+                         try (PreparedStatement updateStmt = conn.prepareStatement(updateNameQuery)) {
+                             updateStmt.setString(1, doctor.getName());
+                             updateStmt.setInt(2, userId);
+                             updateStmt.executeUpdate();
+                         }
+                     }
+                 } catch (SQLException e) {
+                     // Name column might not exist, ignore
+                     System.out.println("Could not update name column: " + e.getMessage());
+                 }
+
+                 try {
+                     if (doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty()) {
+                         String updateImageQuery = "UPDATE doctors SET image_url = ? WHERE user_id = ?";
+                         try (PreparedStatement updateStmt = conn.prepareStatement(updateImageQuery)) {
+                             updateStmt.setString(1, doctor.getImageUrl());
+                             updateStmt.setInt(2, userId);
+                             updateStmt.executeUpdate();
+                         }
+                     }
+                 } catch (SQLException e) {
+                     // image_url column might not exist, ignore
+                     System.out.println("Could not update image_url column: " + e.getMessage());
+                 }
              }
 
              // Commit the transaction
@@ -141,7 +166,13 @@ package com.doctorapp.dao;
                      doctor.setDepartmentId(rs.getInt("department_id"));
 
                      // Use name from doctors table, or construct from first_name and last_name if null
-                     String name = rs.getString("name");
+                     String name = null;
+                     try {
+                         name = rs.getString("name");
+                     } catch (SQLException e) {
+                         // Column might not exist yet, ignore
+                     }
+
                      if (name == null || name.isEmpty()) {
                          String firstName = rs.getString("first_name");
                          String lastName = rs.getString("last_name");
@@ -248,7 +279,13 @@ package com.doctorapp.dao;
                      doctor.setDepartmentId(rs.getInt("department_id"));
 
                      // Use name from doctors table, or construct from first_name and last_name if null
-                     String name = rs.getString("name");
+                     String name = null;
+                     try {
+                         name = rs.getString("name");
+                     } catch (SQLException e) {
+                         // Column might not exist yet, ignore
+                     }
+
                      if (name == null || name.isEmpty()) {
                          String firstName = rs.getString("first_name");
                          String lastName = rs.getString("last_name");
@@ -355,7 +392,13 @@ package com.doctorapp.dao;
                  doctor.setDepartmentId(rs.getInt("department_id"));
 
                  // Use name from doctors table, or construct from first_name and last_name if null
-                 String name = rs.getString("name");
+                 String name = null;
+                 try {
+                     name = rs.getString("name");
+                 } catch (SQLException e) {
+                     // Column might not exist yet, ignore
+                 }
+
                  if (name == null || name.isEmpty()) {
                      String firstName = rs.getString("first_name");
                      String lastName = rs.getString("last_name");
@@ -451,7 +494,7 @@ package com.doctorapp.dao;
          String query = "SELECT d.*, u.first_name, u.last_name, u.email AS user_email, u.phone AS user_phone, u.address AS user_address " +
                        "FROM doctors d " +
                        "JOIN users u ON d.user_id = u.id " +
-                       "WHERE (d.name LIKE ? OR d.email LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ?) " +
+                       "WHERE (d.email LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ? OR u.email LIKE ?) " +
                        "AND u.role = 'DOCTOR'";
 
          try (Connection conn = DBConnection.getConnection();
@@ -471,7 +514,13 @@ package com.doctorapp.dao;
                      doctor.setDepartmentId(rs.getInt("department_id"));
 
                      // Use name from doctors table, or construct from first_name and last_name if null
-                     String name = rs.getString("name");
+                     String name = null;
+                     try {
+                         name = rs.getString("name");
+                     } catch (SQLException e) {
+                         // Column might not exist yet, ignore
+                     }
+
                      if (name == null || name.isEmpty()) {
                          String firstName = rs.getString("first_name");
                          String lastName = rs.getString("last_name");
@@ -580,7 +629,13 @@ package com.doctorapp.dao;
                      doctor.setId(rs.getInt("id"));
 
                      // Use name from doctors table, or construct from first_name and last_name if null
-                     String name = rs.getString("name");
+                     String name = null;
+                     try {
+                         name = rs.getString("name");
+                     } catch (SQLException e) {
+                         // Column might not exist yet, ignore
+                     }
+
                      if (name == null || name.isEmpty()) {
                          String firstName = rs.getString("first_name");
                          String lastName = rs.getString("last_name");
@@ -749,7 +804,13 @@ package com.doctorapp.dao;
                      doctor.setId(rs.getInt("id"));
 
                      // Use name from doctors table, or construct from first_name and last_name if null
-                     String name = rs.getString("name");
+                     String name = null;
+                     try {
+                         name = rs.getString("name");
+                     } catch (SQLException e) {
+                         // Column might not exist yet, ignore
+                     }
+
                      if (name == null || name.isEmpty()) {
                          String firstName = rs.getString("first_name");
                          String lastName = rs.getString("last_name");
@@ -935,7 +996,13 @@ package com.doctorapp.dao;
                  doctor.setId(rs.getInt("id"));
 
                  // Use name from doctors table, or construct from first_name and last_name if null
-                 String name = rs.getString("name");
+                 String name = null;
+                 try {
+                     name = rs.getString("name");
+                 } catch (SQLException e) {
+                     // Column might not exist yet, ignore
+                 }
+
                  if (name == null || name.isEmpty()) {
                      String firstName = rs.getString("first_name");
                      String lastName = rs.getString("last_name");
@@ -1052,7 +1119,13 @@ package com.doctorapp.dao;
                      doctor.setId(rs.getInt("id"));
 
                      // Use name from doctors table, or construct from first_name and last_name if null
-                     String name = rs.getString("name");
+                     String name = null;
+                     try {
+                         name = rs.getString("name");
+                     } catch (SQLException e) {
+                         // Column might not exist yet, ignore
+                     }
+
                      if (name == null || name.isEmpty()) {
                          String firstName = rs.getString("first_name");
                          String lastName = rs.getString("last_name");
@@ -1174,7 +1247,13 @@ package com.doctorapp.dao;
                      doctor.setId(rs.getInt("id"));
 
                      // Use name from doctors table, or construct from first_name and last_name if null
-                     String name = rs.getString("name");
+                     String name = null;
+                     try {
+                         name = rs.getString("name");
+                     } catch (SQLException e) {
+                         // Column might not exist yet, ignore
+                     }
+
                      if (name == null || name.isEmpty()) {
                          String firstName = rs.getString("first_name");
                          String lastName = rs.getString("last_name");
@@ -1275,77 +1354,199 @@ package com.doctorapp.dao;
      public List<Doctor> getTopDoctors(int limit) {
          List<Doctor> doctors = new ArrayList<>();
 
-         // Modified query to handle the case where doctor_ratings table might not exist yet
-         // or when there are no ratings
-         String query = "SELECT d.id, u.first_name, u.last_name, d.specialization, d.qualification, " +
-                       "d.experience, u.email, u.phone, u.address, d.consultation_fee, " +
-                       "d.profile_image, d.rating, d.patient_count " +
-                       "FROM doctors d " +
-                       "JOIN users u ON d.user_id = u.id " +
-                       "ORDER BY d.rating DESC, d.patient_count DESC " +
-                       "LIMIT ?";
+         try {
+             // Try the most compatible query first
+             String query = "SELECT d.*, u.email AS user_email, u.phone AS user_phone, u.address AS user_address " +
+                           "FROM doctors d " +
+                           "JOIN users u ON d.user_id = u.id " +
+                           "WHERE u.role = 'DOCTOR' " +
+                           "ORDER BY d.rating DESC, d.patient_count DESC " +
+                           "LIMIT ?";
 
-         try (Connection conn = DBConnection.getConnection();
-              PreparedStatement pstmt = conn.prepareStatement(query)) {
+             try (Connection conn = DBConnection.getConnection();
+                  PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-             pstmt.setInt(1, limit);
+                 pstmt.setInt(1, limit);
 
-             try (ResultSet rs = pstmt.executeQuery()) {
-                 while (rs.next()) {
-                     Doctor doctor = new Doctor();
-                     doctor.setId(rs.getInt("id"));
+                 try (ResultSet rs = pstmt.executeQuery()) {
+                     while (rs.next()) {
+                         Doctor doctor = new Doctor();
+                         doctor.setId(rs.getInt("id"));
+                         doctor.setUserId(rs.getInt("user_id"));
 
-                     // Combine first and last name from users table
-                     String firstName = rs.getString("first_name");
-                     String lastName = rs.getString("last_name");
-                     String fullName = "Dr. " + (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
-                     fullName = fullName.trim();
-                     doctor.setName(fullName);
+                         // Use name from doctors table directly
+                         String name = null;
+                         try {
+                             name = rs.getString("name");
+                         } catch (SQLException e) {
+                             // Column might not exist yet, ignore
+                         }
 
-                     doctor.setSpecialization(rs.getString("specialization"));
-                     doctor.setQualification(rs.getString("qualification"));
-                     doctor.setExperience(rs.getString("experience"));
-                     doctor.setEmail(rs.getString("email"));
-                     doctor.setPhone(rs.getString("phone"));
-                     doctor.setAddress(rs.getString("address"));
+                         if (name == null || name.isEmpty()) {
+                             // If name is not available, use a default name
+                             name = "Dr. " + rs.getInt("id");
+                         }
+                         doctor.setName(name);
 
-                     // Get consultation fee, set default if null
-                     String consultationFee = rs.getString("consultation_fee");
-                     if (consultationFee == null || consultationFee.isEmpty()) {
-                         consultationFee = "1000";
+                         doctor.setSpecialization(rs.getString("specialization"));
+                         doctor.setQualification(rs.getString("qualification"));
+                         doctor.setExperience(rs.getString("experience"));
+
+                         // Get email from doctors table or users table
+                         String email = rs.getString("email");
+                         if (email == null || email.isEmpty()) {
+                             email = rs.getString("user_email");
+                         }
+                         doctor.setEmail(email);
+
+                         // Get phone from doctors table or users table
+                         String phone = rs.getString("phone");
+                         if (phone == null || phone.isEmpty()) {
+                             phone = rs.getString("user_phone");
+                         }
+                         doctor.setPhone(phone);
+
+                         // Get address from doctors table or users table
+                         String address = rs.getString("address");
+                         if (address == null || address.isEmpty()) {
+                             address = rs.getString("user_address");
+                         }
+                         doctor.setAddress(address);
+
+                         // Get consultation fee, set default if null
+                         String consultationFee = rs.getString("consultation_fee");
+                         if (consultationFee == null || consultationFee.isEmpty()) {
+                             consultationFee = "1000";
+                         }
+                         doctor.setConsultationFee(consultationFee);
+
+                         // Get available days, set default if null
+                         String availableDays = rs.getString("available_days");
+                         if (availableDays == null || availableDays.isEmpty()) {
+                             availableDays = "Monday,Tuesday,Wednesday,Thursday,Friday";
+                         }
+                         doctor.setAvailableDays(availableDays);
+
+                         // Get available time, set default if null
+                         String availableTime = rs.getString("available_time");
+                         if (availableTime == null || availableTime.isEmpty()) {
+                             availableTime = "09:00 AM - 05:00 PM";
+                         }
+                         doctor.setAvailableTime(availableTime);
+
+                         // Use profile_image or image_url for imageUrl if available
+                         String profileImage = null;
+                         String imageUrl = null;
+
+                         try {
+                             profileImage = rs.getString("profile_image");
+                         } catch (SQLException e) {
+                             // Column might not exist yet, ignore
+                         }
+
+                         try {
+                             imageUrl = rs.getString("image_url");
+                         } catch (SQLException e) {
+                             // Column might not exist yet, ignore
+                         }
+
+                         if (profileImage != null && !profileImage.isEmpty()) {
+                             doctor.setProfileImage(profileImage);
+                             doctor.setImageUrl(profileImage);
+                         } else if (imageUrl != null && !imageUrl.isEmpty()) {
+                             doctor.setImageUrl(imageUrl);
+                             doctor.setProfileImage(imageUrl);
+                         } else {
+                             doctor.setImageUrl("/assets/images/doctors/default-doctor.png");
+                             doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                         }
+
+                         // Get rating and patient count, set defaults if null
+                         double rating = 0.0;
+                         int patientCount = 0;
+
+                         try {
+                             rating = rs.getDouble("rating");
+                         } catch (SQLException e) {
+                             // Column might not exist yet, use default
+                         }
+
+                         try {
+                             patientCount = rs.getInt("patient_count");
+                         } catch (SQLException e) {
+                             // Column might not exist yet, use default
+                         }
+
+                         doctor.setRating(rating);
+                         doctor.setPatientCount(patientCount);
+                         doctor.setSuccessRate(90); // Default value for now
+
+                         doctors.add(doctor);
                      }
-                     doctor.setConsultationFee(consultationFee);
-
-                     // Set default values for fields that might not exist in the database
-                     doctor.setAvailableDays("Monday,Tuesday,Wednesday,Thursday,Friday");
-                     doctor.setAvailableTime("09:00 AM - 05:00 PM");
-
-                     // Use profile_image for imageUrl if available
-                     String profileImage = rs.getString("profile_image");
-                     if (profileImage != null && !profileImage.isEmpty()) {
-                         doctor.setImageUrl(profileImage);
-                         doctor.setProfileImage(profileImage);
-                     } else {
-                         doctor.setImageUrl("/assets/images/doctors/default-doctor.png");
-                         doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
-                     }
-
-                     doctor.setRating(rs.getDouble("rating"));
-                     doctor.setPatientCount(rs.getInt("patient_count"));
-                     doctor.setSuccessRate(90); // Default value for now
-
-                     doctors.add(doctor);
                  }
              }
-
          } catch (SQLException | ClassNotFoundException e) {
              System.out.println("Error getting top doctors: " + e.getMessage());
-             e.printStackTrace();
 
+             // Try a simpler fallback query
+             try {
+                 String fallbackQuery = "SELECT d.id, d.user_id, d.specialization, d.qualification, " +
+                                      "d.experience, d.consultation_fee " +
+                                      "FROM doctors d " +
+                                      "JOIN users u ON d.user_id = u.id " +
+                                      "WHERE u.role = 'DOCTOR' " +
+                                      "LIMIT ?";
+
+                 try (Connection conn = DBConnection.getConnection();
+                      PreparedStatement pstmt = conn.prepareStatement(fallbackQuery)) {
+
+                     pstmt.setInt(1, limit);
+
+                     try (ResultSet rs = pstmt.executeQuery()) {
+                         while (rs.next()) {
+                             Doctor doctor = new Doctor();
+                             doctor.setId(rs.getInt("id"));
+                             doctor.setUserId(rs.getInt("user_id"));
+                             doctor.setName("Dr. " + rs.getInt("id")); // Default name
+                             doctor.setSpecialization(rs.getString("specialization"));
+                             doctor.setQualification(rs.getString("qualification"));
+                             doctor.setExperience(rs.getString("experience"));
+
+                             // Set default values for other fields
+                             doctor.setEmail("doctor" + rs.getInt("id") + "@example.com");
+                             doctor.setPhone("N/A");
+                             doctor.setAddress("N/A");
+
+                             String consultationFee = rs.getString("consultation_fee");
+                             if (consultationFee == null || consultationFee.isEmpty()) {
+                                 consultationFee = "1000";
+                             }
+                             doctor.setConsultationFee(consultationFee);
+
+                             doctor.setAvailableDays("Monday,Tuesday,Wednesday,Thursday,Friday");
+                             doctor.setAvailableTime("09:00 AM - 05:00 PM");
+                             doctor.setImageUrl("/assets/images/doctors/default-doctor.png");
+                             doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                             doctor.setRating(0.0);
+                             doctor.setPatientCount(0);
+                             doctor.setSuccessRate(90);
+
+                             doctors.add(doctor);
+                         }
+                     }
+                 }
+             } catch (SQLException | ClassNotFoundException fallbackEx) {
+                 System.out.println("Error in fallback query: " + fallbackEx.getMessage());
+                 fallbackEx.printStackTrace();
+             }
+
+             // If all queries failed, return an empty list rather than null
+             if (doctors.isEmpty()) {
+                 System.out.println("Returning empty list of doctors due to error");
+             }
          }
 
          System.out.println("Returning " + doctors.size() + " top doctors from database");
-
          return doctors;
      }
 

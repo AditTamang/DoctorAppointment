@@ -1,30 +1,29 @@
 -- Database Schema for Doctor Appointment System
+CREATE DATABASE IF NOT EXISTS doctor_appointment;
+USE doctor_appointment;
 
--- Drop tables if they exist
-DROP TABLE IF EXISTS prescriptions;
-DROP TABLE IF EXISTS medical_records;
-DROP TABLE IF EXISTS appointments;
-DROP TABLE IF EXISTS doctor_schedules;
-DROP TABLE IF EXISTS doctors;
-DROP TABLE IF EXISTS patients;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS departments;
-DROP TABLE IF EXISTS announcements;
+-- Tables will be created only if they don't exist
+-- This preserves existing data in the database
 
 -- Create users table
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
     phone VARCHAR(20),
     role ENUM('ADMIN', 'DOCTOR', 'PATIENT') NOT NULL,
+    date_of_birth DATE,
+    gender ENUM('Male', 'Female', 'Other'),
+    address TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- Create departments table
-CREATE TABLE departments (
+CREATE TABLE IF NOT EXISTS departments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT,
@@ -33,12 +32,30 @@ CREATE TABLE departments (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- Create doctor_registration_requests table
+CREATE TABLE IF NOT EXISTS doctor_registration_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    specialization VARCHAR(100) NOT NULL,
+    qualification VARCHAR(255) NOT NULL,
+    experience VARCHAR(50),
+    address TEXT,
+    status ENUM('PENDING', 'APPROVED', 'REJECTED') DEFAULT 'PENDING',
+    admin_notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- Create doctors table
-CREATE TABLE doctors (
+CREATE TABLE IF NOT EXISTS doctors (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
+    name VARCHAR(100),
     specialization VARCHAR(100) NOT NULL,
     qualification VARCHAR(255) NOT NULL,
     experience INT DEFAULT 0,
@@ -49,6 +66,7 @@ CREATE TABLE doctors (
     available_days VARCHAR(100) DEFAULT 'Monday-Friday',
     available_time VARCHAR(100) DEFAULT '09:00 AM - 05:00 PM',
     profile_image VARCHAR(255),
+    image_url VARCHAR(255),
     bio TEXT,
     department_id INT,
     rating DECIMAL(3, 1) DEFAULT 0.0,
@@ -61,25 +79,19 @@ CREATE TABLE doctors (
 );
 
 -- Create patients table
-CREATE TABLE patients (
+CREATE TABLE IF NOT EXISTS patients (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    date_of_birth DATE,
-    gender ENUM('Male', 'Female', 'Other'),
-    phone VARCHAR(20),
-    email VARCHAR(100),
-    address TEXT,
     blood_group VARCHAR(10),
     allergies TEXT,
+    medical_history TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Create doctor_schedules table
-CREATE TABLE doctor_schedules (
+CREATE TABLE IF NOT EXISTS doctor_schedules (
     id INT AUTO_INCREMENT PRIMARY KEY,
     doctor_id INT NOT NULL,
     day_of_week ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
@@ -94,7 +106,7 @@ CREATE TABLE doctor_schedules (
 );
 
 -- Create appointments table
-CREATE TABLE appointments (
+CREATE TABLE IF NOT EXISTS appointments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     patient_id INT NOT NULL,
     doctor_id INT NOT NULL,
@@ -114,7 +126,7 @@ CREATE TABLE appointments (
 );
 
 -- Create medical_records table
-CREATE TABLE medical_records (
+CREATE TABLE IF NOT EXISTS medical_records (
     id INT AUTO_INCREMENT PRIMARY KEY,
     patient_id INT NOT NULL,
     doctor_id INT NOT NULL,
@@ -131,7 +143,7 @@ CREATE TABLE medical_records (
 );
 
 -- Create prescriptions table
-CREATE TABLE prescriptions (
+CREATE TABLE IF NOT EXISTS prescriptions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     medical_record_id INT,
     appointment_id INT,
@@ -153,7 +165,7 @@ CREATE TABLE prescriptions (
 );
 
 -- Create announcements table
-CREATE TABLE announcements (
+CREATE TABLE IF NOT EXISTS announcements (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,

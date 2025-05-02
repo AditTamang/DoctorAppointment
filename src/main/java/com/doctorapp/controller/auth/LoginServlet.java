@@ -71,14 +71,21 @@ public class LoginServlet extends HttpServlet {
                         // Check if the doctor has been approved
                         boolean isDoctorApproved = doctorRegistrationService.isDoctorApproved(user.getId());
 
+                        System.out.println("Doctor login attempt - User ID: " + user.getId() +
+                                          ", Email: " + user.getEmail() +
+                                          ", Approval Status: " + isDoctorApproved);
+
                         if (!isDoctorApproved) {
                             request.setAttribute("error", "Your doctor account has not been approved yet. Please wait for admin approval or contact support.");
                             request.getRequestDispatcher("/login.jsp").forward(request, response);
                             return;
                         }
+
+                        System.out.println("Doctor approved, proceeding with login");
                     } catch (Exception e) {
                         // Log the error but allow login if we can't determine approval status
                         System.err.println("Error checking doctor approval status: " + e.getMessage());
+                        e.printStackTrace();
                         // For security, we'll assume the doctor is approved if we can't check
                         // This prevents locking out doctors if the approval system has an error
                     }
