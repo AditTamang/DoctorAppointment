@@ -10,20 +10,20 @@
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
-    
+
     // Get doctor from request attribute
     Doctor doctor = (Doctor) request.getAttribute("doctor");
     if (doctor == null) {
         response.sendRedirect(request.getContextPath() + "/doctors");
         return;
     }
-    
+
     // Get patient ID from request
     String patientId = request.getParameter("patientId");
     if (patientId == null || patientId.isEmpty()) {
         patientId = String.valueOf(request.getAttribute("patientId"));
     }
-    
+
     // Get available time slots
     List<String> availableTimeSlots = (List<String>) request.getAttribute("availableTimeSlots");
 %>
@@ -37,6 +37,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patientDashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-booking.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-confirmation.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-confirm-fix.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-sidebar-fix.css">
 </head>
 <body>
     <div class="dashboard-container">
@@ -137,17 +141,17 @@
                         <form action="${pageContext.request.contextPath}/appointment/confirm" method="post">
                             <input type="hidden" name="doctorId" value="<%= doctor.getId() %>">
                             <input type="hidden" name="patientId" value="<%= patientId %>">
-                            
+
                             <div class="form-group">
                                 <label for="appointmentDate">Appointment Date</label>
-                                <input type="date" id="appointmentDate" name="appointmentDate" required 
-                                       min="<%= java.time.LocalDate.now() %>" 
+                                <input type="date" id="appointmentDate" name="appointmentDate" required
+                                       min="<%= java.time.LocalDate.now() %>"
                                        value="${appointmentDate != null ? appointmentDate : ''}">
                                 <c:if test="${not empty dateError}">
                                     <div class="error-message">${dateError}</div>
                                 </c:if>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label>Appointment Time</label>
                                 <div class="time-slots">
@@ -155,8 +159,8 @@
                                         <input type="radio" id="time_09_00" name="appointmentTime" value="09:00 AM" required>
                                         <label for="time_09_00">09:00 AM</label>
                                     </div>
-                                    <div class="time-slot">
-                                        <input type="radio" id="time_10_00" name="appointmentTime" value="10:00 AM">
+                                    <div class="time-slot unavailable">
+                                        <input type="radio" id="time_10_00" name="appointmentTime" value="10:00 AM" disabled>
                                         <label for="time_10_00">10:00 AM</label>
                                     </div>
                                     <div class="time-slot">
@@ -184,11 +188,12 @@
                                         <label for="time_05_00">05:00 PM</label>
                                     </div>
                                 </div>
+                                <div class="time-unavailable-message">This time slot is no longer available. Please select another time.</div>
                                 <c:if test="${not empty timeError}">
                                     <div class="error-message">${timeError}</div>
                                 </c:if>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="reason">Reason for Visit</label>
                                 <textarea id="reason" name="reason" placeholder="Please describe the reason for your visit">${reason != null ? reason : ''}</textarea>
@@ -196,12 +201,12 @@
                                     <div class="error-message">${reasonError}</div>
                                 </c:if>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="symptoms">Symptoms (if any)</label>
                                 <textarea id="symptoms" name="symptoms" placeholder="Please describe any symptoms you are experiencing">${symptoms != null ? symptoms : ''}</textarea>
                             </div>
-                            
+
                             <div class="form-actions">
                                 <a href="${pageContext.request.contextPath}/doctors" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left"></i> Back
@@ -222,12 +227,12 @@
         document.getElementById('menuToggle').addEventListener('click', function() {
             document.querySelector('.sidebar').classList.toggle('active');
         });
-        
+
         // Set minimum date to today for the date picker
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('appointmentDate').min = today;
-            
+
             // Pre-select time slot if it was previously selected
             const selectedTime = "${appointmentTime}";
             if (selectedTime) {

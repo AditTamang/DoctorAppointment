@@ -40,6 +40,7 @@
      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
      <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
      <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patientDashboard.css">
+     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-sidebar-fix.css">
  </head>
  <body>
      <div class="dashboard-container">

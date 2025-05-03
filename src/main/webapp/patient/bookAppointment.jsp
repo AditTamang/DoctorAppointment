@@ -35,7 +35,8 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patientDashboard.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-booking.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-booking-fix.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/book-appointment-fix.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-sidebar-fix.css">
 </head>
 <body>
     <div class="dashboard-container">

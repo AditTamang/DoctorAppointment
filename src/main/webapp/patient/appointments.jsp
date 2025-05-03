@@ -11,10 +11,10 @@
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
-    
+
     // Get appointments from request
     List<Appointment> appointments = (List<Appointment>) request.getAttribute("appointments");
-    
+
     // Create date formatter
     SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
 %>
@@ -29,6 +29,9 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patientDashboard.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-pages.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-confirmation.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-confirm-fix.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-sidebar-fix.css">
 </head>
 <body>
     <div class="dashboard-container">
@@ -227,13 +230,13 @@
                 document.querySelectorAll('.tab-button').forEach(btn => {
                     btn.classList.remove('active');
                 });
-                
+
                 // Add active class to clicked button
                 this.classList.add('active');
-                
+
                 // Get the tab value
                 const tab = this.getAttribute('data-tab');
-                
+
                 // Show all cards if "all" tab is selected
                 if (tab === 'all') {
                     document.querySelectorAll('.appointment-card').forEach(card => {
@@ -244,7 +247,7 @@
                     document.querySelectorAll('.appointment-card').forEach(card => {
                         card.style.display = 'none';
                     });
-                    
+
                     // Show only cards with matching status
                     document.querySelectorAll(`.appointment-card[data-status="${tab}"]`).forEach(card => {
                         card.style.display = 'block';
@@ -301,21 +304,21 @@
                     if (response.ok) {
                         // Update UI to show appointment as cancelled
                         const appointmentCard = document.querySelector(`.appointment-card .cancel-appointment[data-id="${appointmentToCancel}"]`).closest('.appointment-card');
-                        
+
                         // Update status badge
                         const statusBadge = appointmentCard.querySelector('.status-badge');
                         statusBadge.className = 'status-badge status-cancelled';
                         statusBadge.textContent = 'CANCELLED';
-                        
+
                         // Update data-status attribute
                         appointmentCard.setAttribute('data-status', 'cancelled');
-                        
+
                         // Remove cancel button
                         appointmentCard.querySelector('.cancel-appointment').remove();
-                        
+
                         // Close modal
                         modal.style.display = 'none';
-                        
+
                         // Show success message
                         alert('Appointment cancelled successfully');
                     } else {

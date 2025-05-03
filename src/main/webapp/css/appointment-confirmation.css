@@ -1,4 +1,4 @@
-/* Appointment Confirmation Styles */
+/* Appointment Confirmation Styles - Updated Version */
 .confirmation-container {
     background-color: #fff;
     border-radius: 10px;
@@ -9,7 +9,7 @@
 }
 
 .confirmation-header {
-    background: linear-gradient(135deg, #4e73df, #36b9cc);
+    background: linear-gradient(135deg, #4CAF50, #8BC34A);
     color: white;
     padding: 40px 30px;
     position: relative;
@@ -24,7 +24,7 @@
     align-items: center;
     justify-content: center;
     margin: 0 auto 20px;
-    color: #4e73df;
+    color: #4CAF50;
     font-size: 50px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
@@ -80,11 +80,11 @@
 .doctor-info {
     display: flex;
     align-items: center;
-    background-color: #eaecf4;
+    background-color: #f1f8e9;
     border-radius: 10px;
     padding: 20px;
     margin-bottom: 30px;
-    border: 1px solid #e3e6f0;
+    border: 1px solid #c5e1a5;
 }
 
 .doctor-avatar {
@@ -124,7 +124,7 @@
 
 .doctor-details p i {
     margin-right: 8px;
-    color: #4e73df;
+    color: #4CAF50;
     width: 16px;
     text-align: center;
 }
@@ -138,23 +138,27 @@
 }
 
 .status-pending {
-    background-color: #f6c23e;
+    background-color: #fff3cd;
     color: #856404;
+    border: 1px solid #ffeeba;
 }
 
 .status-confirmed {
-    background-color: #1cc88a;
+    background-color: #d4edda;
     color: #155724;
+    border: 1px solid #c3e6cb;
 }
 
 .status-cancelled {
-    background-color: #e74a3b;
+    background-color: #f8d7da;
     color: #721c24;
+    border: 1px solid #f5c6cb;
 }
 
 .status-completed {
-    background-color: #4e73df;
-    color: #fff;
+    background-color: #cce5ff;
+    color: #004085;
+    border: 1px solid #b8daff;
 }
 
 .action-buttons {
@@ -200,33 +204,33 @@
     .detail-row {
         flex-direction: column;
     }
-    
+
     .detail-label {
         margin-bottom: 5px;
     }
-    
+
     .doctor-info {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .doctor-avatar {
         margin-right: 0;
         margin-bottom: 15px;
     }
-    
+
     .doctor-details {
         text-align: center;
     }
-    
+
     .doctor-details p {
         justify-content: center;
     }
-    
+
     .action-buttons {
         flex-direction: column;
     }
-    
+
     .btn {
         width: 100%;
         justify-content: center;

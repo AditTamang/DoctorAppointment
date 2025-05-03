@@ -14,7 +14,7 @@
         <%@include file="./assets/css/style.css"%>
         <%@include file="./assets/css/appointment.css"%>
     </style>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-booking-fix.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/book-appointment-fix.css">
 </head>
 <body>
     <div class="container">

@@ -25,7 +25,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/appointment-booking-fix.css">
+    <link rel="stylesheet" href="../css/appointment-booking.css">
+    <link rel="stylesheet" href="../css/book-appointment-fix.css">
 </head>
 <body>
     <!-- Header -->
@@ -78,65 +79,67 @@
                     <form action="../appointment/book" method="post">
                         <input type="hidden" name="doctorId" value="<%= doctor.getId() %>">
 
-                        <div class="form-group">
-                            <label for="appointmentDate">Appointment Date</label>
-                            <input type="date" id="appointmentDate" name="appointmentDate" class="form-control" required>
-                        </div>
+                        <div class="booking-form-container">
+                            <div class="form-group">
+                                <label for="appointmentDate">Appointment Date</label>
+                                <input type="date" id="appointmentDate" name="appointmentDate" class="form-control" required>
+                            </div>
 
-                        <div class="form-group">
-                            <label for="appointmentTime" class="time-slots-title">Appointment Time</label>
-                            <div class="time-slots">
-                                <div class="time-slot">
-                                    <input type="radio" id="time_09_00" name="appointmentTime" value="09:00 AM" required>
-                                    <label for="time_09_00">09:00 AM</label>
-                                </div>
-                                <div class="time-slot">
-                                    <input type="radio" id="time_10_00" name="appointmentTime" value="10:00 AM">
-                                    <label for="time_10_00">10:00 AM</label>
-                                </div>
-                                <div class="time-slot">
-                                    <input type="radio" id="time_11_00" name="appointmentTime" value="11:00 AM">
-                                    <label for="time_11_00">11:00 AM</label>
-                                </div>
-                                <div class="time-slot">
-                                    <input type="radio" id="time_12_00" name="appointmentTime" value="12:00 PM">
-                                    <label for="time_12_00">12:00 PM</label>
-                                </div>
-                                <div class="time-slot">
-                                    <input type="radio" id="time_01_00" name="appointmentTime" value="01:00 PM">
-                                    <label for="time_01_00">01:00 PM</label>
-                                </div>
-                                <div class="time-slot">
-                                    <input type="radio" id="time_02_00" name="appointmentTime" value="02:00 PM">
-                                    <label for="time_02_00">02:00 PM</label>
-                                </div>
-                                <div class="time-slot">
-                                    <input type="radio" id="time_03_00" name="appointmentTime" value="03:00 PM">
-                                    <label for="time_03_00">03:00 PM</label>
-                                </div>
-                                <div class="time-slot">
-                                    <input type="radio" id="time_04_00" name="appointmentTime" value="04:00 PM">
-                                    <label for="time_04_00">04:00 PM</label>
-                                </div>
-                                <div class="time-slot">
-                                    <input type="radio" id="time_05_00" name="appointmentTime" value="05:00 PM">
-                                    <label for="time_05_00">05:00 PM</label>
+                            <div class="form-group">
+                                <label for="appointmentTime" class="time-slots-title">Select Appointment Time</label>
+                                <div class="time-slots">
+                                    <div class="time-slot">
+                                        <input type="radio" id="time_09_00" name="appointmentTime" value="09:00 AM" required>
+                                        <label for="time_09_00">09:00 AM</label>
+                                    </div>
+                                    <div class="time-slot">
+                                        <input type="radio" id="time_10_00" name="appointmentTime" value="10:00 AM">
+                                        <label for="time_10_00">10:00 AM</label>
+                                    </div>
+                                    <div class="time-slot">
+                                        <input type="radio" id="time_11_00" name="appointmentTime" value="11:00 AM">
+                                        <label for="time_11_00">11:00 AM</label>
+                                    </div>
+                                    <div class="time-slot">
+                                        <input type="radio" id="time_12_00" name="appointmentTime" value="12:00 PM">
+                                        <label for="time_12_00">12:00 PM</label>
+                                    </div>
+                                    <div class="time-slot">
+                                        <input type="radio" id="time_01_00" name="appointmentTime" value="01:00 PM">
+                                        <label for="time_01_00">01:00 PM</label>
+                                    </div>
+                                    <div class="time-slot">
+                                        <input type="radio" id="time_02_00" name="appointmentTime" value="02:00 PM">
+                                        <label for="time_02_00">02:00 PM</label>
+                                    </div>
+                                    <div class="time-slot">
+                                        <input type="radio" id="time_03_00" name="appointmentTime" value="03:00 PM">
+                                        <label for="time_03_00">03:00 PM</label>
+                                    </div>
+                                    <div class="time-slot">
+                                        <input type="radio" id="time_04_00" name="appointmentTime" value="04:00 PM">
+                                        <label for="time_04_00">04:00 PM</label>
+                                    </div>
+                                    <div class="time-slot">
+                                        <input type="radio" id="time_05_00" name="appointmentTime" value="05:00 PM">
+                                        <label for="time_05_00">05:00 PM</label>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="form-group reason-container">
-                            <label for="symptoms" class="reason-title">Symptoms/Reason for Visit</label>
-                            <textarea id="symptoms" name="symptoms" class="form-control reason-input" rows="5" placeholder="e.g., Regular checkup, Consultation for specific symptoms, etc." required></textarea>
-                        </div>
+                            <div class="form-group reason-container">
+                                <label for="symptoms" class="reason-title">Symptoms/Reason for Visit</label>
+                                <textarea id="symptoms" name="symptoms" class="form-control reason-input" rows="5" placeholder="Please describe your symptoms or reason for this appointment..." required></textarea>
+                            </div>
 
-                        <div class="form-group action-buttons">
-                            <a href="../doctor/details?id=<%= doctor.getId() %>" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Cancel
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-calendar-check"></i> Confirm Booking
-                            </button>
+                            <div class="form-group action-buttons">
+                                <a href="../doctor/details?id=<%= doctor.getId() %>" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-calendar-check"></i> Confirm Booking
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
