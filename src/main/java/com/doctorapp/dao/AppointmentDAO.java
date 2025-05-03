@@ -461,6 +461,29 @@ public class AppointmentDAO {
          return 0;
      }
 
+     // Get count of today's appointments by doctor
+     public int getTodayAppointmentsCountByDoctor(int doctorId) {
+         String query = "SELECT COUNT(*) FROM appointments " +
+                       "WHERE doctor_id = ? AND appointment_date = CURRENT_DATE";
+
+         try (Connection conn = DBConnection.getConnection();
+              PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+             pstmt.setInt(1, doctorId);
+
+             try (ResultSet rs = pstmt.executeQuery()) {
+                 if (rs.next()) {
+                     return rs.getInt(1);
+                 }
+             }
+
+         } catch (SQLException | ClassNotFoundException e) {
+             LOGGER.log(Level.SEVERE, "Error getting today's appointments count by doctor", e);
+         }
+
+         return 0;
+     }
+
      // Get upcoming appointments by doctor
      public List<Appointment> getUpcomingAppointmentsByDoctor(int doctorId, int limit) {
          List<Appointment> appointments = new ArrayList<>();
@@ -579,8 +602,7 @@ public class AppointmentDAO {
      // Get upcoming appointments by patient
      public List<Appointment> getUpcomingAppointmentsByPatient(int patientId, int limit) {
          List<Appointment> appointments = new ArrayList<>();
-         String query = "SELECT a.*, d.first_name as doctor_first_name, d.last_name as doctor_last_name, " +
-                       "d.specialization " +
+         String query = "SELECT a.*, d.name as doctor_name, d.specialization " +
                        "FROM appointments a " +
                        "JOIN doctors d ON a.doctor_id = d.id " +
                        "WHERE a.patient_id = ? AND (a.appointment_date > CURRENT_DATE OR " +
@@ -607,7 +629,7 @@ public class AppointmentDAO {
                      appointment.setReason(rs.getString("reason"));
                      appointment.setNotes(rs.getString("notes"));
                      appointment.setFee(rs.getDouble("fee"));
-                     appointment.setDoctorName(rs.getString("doctor_first_name") + " " + rs.getString("doctor_last_name"));
+                     appointment.setDoctorName(rs.getString("doctor_name"));
                      appointment.setDoctorSpecialization(rs.getString("specialization"));
 
                      appointments.add(appointment);
@@ -624,8 +646,7 @@ public class AppointmentDAO {
      // Get past appointments by patient
      public List<Appointment> getPastAppointmentsByPatient(int patientId, int limit) {
          List<Appointment> appointments = new ArrayList<>();
-         String query = "SELECT a.*, d.first_name as doctor_first_name, d.last_name as doctor_last_name, " +
-                       "d.specialization " +
+         String query = "SELECT a.*, d.name as doctor_name, d.specialization " +
                        "FROM appointments a " +
                        "JOIN doctors d ON a.doctor_id = d.id " +
                        "WHERE a.patient_id = ? AND ((a.appointment_date < CURRENT_DATE) OR " +
@@ -652,7 +673,7 @@ public class AppointmentDAO {
                      appointment.setReason(rs.getString("reason"));
                      appointment.setNotes(rs.getString("notes"));
                      appointment.setFee(rs.getDouble("fee"));
-                     appointment.setDoctorName(rs.getString("doctor_first_name") + " " + rs.getString("doctor_last_name"));
+                     appointment.setDoctorName(rs.getString("doctor_name"));
                      appointment.setDoctorSpecialization(rs.getString("specialization"));
 
                      appointments.add(appointment);
@@ -669,8 +690,7 @@ public class AppointmentDAO {
      // Get cancelled appointments by patient
      public List<Appointment> getCancelledAppointmentsByPatient(int patientId, int limit) {
          List<Appointment> appointments = new ArrayList<>();
-         String query = "SELECT a.*, d.first_name as doctor_first_name, d.last_name as doctor_last_name, " +
-                       "d.specialization " +
+         String query = "SELECT a.*, d.name as doctor_name, d.specialization " +
                        "FROM appointments a " +
                        "JOIN doctors d ON a.doctor_id = d.id " +
                        "WHERE a.patient_id = ? AND a.status = 'CANCELLED' " +
@@ -695,7 +715,7 @@ public class AppointmentDAO {
                      appointment.setReason(rs.getString("reason"));
                      appointment.setNotes(rs.getString("notes"));
                      appointment.setFee(rs.getDouble("fee"));
-                     appointment.setDoctorName(rs.getString("doctor_first_name") + " " + rs.getString("doctor_last_name"));
+                     appointment.setDoctorName(rs.getString("doctor_name"));
                      appointment.setDoctorSpecialization(rs.getString("specialization"));
 
                      appointments.add(appointment);

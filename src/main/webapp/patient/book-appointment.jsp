@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/appointment-booking-fix.css">
 </head>
 <body>
     <!-- Header -->
@@ -60,26 +61,17 @@
                         </div>
                     <% } %>
 
-                    <div class="doctor-info mb-4">
-                        <div class="doctor-meta-item">
-                            <div class="doctor-meta-label">Doctor:</div>
-                            <div class="doctor-meta-value"><%= doctor.getName() %></div>
+                    <div class="doctor-card mb-4">
+                        <div class="doctor-image">
+                            <img src="${pageContext.request.contextPath}${doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty() ? doctor.getImageUrl() : '/assets/images/doctors/d1.png'}" alt="Doctor Profile">
                         </div>
-                        <div class="doctor-meta-item">
-                            <div class="doctor-meta-label">Specialization:</div>
-                            <div class="doctor-meta-value"><%= doctor.getSpecialization() %></div>
-                        </div>
-                        <div class="doctor-meta-item">
-                            <div class="doctor-meta-label">Consultation Fee:</div>
-                            <div class="doctor-meta-value"><%= doctor.getConsultationFee() %></div>
-                        </div>
-                        <div class="doctor-meta-item">
-                            <div class="doctor-meta-label">Available Days:</div>
-                            <div class="doctor-meta-value"><%= doctor.getAvailableDays() %></div>
-                        </div>
-                        <div class="doctor-meta-item">
-                            <div class="doctor-meta-label">Available Time:</div>
-                            <div class="doctor-meta-value"><%= doctor.getAvailableTime() %></div>
+                        <div class="doctor-info">
+                            <h4><%= doctor.getName().startsWith("Dr.") ? doctor.getName() : "Dr. " + doctor.getName() %></h4>
+                            <p><i class="fas fa-stethoscope"></i> <%= doctor.getSpecialization() %></p>
+                            <p><i class="fas fa-graduation-cap"></i> <%= doctor.getQualification() != null ? doctor.getQualification() : "Qualified Professional" %></p>
+                            <p><i class="fas fa-calendar-alt"></i> Available: <%= doctor.getAvailableDays() %></p>
+                            <p><i class="fas fa-clock"></i> Hours: <%= doctor.getAvailableTime() %></p>
+                            <p class="fee-text"><i class="fas fa-dollar-sign"></i> Consultation Fee: $<%= doctor.getConsultationFee() %></p>
                         </div>
                     </div>
 
@@ -92,36 +84,59 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="appointmentTime">Appointment Time</label>
-                            <select id="appointmentTime" name="appointmentTime" class="form-control" required>
-                                <option value="">Select Time</option>
-                                <option value="09:00 AM">09:00 AM</option>
-                                <option value="09:30 AM">09:30 AM</option>
-                                <option value="10:00 AM">10:00 AM</option>
-                                <option value="10:30 AM">10:30 AM</option>
-                                <option value="11:00 AM">11:00 AM</option>
-                                <option value="11:30 AM">11:30 AM</option>
-                                <option value="12:00 PM">12:00 PM</option>
-                                <option value="12:30 PM">12:30 PM</option>
-                                <option value="02:00 PM">02:00 PM</option>
-                                <option value="02:30 PM">02:30 PM</option>
-                                <option value="03:00 PM">03:00 PM</option>
-                                <option value="03:30 PM">03:30 PM</option>
-                                <option value="04:00 PM">04:00 PM</option>
-                                <option value="04:30 PM">04:30 PM</option>
-                                <option value="05:00 PM">05:00 PM</option>
-                                <option value="05:30 PM">05:30 PM</option>
-                            </select>
+                            <label for="appointmentTime" class="time-slots-title">Appointment Time</label>
+                            <div class="time-slots">
+                                <div class="time-slot">
+                                    <input type="radio" id="time_09_00" name="appointmentTime" value="09:00 AM" required>
+                                    <label for="time_09_00">09:00 AM</label>
+                                </div>
+                                <div class="time-slot">
+                                    <input type="radio" id="time_10_00" name="appointmentTime" value="10:00 AM">
+                                    <label for="time_10_00">10:00 AM</label>
+                                </div>
+                                <div class="time-slot">
+                                    <input type="radio" id="time_11_00" name="appointmentTime" value="11:00 AM">
+                                    <label for="time_11_00">11:00 AM</label>
+                                </div>
+                                <div class="time-slot">
+                                    <input type="radio" id="time_12_00" name="appointmentTime" value="12:00 PM">
+                                    <label for="time_12_00">12:00 PM</label>
+                                </div>
+                                <div class="time-slot">
+                                    <input type="radio" id="time_01_00" name="appointmentTime" value="01:00 PM">
+                                    <label for="time_01_00">01:00 PM</label>
+                                </div>
+                                <div class="time-slot">
+                                    <input type="radio" id="time_02_00" name="appointmentTime" value="02:00 PM">
+                                    <label for="time_02_00">02:00 PM</label>
+                                </div>
+                                <div class="time-slot">
+                                    <input type="radio" id="time_03_00" name="appointmentTime" value="03:00 PM">
+                                    <label for="time_03_00">03:00 PM</label>
+                                </div>
+                                <div class="time-slot">
+                                    <input type="radio" id="time_04_00" name="appointmentTime" value="04:00 PM">
+                                    <label for="time_04_00">04:00 PM</label>
+                                </div>
+                                <div class="time-slot">
+                                    <input type="radio" id="time_05_00" name="appointmentTime" value="05:00 PM">
+                                    <label for="time_05_00">05:00 PM</label>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="symptoms">Symptoms/Reason for Visit</label>
-                            <textarea id="symptoms" name="symptoms" class="form-control" rows="5" required></textarea>
+                        <div class="form-group reason-container">
+                            <label for="symptoms" class="reason-title">Symptoms/Reason for Visit</label>
+                            <textarea id="symptoms" name="symptoms" class="form-control reason-input" rows="5" placeholder="e.g., Regular checkup, Consultation for specific symptoms, etc." required></textarea>
                         </div>
 
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Book Appointment</button>
-                            <a href="../doctor/details?id=<%= doctor.getId() %>" class="btn btn-outline">Cancel</a>
+                        <div class="form-group action-buttons">
+                            <a href="../doctor/details?id=<%= doctor.getId() %>" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-calendar-check"></i> Confirm Booking
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -166,5 +181,28 @@
     </footer>
 
     <script src="../js/script.js"></script>
+    <script>
+        // Set minimum date to today for the date picker
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('appointmentDate').min = today;
+
+            // Add click event listeners to time slots for better visual feedback
+            const timeSlots = document.querySelectorAll('.time-slot input[type="radio"]');
+            timeSlots.forEach(slot => {
+                slot.addEventListener('change', function() {
+                    // Remove selected class from all labels
+                    document.querySelectorAll('.time-slot label').forEach(label => {
+                        label.classList.remove('selected');
+                    });
+
+                    // Add selected class to the clicked label
+                    if (this.checked) {
+                        this.nextElementSibling.classList.add('selected');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

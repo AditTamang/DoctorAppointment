@@ -2,17 +2,8 @@ package com.doctorapp.controller.patient;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import com.doctorapp.model.Appointment;
 import com.doctorapp.model.Doctor;
@@ -20,7 +11,13 @@ import com.doctorapp.model.User;
 import com.doctorapp.service.AppointmentService;
 import com.doctorapp.service.DoctorService;
 import com.doctorapp.service.PatientService;
-import com.doctorapp.util.ValidationUtil;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Servlet for handling appointment booking operations
@@ -48,10 +45,74 @@ public class AppointmentBookingServlet extends HttpServlet {
             case "/appointment/book":
                 showBookingForm(request, response);
                 break;
+            case "/appointment/confirm":
+                showConfirmationForm(request, response);
+                break;
             default:
                 response.sendRedirect(request.getContextPath() + "/doctors");
                 break;
         }
+    }
+
+    /**
+     * Show appointment confirmation form
+     */
+    private void showConfirmationForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+
+        if (user == null || !"PATIENT".equals(user.getRole())) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        // Get doctor ID from request
+        String doctorIdParam = request.getParameter("doctorId");
+        if (doctorIdParam == null || doctorIdParam.isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/doctors");
+            return;
+        }
+
+        int doctorId;
+        try {
+            doctorId = Integer.parseInt(doctorIdParam);
+        } catch (NumberFormatException e) {
+            response.sendRedirect(request.getContextPath() + "/doctors");
+            return;
+        }
+
+        // Get doctor details
+        Doctor doctor = doctorService.getDoctorById(doctorId);
+        if (doctor == null) {
+            response.sendRedirect(request.getContextPath() + "/doctors");
+            return;
+        }
+
+        // Get patient ID
+        int patientId = patientService.getPatientIdByUserId(user.getId());
+        if (patientId == 0) {
+            // Create a new patient record if it doesn't exist
+            com.doctorapp.model.Patient patient = new com.doctorapp.model.Patient();
+            patient.setUserId(user.getId());
+            patient.setFirstName(user.getFirstName());
+            patient.setLastName(user.getLastName());
+            patient.setEmail(user.getEmail());
+            patient.setPhone(user.getPhone());
+            patient.setAddress(user.getAddress());
+
+            // Save the new patient
+            patientService.addPatient(patient);
+
+            // Get the newly created patient ID
+            patientId = patientService.getPatientIdByUserId(user.getId());
+        }
+
+        // Set attributes for the confirmation form
+        request.setAttribute("doctor", doctor);
+        request.setAttribute("patientId", patientId);
+
+        // Forward to confirmation form
+        request.getRequestDispatcher("/patient/appointment-confirm.jsp").forward(request, response);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -207,8 +268,8 @@ public class AppointmentBookingServlet extends HttpServlet {
             request.setAttribute("reason", reason);
             request.setAttribute("symptoms", symptoms);
 
-            // Forward back to booking form
-            request.getRequestDispatcher("/patient/bookAppointment.jsp").forward(request, response);
+            // Forward back to confirmation form
+            request.getRequestDispatcher("/patient/appointment-confirm.jsp").forward(request, response);
             return;
         }
 
@@ -258,8 +319,8 @@ public class AppointmentBookingServlet extends HttpServlet {
             request.setAttribute("reason", reason);
             request.setAttribute("symptoms", symptoms);
 
-            // Forward back to booking form
-            request.getRequestDispatcher("/patient/bookAppointment.jsp").forward(request, response);
+            // Forward back to confirmation form
+            request.getRequestDispatcher("/patient/appointment-confirm.jsp").forward(request, response);
             return;
         }
 
@@ -304,8 +365,8 @@ public class AppointmentBookingServlet extends HttpServlet {
             request.setAttribute("reason", reason);
             request.setAttribute("symptoms", symptoms);
 
-            // Forward back to booking form
-            request.getRequestDispatcher("/patient/bookAppointment.jsp").forward(request, response);
+            // Forward back to confirmation form
+            request.getRequestDispatcher("/patient/appointment-confirm.jsp").forward(request, response);
         }
     }
 }

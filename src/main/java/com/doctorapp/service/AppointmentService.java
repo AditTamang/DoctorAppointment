@@ -119,6 +119,15 @@ package com.doctorapp.service;
          return appointmentDAO.getTodayAppointmentsByDoctor(doctorId);
      }
 
+     /**
+      * Get count of today's appointments by doctor
+      * @param doctorId Doctor ID
+      * @return Count of today's appointments for the doctor
+      */
+     public int getTodayAppointmentsCountByDoctor(int doctorId) {
+         return appointmentDAO.getTodayAppointmentsCountByDoctor(doctorId);
+     }
+
 
      /**
       * Get next appointment by patient

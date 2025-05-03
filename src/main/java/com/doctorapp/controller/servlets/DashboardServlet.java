@@ -188,9 +188,9 @@ package com.doctorapp.controller.servlets;
              }
 
              try {
-                 request.setAttribute("todayAppointments", appointmentDAO.getTodayAppointmentsByDoctor(doctorId));
+                 request.setAttribute("todayAppointments", appointmentDAO.getTodayAppointmentsCountByDoctor(doctorId));
              } catch (Exception e) {
-                 System.err.println("Error loading today's appointments: " + e.getMessage());
+                 System.err.println("Error loading today's appointments count: " + e.getMessage());
              }
 
              try {
