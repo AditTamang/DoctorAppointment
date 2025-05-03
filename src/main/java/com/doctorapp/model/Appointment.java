@@ -137,11 +137,22 @@ public class Appointment {
     }
 
     public String getStatus() {
+        // Convert database status to UI status if needed
+        if ("CONFIRMED".equals(status)) {
+            return "APPROVED";
+        } else if ("CANCELLED".equals(status) && this.reason != null && !this.reason.isEmpty()) {
+            return "REJECTED";
+        }
         return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    // Get the raw database status
+    public String getRawStatus() {
+        return status;
     }
 
     public String getSymptoms() {

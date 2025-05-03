@@ -206,6 +206,16 @@ package com.doctorapp.service;
      }
 
      /**
+      * Get appointments by doctor ID and status
+      * @param doctorId Doctor ID
+      * @param status Appointment status
+      * @return List of appointments for the doctor with the specified status
+      */
+     public List<Appointment> getAppointmentsByDoctorIdAndStatus(int doctorId, String status) {
+         return appointmentDAO.getAppointmentsByDoctorIdAndStatus(doctorId, status);
+     }
+
+     /**
       * Get available time slots for a doctor
       * @param doctorId Doctor ID
       * @return List of available time slots

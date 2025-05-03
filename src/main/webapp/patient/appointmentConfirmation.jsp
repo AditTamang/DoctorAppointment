@@ -30,7 +30,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patientDashboard.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-confirmation.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-pages.css">
 </head>
 <body>
     <div class="dashboard-container">
@@ -115,81 +115,77 @@
 
             <!-- Dashboard Content -->
             <div class="dashboard-content">
-                <div class="confirmation-container">
+                <div class="appointment-container">
                     <div class="confirmation-header">
-                        <div class="confirmation-icon">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <h2>Appointment Confirmed!</h2>
-                        <p>Your appointment has been successfully booked</p>
+                        <i class="fas fa-check-circle"></i>
+                        <h2>Appointment has been successfully booked</h2>
                     </div>
 
-                    <div class="confirmation-body">
-                        <div class="doctor-info">
-                            <div class="doctor-avatar">
-                                <img src="${pageContext.request.contextPath}${doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty() ? doctor.getImageUrl() : '/assets/images/doctors/default.jpg'}" alt="Doctor Profile">
-                            </div>
-                            <div class="doctor-details">
-                                <h3><%= doctor.getName().startsWith("Dr.") ? doctor.getName() : "Dr. " + doctor.getName() %></h3>
-                                <p><i class="fas fa-stethoscope"></i> <%= doctor.getSpecialization() %></p>
-                                <p><i class="fas fa-graduation-cap"></i> <%= doctor.getQualification() != null ? doctor.getQualification() : "Qualified Professional" %></p>
-                                <p><i class="fas fa-phone"></i> <%= doctor.getPhone() != null ? doctor.getPhone() : "Contact details will be shared" %></p>
-                                <p><i class="fas fa-map-marker-alt"></i> <%= doctor.getAddress() != null ? doctor.getAddress() : "Clinic address will be provided" %></p>
-                            </div>
-                        </div>
-
-                        <div class="appointment-details">
-                            <div class="detail-row">
-                                <div class="detail-label">Appointment ID</div>
-                                <div class="detail-value">#<%= appointment.getId() %></div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Date</div>
-                                <div class="detail-value"><%= appointment.getAppointmentDate() %></div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Time</div>
-                                <div class="detail-value"><%= appointment.getAppointmentTime() %></div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Status</div>
-                                <div class="detail-value">
-                                    <span class="status-badge status-<%= appointment.getStatus().toLowerCase() %>">
-                                        <%= appointment.getStatus() %>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Reason</div>
-                                <div class="detail-value"><%= appointment.getReason() %></div>
-                            </div>
-                            <% if (appointment.getSymptoms() != null && !appointment.getSymptoms().isEmpty()) { %>
-                            <div class="detail-row">
-                                <div class="detail-label">Symptoms</div>
-                                <div class="detail-value"><%= appointment.getSymptoms() %></div>
-                            </div>
+                    <div class="doctor-info">
+                        <div class="doctor-avatar">
+                            <% if (doctor.getProfileImage() != null && !doctor.getProfileImage().isEmpty()) { %>
+                                <img src="${pageContext.request.contextPath}/<%= doctor.getProfileImage() %>" alt="<%= doctor.getName() %>">
+                            <% } else { %>
+                                <div class="initials"><%= doctor.getName().charAt(0) %></div>
                             <% } %>
                         </div>
-
-                        <div class="instructions">
-                            <h3><i class="fas fa-info-circle"></i> Important Information</h3>
-                            <ul>
-                                <li>Please arrive 15 minutes before your scheduled appointment time.</li>
-                                <li>Bring your ID and any relevant medical records or test results.</li>
-                                <li>If you need to cancel or reschedule, please do so at least 24 hours in advance.</li>
-                                <li>The doctor will confirm your appointment. You'll receive a notification once confirmed.</li>
-                                <li>For any queries, please contact our support team.</li>
-                            </ul>
+                        <div class="doctor-details">
+                            <h3 class="doctor-name"><%= doctor.getName().startsWith("Dr.") ? doctor.getName() : "Dr. " + doctor.getName() %></h3>
+                            <p class="doctor-specialty"><%= doctor.getSpecialization() %></p>
                         </div>
+                    </div>
 
-                        <div class="action-buttons">
-                            <a href="${pageContext.request.contextPath}/appointments" class="btn btn-primary">
-                                <i class="fas fa-calendar-check"></i> View My Appointments
-                            </a>
-                            <a href="${pageContext.request.contextPath}/patient/dashboard" class="btn btn-secondary">
-                                <i class="fas fa-home"></i> Go to Dashboard
-                            </a>
+                    <div class="appointment-details">
+                        <div class="detail-row">
+                            <div class="detail-label">Appointment ID:</div>
+                            <div class="detail-value">#<%= appointment.getId() %></div>
                         </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Date:</div>
+                            <div class="detail-value"><%= appointment.getAppointmentDate() %></div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Time:</div>
+                            <div class="detail-value"><%= appointment.getAppointmentTime() %></div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Status:</div>
+                            <div class="detail-value">
+                                <span class="status-badge status-<%= appointment.getStatus().toLowerCase() %>">
+                                    <%= appointment.getStatus() %>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Reason:</div>
+                            <div class="detail-value"><%= appointment.getReason() != null ? appointment.getReason() : "Not specified" %></div>
+                        </div>
+                        <% if (appointment.getSymptoms() != null && !appointment.getSymptoms().isEmpty()) { %>
+                        <div class="detail-row">
+                            <div class="detail-label">Symptoms:</div>
+                            <div class="detail-value"><%= appointment.getSymptoms() %></div>
+                        </div>
+                        <% } %>
+                    </div>
+
+                    <div class="appointment-instructions">
+                        <h3>Important Information</h3>
+                        <ul>
+                            <li>Please arrive 15 minutes before your scheduled appointment time.</li>
+                            <li>Bring your ID and any relevant medical records or test results.</li>
+                            <li>If you need to cancel or reschedule, please do so at least 24 hours in advance.</li>
+                            <li>The doctor will confirm your appointment. You'll receive a notification once confirmed.</li>
+                            <li>For any queries, please contact our support team.</li>
+                        </ul>
+                    </div>
+
+                    <div class="action-buttons">
+                        <a href="${pageContext.request.contextPath}/appointments" class="btn btn-primary">
+                            <i class="fas fa-calendar-check"></i> View My Appointments
+                        </a>
+                        <a href="${pageContext.request.contextPath}/patient/dashboard" class="btn btn-secondary">
+                            <i class="fas fa-home"></i> Go to Dashboard
+                        </a>
                     </div>
                 </div>
             </div>

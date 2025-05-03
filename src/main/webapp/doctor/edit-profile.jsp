@@ -128,6 +128,25 @@
             gap: 10px;
         }
 
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
         @media (max-width: 768px) {
             .profile-edit-content {
                 grid-template-columns: 1fr;
@@ -229,8 +248,19 @@
                     </a>
                 </div>
 
-                <form id="edit-profile-form" action="${pageContext.request.contextPath}/doctor/update-profile" method="post" enctype="multipart/form-data">
+                <form id="edit-profile-form" action="${pageContext.request.contextPath}/doctor/profile/update" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="doctorId" value="<%= doctor.getId() %>">
+                    <!-- Add success/error message display -->
+                    <% if (request.getAttribute("successMessage") != null) { %>
+                        <div class="alert alert-success">
+                            <%= request.getAttribute("successMessage") %>
+                        </div>
+                    <% } %>
+                    <% if (request.getAttribute("errorMessage") != null) { %>
+                        <div class="alert alert-danger">
+                            <%= request.getAttribute("errorMessage") %>
+                        </div>
+                    <% } %>
 
                     <div class="profile-image-upload">
                         <div class="profile-image-preview">
@@ -259,13 +289,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="specialty">Specialty</label>
-                            <input type="text" id="specialty" name="specialization" value="<%= specialty %>">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="university">University</label>
-                            <input type="text" id="university" name="university" value="<%= university %>">
+                            <label for="specialization">Specialization</label>
+                            <input type="text" id="specialization" name="specialization" value="<%= specialty %>">
                         </div>
 
                         <div class="form-group">
@@ -286,9 +311,9 @@
                         <div class="form-group">
                             <label for="status">Status</label>
                             <select id="status" name="status">
-                                <option value="active" selected>Active</option>
-                                <option value="inactive">Inactive</option>
-                                <option value="on-leave">On Leave</option>
+                                <option value="ACTIVE" <%= doctor.getStatus() != null && doctor.getStatus().equals("ACTIVE") ? "selected" : "" %>>Active</option>
+                                <option value="INACTIVE" <%= doctor.getStatus() != null && doctor.getStatus().equals("INACTIVE") ? "selected" : "" %>>Inactive</option>
+                                <option value="PENDING" <%= doctor.getStatus() != null && doctor.getStatus().equals("PENDING") ? "selected" : "" %>>Pending</option>
                             </select>
                         </div>
 
@@ -338,6 +363,14 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Show success message if present
+            const successMessage = document.querySelector('.alert-success');
+            if (successMessage) {
+                // Auto-hide the success message after 5 seconds
+                setTimeout(function() {
+                    successMessage.style.display = 'none';
+                }, 5000);
+            }
             // Profile image upload
             const uploadBtn = document.getElementById('upload-btn');
             const removeBtn = document.getElementById('remove-btn');
@@ -378,12 +411,12 @@
                     // Get form values
                     const firstName = document.getElementById('first-name').value;
                     const lastName = document.getElementById('last-name').value;
-                    const specialty = document.getElementById('specialty').value;
+                    const specialization = document.getElementById('specialization').value;
                     const email = document.getElementById('email').value;
                     const phone = document.getElementById('phone').value;
 
                     // Validate form
-                    if (!firstName || !lastName || !specialty || !email || !phone) {
+                    if (!firstName || !lastName || !specialization || !email || !phone) {
                         alert('Please fill in all required fields.');
                         e.preventDefault();
                         return;

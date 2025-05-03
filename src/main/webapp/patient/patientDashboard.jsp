@@ -147,10 +147,19 @@
                  </h3>
 
                  <!-- Appointment Tabs -->
-                 <div class="appointment-tabs" style="display: flex; margin-bottom: 20px; border-bottom: 1px solid #eee;">
-                     <button class="tab-button active" data-tab="upcoming" style="padding: 10px 20px; background: none; border: none; cursor: pointer; font-weight: 600; color: #4CAF50; border-bottom: 2px solid #4CAF50;">Upcoming</button>
-                     <button class="tab-button" data-tab="past" style="padding: 10px 20px; background: none; border: none; cursor: pointer; font-weight: 600; color: #666;">Past</button>
-                     <button class="tab-button" data-tab="cancelled" style="padding: 10px 20px; background: none; border: none; cursor: pointer; font-weight: 600; color: #666;">Cancelled</button>
+                 <div class="appointment-tabs" style="display: flex; margin-bottom: 20px; border-bottom: 1px solid #eee; gap: 5px;">
+                     <button class="tab-button active" data-tab="upcoming" style="padding: 12px 20px; background: none; border: none; cursor: pointer; font-weight: 600; color: #4CAF50; border-bottom: 3px solid #4CAF50; transition: all 0.3s ease; position: relative;">
+                         <i class="fas fa-calendar-alt" style="margin-right: 8px;"></i>Upcoming
+                         <span class="tab-count" style="position: absolute; top: 5px; right: 5px; background-color: #4CAF50; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px;"><%= upcomingAppointments.size() %></span>
+                     </button>
+                     <button class="tab-button" data-tab="past" style="padding: 12px 20px; background: none; border: none; cursor: pointer; font-weight: 600; color: #666; transition: all 0.3s ease; position: relative;">
+                         <i class="fas fa-history" style="margin-right: 8px;"></i>Past
+                         <span class="tab-count" style="position: absolute; top: 5px; right: 5px; background-color: #2196F3; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px;"><%= pastAppointments.size() %></span>
+                     </button>
+                     <button class="tab-button" data-tab="cancelled" style="padding: 12px 20px; background: none; border: none; cursor: pointer; font-weight: 600; color: #666; transition: all 0.3s ease; position: relative;">
+                         <i class="fas fa-ban" style="margin-right: 8px;"></i>Cancelled
+                         <span class="tab-count" style="position: absolute; top: 5px; right: 5px; background-color: #F44336; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px;"><%= cancelledAppointments.size() %></span>
+                     </button>
                  </div>
 
                  <!-- Appointment Lists -->
@@ -165,7 +174,7 @@
                          </div>
                      <% } else { %>
                          <% for (Appointment appointment : upcomingAppointments) { %>
-                             <div class="appointment-card" style="background-color: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); padding: 20px; margin-bottom: 20px; transition: transform 0.3s ease;">
+                             <div class="appointment-card" data-appointment-id="<%= appointment.getId() %>" data-status="<%= appointment.getStatus() %>">
                                  <div class="appointment-header">
                                      <div class="appointment-date">
                                          <div class="date-box">
@@ -183,19 +192,7 @@
                                          </div>
                                          <div class="time"><%= appointment.getAppointmentTime() %></div>
                                      </div>
-                                     <div class="appointment-status" style="
-                                        <%
-                                        String status = appointment.getStatus();
-                                        if (status.equalsIgnoreCase("CONFIRMED") || status.equalsIgnoreCase("APPROVED")) { %>
-                                            background-color: rgba(76, 175, 80, 0.1); color: #4CAF50;
-                                        <% } else if (status.equalsIgnoreCase("PENDING")) { %>
-                                            background-color: rgba(255, 152, 0, 0.1); color: #FF9800;
-                                        <% } else if (status.equalsIgnoreCase("CANCELLED")) { %>
-                                            background-color: rgba(244, 67, 54, 0.1); color: #F44336;
-                                        <% } else if (status.equalsIgnoreCase("COMPLETED")) { %>
-                                            background-color: rgba(33, 150, 243, 0.1); color: #2196F3;
-                                        <% } %>
-                                        ">
+                                     <div class="appointment-status" data-status="<%= appointment.getStatus() %>">
                                          <%= appointment.getStatus() %>
                                      </div>
                                  </div>
@@ -247,7 +244,7 @@
                          </div>
                      <% } else { %>
                          <% for (Appointment appointment : pastAppointments) { %>
-                             <div class="appointment-card" style="background-color: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); padding: 20px; margin-bottom: 20px; transition: transform 0.3s ease;">
+                             <div class="appointment-card" data-appointment-id="<%= appointment.getId() %>" data-status="COMPLETED">
                                  <div class="appointment-header">
                                      <div class="appointment-date">
                                          <div class="date-box">
@@ -265,7 +262,7 @@
                                          </div>
                                          <div class="time"><%= appointment.getAppointmentTime() %></div>
                                      </div>
-                                     <div class="appointment-status" style="background-color: rgba(33, 150, 243, 0.1); color: #2196F3;">
+                                     <div class="appointment-status" data-status="COMPLETED">
                                          COMPLETED
                                      </div>
                                  </div>
@@ -314,7 +311,7 @@
                          </div>
                      <% } else { %>
                          <% for (Appointment appointment : cancelledAppointments) { %>
-                             <div class="appointment-card" style="background-color: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); padding: 20px; margin-bottom: 20px; transition: transform 0.3s ease;">
+                             <div class="appointment-card" data-appointment-id="<%= appointment.getId() %>" data-status="CANCELLED">
                                  <div class="appointment-header">
                                      <div class="appointment-date">
                                          <div class="date-box">
@@ -332,7 +329,7 @@
                                          </div>
                                          <div class="time"><%= appointment.getAppointmentTime() %></div>
                                      </div>
-                                     <div class="appointment-status" style="background-color: rgba(244, 67, 54, 0.1); color: #F44336;">
+                                     <div class="appointment-status" data-status="CANCELLED">
                                          CANCELLED
                                      </div>
                                  </div>
@@ -376,6 +373,8 @@
          </div>
      </div>
 
+
+
      <!-- JavaScript for Tab Switching -->
      <script>
          document.addEventListener('DOMContentLoaded', function() {
@@ -407,8 +406,19 @@
 
                      // Add active class and styling to clicked button
                      this.classList.add('active');
-                     this.style.color = '#4CAF50';
-                     this.style.borderBottom = '2px solid #4CAF50';
+
+                     // Set color based on tab type
+                     const tabType = this.getAttribute('data-tab');
+                     let tabColor = '#4CAF50'; // Default green for upcoming
+
+                     if (tabType === 'past') {
+                         tabColor = '#2196F3'; // Blue for past
+                     } else if (tabType === 'cancelled') {
+                         tabColor = '#F44336'; // Red for cancelled
+                     }
+
+                     this.style.color = tabColor;
+                     this.style.borderBottom = '3px solid ' + tabColor;
 
                      // Hide all appointment lists
                      appointmentLists.forEach(list => list.style.display = 'none');
@@ -423,7 +433,71 @@
          // Function to confirm appointment cancellation
          function confirmCancel(appointmentId) {
              if (confirm('Are you sure you want to cancel this appointment?')) {
-                 window.location.href = '${pageContext.request.contextPath}/appointment/cancel?id=' + appointmentId;
+                 // Send POST request to cancel the appointment
+                 fetch('${pageContext.request.contextPath}/appointment/cancel', {
+                     method: 'POST',
+                     headers: {
+                         'Content-Type': 'application/x-www-form-urlencoded',
+                         'X-Requested-With': 'XMLHttpRequest'
+                     },
+                     body: 'id=' + appointmentId
+                 })
+                 .then(response => {
+                     if (response.ok) {
+                         // Update UI to show appointment as cancelled
+                         const appointmentCard = document.querySelector(`[data-appointment-id="${appointmentId}"]`);
+                         if (appointmentCard) {
+                             // Update status badge
+                             const statusBadge = appointmentCard.querySelector('.appointment-status');
+                             if (statusBadge) {
+                                 statusBadge.style.backgroundColor = 'rgba(244, 67, 54, 0.1)';
+                                 statusBadge.style.color = '#F44336';
+                                 statusBadge.textContent = 'CANCELLED';
+                             }
+
+                             // Update actions
+                             const actionsDiv = appointmentCard.querySelector('.appointment-actions');
+                             if (actionsDiv) {
+                                 actionsDiv.innerHTML = '<a href="${pageContext.request.contextPath}/doctors" class="action-btn" style="background-color: #FF9800; color: white; padding: 8px 12px; border-radius: 4px; text-decoration: none;"><i class="fas fa-redo"></i> Book Again</a>';
+                             }
+
+                             // Move the appointment to cancelled tab
+                             const cancelledTab = document.getElementById('cancelled-appointments');
+                             const upcomingTab = document.getElementById('upcoming-appointments');
+                             if (cancelledTab && upcomingTab) {
+                                 upcomingTab.removeChild(appointmentCard);
+
+                                 // Check if there are no more upcoming appointments
+                                 if (upcomingTab.children.length === 0) {
+                                     upcomingTab.innerHTML = `
+                                         <div class="no-appointments" style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+                                             <i class="fas fa-calendar-times" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
+                                             <p style="margin-bottom: 15px;">No upcoming appointments.</p>
+                                             <a href="${pageContext.request.contextPath}/doctors" style="background-color: #4CAF50; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; display: inline-flex; align-items: center;">
+                                                 <i class="fas fa-plus" style="margin-right: 8px;"></i> Book an appointment
+                                             </a>
+                                         </div>
+                                     `;
+                                 }
+
+                                 // Add to cancelled tab
+                                 if (cancelledTab.querySelector('.no-appointments')) {
+                                     cancelledTab.innerHTML = '';
+                                 }
+                                 cancelledTab.appendChild(appointmentCard);
+                             }
+                         }
+
+                         // Show success message
+                         alert('Appointment cancelled successfully!');
+                     } else {
+                         alert('Failed to cancel appointment. Please try again.');
+                     }
+                 })
+                 .catch(error => {
+                     console.error('Error cancelling appointment:', error);
+                     alert('An error occurred while cancelling the appointment. Please try again.');
+                 });
              }
          }
      </script>

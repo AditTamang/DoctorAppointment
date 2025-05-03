@@ -36,51 +36,26 @@
                 <h2>HealthPro Portal</h2>
             </div>
 
-            <div class="profile-overview">
-                <h3><i class="fas fa-user-md"></i> <span>Profile Overview</span></h3>
-            </div>
-
             <div class="sidebar-menu">
                 <ul>
                     <li>
                         <a href="index.jsp">
-                            <i class="fas fa-user"></i>
                             <span>Profile</span>
                         </a>
                     </li>
                     <li class="active">
                         <a href="appointments.jsp">
-                            <i class="fas fa-calendar-check"></i>
                             <span>Appointment Management</span>
                         </a>
                     </li>
                     <li>
                         <a href="patients.jsp">
-                            <i class="fas fa-user-injured"></i>
                             <span>Patient Details</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="availability.jsp">
-                            <i class="fas fa-clock"></i>
-                            <span>Set Availability</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="health-packages.jsp">
-                            <i class="fas fa-box-open"></i>
-                            <span>Health Packages</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="preferences.jsp">
-                            <i class="fas fa-cog"></i>
-                            <span>UI Preferences</span>
-                        </a>
-                    </li>
+
                     <li class="logout">
                         <a href="../logout">
-                            <i class="fas fa-sign-out-alt"></i>
                             <span>Logout</span>
                         </a>
                     </li>
@@ -93,18 +68,7 @@
             <!-- Top Header -->
             <div class="top-header">
                 <div class="top-header-left">
-                    <a href="index.jsp">Profile</a>
-                    <a href="appointments.jsp" class="active">Appointment Management</a>
-                    <a href="patients.jsp">Patient Details</a>
-                </div>
-
-                <div class="top-header-right">
-                    <div class="search-icon">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <div class="user-profile-icon">
-                        <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
-                    </div>
+                    <h2>Doctor Dashboard - Appointment Management</h2>
                 </div>
             </div>
 
@@ -122,12 +86,8 @@
 
                 <div class="appointment-filter">
                     <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Search">
+                        <input type="text" placeholder="Search by patient name">
                     </div>
-                    <button class="filter-btn">
-                        <i class="fas fa-filter"></i> Filter
-                    </button>
                 </div>
 
                 <div class="appointment-content">
@@ -138,7 +98,6 @@
                                 <th>Patient Name</th>
                                 <th>Date</th>
                                 <th>Status</th>
-                                <th>Assigned Doctor</th>
                                 <th>Action</th>
                                 <th>Notes</th>
                             </tr>
@@ -150,19 +109,7 @@
                                 <td class="appointment-date">2023-10-10</td>
                                 <td><span class="status-badge active">Active</span></td>
                                 <td>
-                                    <div class="assigned-doctor">
-                                        <div class="doctor-avatar">
-                                            <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
-                                        </div>
-                                        <div class="assigned-doctor-info">
-                                            <span class="assigned-doctor-name"><%= doctorName %></span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="#" class="action-btn view"><i class="fas fa-eye"></i></a>
-                                    <a href="#" class="action-btn edit"><i class="fas fa-edit"></i></a>
-                                    <a href="#" class="action-btn delete"><i class="fas fa-trash"></i></a>
+                                    <a href="#" class="action-btn view">View</a>
                                 </td>
                                 <td>
                                     <span class="notes-badge">Follow-up required</span>
@@ -174,19 +121,7 @@
                                 <td class="appointment-date">2023-10-11</td>
                                 <td><span class="status-badge active">Active</span></td>
                                 <td>
-                                    <div class="assigned-doctor">
-                                        <div class="doctor-avatar">
-                                            <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
-                                        </div>
-                                        <div class="assigned-doctor-info">
-                                            <span class="assigned-doctor-name"><%= doctorName %></span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="#" class="action-btn view"><i class="fas fa-eye"></i></a>
-                                    <a href="#" class="action-btn edit"><i class="fas fa-edit"></i></a>
-                                    <a href="#" class="action-btn delete"><i class="fas fa-trash"></i></a>
+                                    <a href="#" class="action-btn view">View</a>
                                 </td>
                                 <td>
                                     <span class="notes-badge">First consultation</span>
@@ -198,22 +133,11 @@
                                 <td class="appointment-date">2023-10-12</td>
                                 <td><span class="status-badge pending">Pending</span></td>
                                 <td>
-                                    <div class="assigned-doctor">
-                                        <div class="doctor-avatar">
-                                            <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
-                                        </div>
-                                        <div class="assigned-doctor-info">
-                                            <span class="assigned-doctor-name"><%= doctorName %></span>
-                                        </div>
-                                    </div>
+                                    <a href="#" class="action-btn approve" data-id="003">Approve</a>
+                                    <a href="#" class="action-btn reject" data-id="003">Reject</a>
                                 </td>
                                 <td>
-                                    <a href="#" class="action-btn view"><i class="fas fa-eye"></i></a>
-                                    <a href="#" class="action-btn edit"><i class="fas fa-edit"></i></a>
-                                    <a href="#" class="action-btn delete"><i class="fas fa-trash"></i></a>
-                                </td>
-                                <td>
-                                    <span class="notes-badge">No-show</span>
+                                    <span class="notes-badge">New appointment request</span>
                                 </td>
                             </tr>
                             <tr>
@@ -222,17 +146,7 @@
                                 <td class="appointment-date">2023-10-13</td>
                                 <td><span class="status-badge completed">Completed</span></td>
                                 <td>
-                                    <div class="assigned-doctor">
-                                        <div class="doctor-avatar">
-                                            <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
-                                        </div>
-                                        <div class="assigned-doctor-info">
-                                            <span class="assigned-doctor-name"><%= doctorName %></span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="#" class="action-btn view"><i class="fas fa-eye"></i></a>
+                                    <a href="#" class="action-btn view">View</a>
                                 </td>
                                 <td>
                                     <span class="notes-badge">Routine check-up</span>
@@ -242,23 +156,13 @@
                                 <td>005</td>
                                 <td class="patient-name">Sarah White</td>
                                 <td class="appointment-date">2023-10-14</td>
-                                <td><span class="status-badge active">Active</span></td>
+                                <td><span class="status-badge pending">Pending</span></td>
                                 <td>
-                                    <div class="assigned-doctor">
-                                        <div class="doctor-avatar">
-                                            <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
-                                        </div>
-                                        <div class="assigned-doctor-info">
-                                            <span class="assigned-doctor-name"><%= doctorName %></span>
-                                        </div>
-                                    </div>
+                                    <a href="#" class="action-btn approve" data-id="005">Approve</a>
+                                    <a href="#" class="action-btn reject" data-id="005">Reject</a>
                                 </td>
                                 <td>
-                                    <a href="#" class="action-btn view"><i class="fas fa-eye"></i></a>
-                                    <a href="#" class="action-btn edit"><i class="fas fa-edit"></i></a>
-                                </td>
-                                <td>
-                                    <span class="notes-badge">Follow-up in 2 weeks</span>
+                                    <span class="notes-badge">Follow-up request</span>
                                 </td>
                             </tr>
                         </tbody>
@@ -282,7 +186,6 @@
                     this.classList.add('active');
 
                     // Here you would typically show/hide content based on the selected tab
-                    // For now, we're just showing the same content for all tabs
                     const tabName = this.getAttribute('data-tab');
                     console.log('Switched to tab:', tabName);
 
@@ -311,18 +214,70 @@
                 });
             }
 
-            // Delete appointment functionality
-            const deleteButtons = document.querySelectorAll('.action-btn.delete');
-            deleteButtons.forEach(btn => {
+            // Approve appointment functionality
+            const approveButtons = document.querySelectorAll('.action-btn.approve');
+            approveButtons.forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
                     const appointmentId = this.getAttribute('data-id');
+                    const patientName = this.closest('tr').querySelector('.patient-name').textContent;
 
-                    if (confirm('Are you sure you want to delete this appointment?')) {
-                        // In a real application, you would send a request to the server
-                        alert('Appointment deleted successfully!');
-                        // Remove the row from the table
-                        this.closest('tr').remove();
+                    if (confirm(`Are you sure you want to approve the appointment for ${patientName}?`)) {
+                        // Here you would send the approval to the server
+                        // For example:
+                        // fetch('/doctor/appointment/update', {
+                        //     method: 'POST',
+                        //     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        //     body: `id=${appointmentId}&status=APPROVED`
+                        // })
+
+                        // Update the UI to reflect the change
+                        const statusCell = this.closest('tr').querySelector('.status-badge');
+                        statusCell.className = 'status-badge active';
+                        statusCell.textContent = 'Active';
+
+                        // Replace approve/reject buttons with view button
+                        const actionCell = this.closest('td');
+                        actionCell.innerHTML = '<a href="#" class="action-btn view">View</a>';
+
+                        alert('Appointment approved successfully!');
+                    }
+                });
+            });
+
+            // Reject appointment functionality
+            const rejectButtons = document.querySelectorAll('.action-btn.reject');
+            rejectButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const appointmentId = this.getAttribute('data-id');
+                    const patientName = this.closest('tr').querySelector('.patient-name').textContent;
+
+                    const reason = prompt(`Please provide a reason for rejecting ${patientName}'s appointment:`, '');
+
+                    if (reason !== null) {
+                        // Here you would send the rejection to the server
+                        // For example:
+                        // fetch('/doctor/appointment/update', {
+                        //     method: 'POST',
+                        //     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        //     body: `id=${appointmentId}&status=REJECTED&notes=${encodeURIComponent(reason)}`
+                        // })
+
+                        // Update the UI to reflect the change
+                        const statusCell = this.closest('tr').querySelector('.status-badge');
+                        statusCell.className = 'status-badge cancelled';
+                        statusCell.textContent = 'Rejected';
+
+                        // Replace approve/reject buttons with view button
+                        const actionCell = this.closest('td');
+                        actionCell.innerHTML = '<a href="#" class="action-btn view">View</a>';
+
+                        // Update notes
+                        const notesCell = this.closest('tr').querySelector('.notes-badge');
+                        notesCell.textContent = `Rejected: ${reason}`;
+
+                        alert('Appointment rejected successfully!');
                     }
                 });
             });

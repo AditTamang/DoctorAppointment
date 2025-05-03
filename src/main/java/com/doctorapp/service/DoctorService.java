@@ -139,6 +139,16 @@ package com.doctorapp.service;
      }
 
      /**
+      * Get a doctor's ID by user ID
+      * @param userId User ID
+      * @return Doctor ID if found, 0 otherwise
+      */
+     public int getDoctorIdByUserId(int userId) {
+         Doctor doctor = getDoctorByUserId(userId);
+         return (doctor != null) ? doctor.getId() : 0;
+     }
+
+     /**
       * Increment the patient count for a doctor
       * @param doctorId Doctor ID
       * @return true if update was successful, false otherwise

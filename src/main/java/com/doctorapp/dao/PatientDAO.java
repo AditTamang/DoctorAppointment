@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.doctorapp.model.Patient;
 import com.doctorapp.model.MedicalRecord;
+import com.doctorapp.model.Patient;
 import com.doctorapp.model.Prescription;
 import com.doctorapp.util.DBConnection;
 
@@ -74,7 +74,8 @@ public class PatientDAO {
 
     // Get patient by user ID
     public Patient getPatientByUserId(int userId) {
-        String query = "SELECT p.*, u.email FROM patients p JOIN users u ON p.user_id = u.id WHERE p.user_id = ?";
+        String query = "SELECT p.*, u.first_name, u.last_name, u.email, u.date_of_birth, u.gender, u.phone, u.address " +
+                      "FROM patients p JOIN users u ON p.user_id = u.id WHERE p.user_id = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -253,7 +254,8 @@ public class PatientDAO {
 
     // Get patient by ID
     public Patient getPatientById(int patientId) {
-        String query = "SELECT p.*, u.email FROM patients p JOIN users u ON p.user_id = u.id WHERE p.id = ?";
+        String query = "SELECT p.*, u.first_name, u.last_name, u.email, u.date_of_birth, u.gender, u.phone, u.address " +
+                      "FROM patients p JOIN users u ON p.user_id = u.id WHERE p.id = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {

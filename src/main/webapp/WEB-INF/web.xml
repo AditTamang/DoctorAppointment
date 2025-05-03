@@ -111,4 +111,20 @@
         <listener-class>com.doctorapp.listener.DatabaseInitListener</listener-class>
     </listener>
 
+    <!-- Multipart Configuration -->
+    <servlet>
+        <servlet-name>AppointmentServlet</servlet-name>
+        <servlet-class>com.doctorapp.controller.servlets.AppointmentServlet</servlet-class>
+        <multipart-config>
+            <location>/tmp</location>
+            <max-file-size>20848820</max-file-size>
+            <max-request-size>418018841</max-request-size>
+            <file-size-threshold>1048576</file-size-threshold>
+        </multipart-config>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AppointmentServlet</servlet-name>
+        <url-pattern>/appointment/*</url-pattern>
+    </servlet-mapping>
+
 </web-app>

@@ -12,53 +12,32 @@ body {
     color: #333;
 }
 
-.container {
+.dashboard-container {
     display: flex;
     min-height: 100vh;
 }
 
 /* Sidebar Styles */
 .sidebar {
-    width: 200px;
-    background-color: #fff;
-    border-right: 1px solid #e0e0e0;
+    width: 220px;
+    background-color: #2c3e50;
+    color: #fff;
     padding: 20px 0;
     display: flex;
     flex-direction: column;
 }
 
-.user-profile {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    border-bottom: 1px solid #e0e0e0;
+.sidebar-header {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     margin-bottom: 20px;
+    text-align: center;
 }
 
-.user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #e0e0e0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 10px;
-}
-
-.user-info {
-    flex: 1;
-}
-
-.user-info h3 {
-    font-size: 16px;
+.sidebar-header h2 {
+    font-size: 18px;
     font-weight: 600;
-    margin-bottom: 2px;
-}
-
-.user-info p {
-    font-size: 12px;
-    color: #777;
+    color: #fff;
 }
 
 .sidebar-menu {
@@ -74,155 +53,61 @@ body {
 }
 
 .sidebar-menu a {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    color: #333;
+    display: block;
+    padding: 12px 20px;
+    color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
     transition: all 0.3s ease;
+    border-left: 3px solid transparent;
 }
 
 .sidebar-menu a:hover {
-    background-color: #f0f0f0;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
 }
 
-.sidebar-menu a.active {
-    background-color: #e3f2fd;
-    color: #1976d2;
-    border-left: 3px solid #1976d2;
+.sidebar-menu li.active a {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-left: 3px solid #3498db;
 }
 
-.sidebar-menu i {
-    margin-right: 10px;
-    font-size: 18px;
-    width: 20px;
-    text-align: center;
-}
-
-.logout-btn {
+.sidebar-menu li.logout {
     margin-top: auto;
-    padding: 15px;
-    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 20px;
 }
 
-.logout-btn a {
-    display: block;
-    padding: 10px;
-    background-color: #f5f5f5;
-    color: #333;
-    border-radius: 4px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.logout-btn a:hover {
-    background-color: #e0e0e0;
+.sidebar-menu li.logout a {
+    color: #e74c3c;
 }
 
 /* Main Content Styles */
 .main-content {
     flex: 1;
     padding: 20px;
-}
-
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.back-button {
-    display: inline-flex;
-    align-items: center;
-    padding: 8px 15px;
     background-color: #f5f5f5;
-    border: none;
-    border-radius: 4px;
-    color: #333;
-    text-decoration: none;
-    font-size: 14px;
-    cursor: pointer;
 }
 
-.back-button i {
-    margin-right: 5px;
-}
-
-.search-bar {
-    flex: 1;
-    max-width: 500px;
-    margin: 0 20px;
-    position: relative;
-}
-
-.search-bar input {
-    width: 100%;
-    padding: 10px 15px;
-    padding-left: 40px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.search-bar i {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #777;
-}
-
-.search-button {
-    padding: 10px 20px;
-    background-color: #1976d2;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-}
-
-.date-display {
-    display: flex;
-    align-items: center;
-    font-size: 14px;
-    color: #555;
-}
-
-.date-display i {
-    margin-left: 5px;
-    cursor: pointer;
-}
-
-.content-header {
+.top-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
 }
 
-.add-new-button {
-    display: inline-flex;
-    align-items: center;
-    padding: 8px 15px;
-    background-color: #1976d2;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    text-decoration: none;
-    font-size: 14px;
-    cursor: pointer;
+.top-header-left h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #2c3e50;
 }
 
-.add-new-button i {
-    margin-right: 5px;
-}
-
-.doctors-count {
+.user-info {
     font-size: 16px;
     font-weight: 500;
-    margin-bottom: 15px;
+    color: #555;
 }
 
 /* Table Styles */
@@ -284,71 +169,376 @@ body {
     background-color: #f44336;
 }
 
+/* Appointment Management Styles */
+.appointment-management {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.appointment-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    background-color: #fff;
+}
+
+.appointment-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+/* Tab styles */
+.appointment-tabs {
+    display: flex;
+    border-bottom: 1px solid #eee;
+    background-color: #fff;
+}
+
+.tab-button {
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-weight: 500;
+    color: #555;
+    transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+    color: #3498db;
+}
+
+.tab-button.active {
+    color: #3498db;
+    border-bottom-color: #3498db;
+}
+
+.count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background-color: #eee;
+    color: #555;
+    font-size: 12px;
+    margin-left: 8px;
+}
+
+.tab-button.active .count-badge {
+    background-color: #3498db;
+    color: white;
+}
+
+/* Tab content */
+.tab-content {
+    padding: 15px;
+}
+
+.appointment-table-container {
+    overflow-x: auto;
+}
+
+/* Appointment Table */
+.appointment-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: #fff;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.appointment-table thead {
+    background-color: #f8f9fa;
+}
+
+.appointment-table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: #2c3e50;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+    position: relative;
+}
+
+.appointment-table th:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: #ddd;
+}
+
+.appointment-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+    font-size: 14px;
+}
+
+.appointment-table tr:last-child td {
+    border-bottom: none;
+}
+
+.appointment-table tr:hover {
+    background-color: #f5f9ff;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 30px 20px;
+    color: #777;
+}
+
+.empty-state h4 {
+    margin-bottom: 10px;
+    color: #555;
+    font-size: 16px;
+}
+
+.empty-state p {
+    color: #888;
+    font-size: 14px;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.status-badge.pending {
+    background-color: #fff3e0;
+    color: #e67e22;
+    border: 1px solid rgba(230, 126, 34, 0.3);
+}
+
+.status-badge.approved {
+    background-color: #e8f5e9;
+    color: #27ae60;
+    border: 1px solid rgba(39, 174, 96, 0.3);
+}
+
+.status-badge.rejected {
+    background-color: #ffebee;
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.status-badge.completed {
+    background-color: #e3f2fd;
+    color: #3498db;
+    border: 1px solid rgba(52, 152, 219, 0.3);
+}
+
+/* Appointment Action Buttons */
+.action-cell {
+    white-space: nowrap;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.approve-btn, .reject-btn, .view-details-btn {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    min-width: 90px;
+    text-align: center;
+}
+
+.approve-btn {
+    background-color: #27ae60;
+    color: white;
+}
+
+.approve-btn:hover {
+    background-color: #219955;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+.reject-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.reject-btn:hover {
+    background-color: #c0392b;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+.view-details-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.view-details-btn:hover {
+    background-color: #2980b9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+.rejected-text {
+    color: #e74c3c;
+    font-style: italic;
+    font-size: 13px;
+    padding: 5px 0;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(52, 152, 219, 0.3);
+    border-radius: 50%;
+    border-top-color: #3498db;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto;
+    display: inline-block;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Notification System */
+#notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none; /* Allow clicking through the container */
+}
+
+.notification {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 250px;
+    max-width: 350px;
+    padding: 12px 15px;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    animation: fade-in 0.3s ease-out forwards;
+    overflow: hidden;
+    pointer-events: auto; /* Make the notification clickable */
+}
+
+.notification.success {
+    border-left: 3px solid #27ae60;
+    background-color: #f0fff4;
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.notification-message {
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: #777;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 5px;
+    margin-left: 10px;
+}
+
+.notification-close:hover {
+    color: #333;
+}
+
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 /* Responsive Styles */
 @media (max-width: 992px) {
-    .container {
+    .dashboard-container {
         flex-direction: column;
     }
-    
+
     .sidebar {
         width: 100%;
         border-right: none;
-        border-bottom: 1px solid #e0e0e0;
     }
-    
-    .header {
+
+    .top-header {
         flex-wrap: wrap;
     }
-    
-    .search-bar {
-        order: 3;
-        margin: 10px 0;
-        max-width: 100%;
+
+    .appointment-tabs {
+        flex-wrap: wrap;
     }
-    
-    .search-button {
-        order: 4;
-    }
-    
-    .date-display {
-        order: 2;
-        margin-left: auto;
+
+    .tab-button {
+        flex: 1;
+        text-align: center;
+        padding: 10px;
     }
 }
 
 @media (max-width: 768px) {
-    .header {
+    .top-header {
         flex-direction: column;
         align-items: flex-start;
     }
-    
-    .back-button {
-        margin-bottom: 10px;
-    }
-    
-    .search-bar {
-        margin: 10px 0;
-    }
-    
-    .date-display {
+
+    .top-header-right {
         margin-top: 10px;
-        align-self: flex-end;
+        align-self: flex-start;
     }
-    
-    .content-header {
+
+    .action-buttons {
         flex-direction: column;
-        align-items: flex-start;
+        gap: 5px;
     }
-    
-    .add-new-button {
-        margin-top: 10px;
+
+    .approve-btn, .reject-btn, .view-details-btn {
+        width: 100%;
     }
-    
-    .doctors-table {
-        font-size: 14px;
-    }
-    
-    .doctors-table th, .doctors-table td {
-        padding: 10px;
+
+    .appointment-table th, .appointment-table td {
+        padding: 8px;
+        font-size: 13px;
     }
 }

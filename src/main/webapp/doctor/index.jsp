@@ -63,24 +63,7 @@
                             <span>Patient Details</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="availability.jsp">
-                            <i class="fas fa-clock"></i>
-                            <span>Set Availability</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="health-packages.jsp">
-                            <i class="fas fa-box-open"></i>
-                            <span>Health Packages</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="preferences.jsp">
-                            <i class="fas fa-cog"></i>
-                            <span>UI Preferences</span>
-                        </a>
-                    </li>
+
                     <li class="logout">
                         <a href="../logout">
                             <i class="fas fa-sign-out-alt"></i>
@@ -100,33 +83,17 @@
                     <a href="appointments.jsp">Appointment Management</a>
                     <a href="patients.jsp">Patient Details</a>
                 </div>
-
-                <div class="top-header-right">
-                    <div class="search-icon">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <div class="user-profile-icon">
-                        <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
-                    </div>
-                </div>
             </div>
 
             <!-- Profile Section -->
             <div class="profile-section">
                 <div class="profile-header">
-                    <div class="doctor-image">
-                        <img src="${pageContext.request.contextPath}/assets/images/doctor.png" alt="Doctor">
-                    </div>
                     <div class="profile-info">
                         <h2><%= doctorName %></h2>
                         <p><%= specialty %></p>
-                        <p><%= university %></p>
-                        <p><%= qualification %></p>
                     </div>
                     <div class="profile-actions">
                         <a href="edit-profile.jsp" class="btn btn-primary">Edit Profile</a>
-                        <button class="btn btn-danger">Delete Profile</button>
-                        <button class="btn btn-outline">Set Active Off</button>
                     </div>
                 </div>
             </div>
@@ -145,12 +112,8 @@
 
                 <div class="appointment-filter">
                     <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Search">
+                        <input type="text" placeholder="Search by patient name or ID">
                     </div>
-                    <button class="filter-btn">
-                        <i class="fas fa-filter"></i> Filter
-                    </button>
                 </div>
 
                 <div class="appointment-content">
@@ -161,7 +124,6 @@
                                 <th>Patient Name</th>
                                 <th>Date</th>
                                 <th>Status</th>
-                                <th>Assigned Doctor</th>
                                 <th>Action</th>
                                 <th>Notes</th>
                             </tr>
@@ -173,18 +135,8 @@
                                 <td class="appointment-date">2023-10-10</td>
                                 <td><span class="status-badge active">Active</span></td>
                                 <td>
-                                    <div class="assigned-doctor">
-                                        <div class="doctor-avatar">
-                                            <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
-                                        </div>
-                                        <div class="assigned-doctor-info">
-                                            <span class="assigned-doctor-name"><%= doctorName %></span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="#" class="action-btn view" title="View Details"><i class="fas fa-eye"></i></a>
-                                    <a href="#" class="action-btn reschedule" title="Reschedule"><i class="fas fa-calendar-alt"></i></a>
+                                    <a href="#" class="action-btn view">View</a>
+                                    <a href="#" class="action-btn reschedule">Reschedule</a>
                                 </td>
                                 <td>
                                     <span class="notes-badge">Follow-up required</span>
@@ -196,18 +148,8 @@
                                 <td class="appointment-date">2023-10-11</td>
                                 <td><span class="status-badge active">Active</span></td>
                                 <td>
-                                    <div class="assigned-doctor">
-                                        <div class="doctor-avatar">
-                                            <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
-                                        </div>
-                                        <div class="assigned-doctor-info">
-                                            <span class="assigned-doctor-name"><%= doctorName %></span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="#" class="action-btn view" title="View Details"><i class="fas fa-eye"></i></a>
-                                    <a href="#" class="action-btn reschedule" title="Reschedule"><i class="fas fa-calendar-alt"></i></a>
+                                    <a href="#" class="action-btn view">View</a>
+                                    <a href="#" class="action-btn reschedule">Reschedule</a>
                                 </td>
                                 <td>
                                     <span class="notes-badge">First consultation</span>
@@ -219,19 +161,9 @@
                                 <td class="appointment-date">2023-10-12</td>
                                 <td><span class="status-badge pending">Pending</span></td>
                                 <td>
-                                    <div class="assigned-doctor">
-                                        <div class="doctor-avatar">
-                                            <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
-                                        </div>
-                                        <div class="assigned-doctor-info">
-                                            <span class="assigned-doctor-name"><%= doctorName %></span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="#" class="action-btn view" title="View Details"><i class="fas fa-eye"></i></a>
-                                    <a href="#" class="action-btn approve" title="Approve"><i class="fas fa-check"></i></a>
-                                    <a href="#" class="action-btn reject" title="Reject"><i class="fas fa-times"></i></a>
+                                    <a href="#" class="action-btn view">View</a>
+                                    <a href="#" class="action-btn approve">Approve</a>
+                                    <a href="#" class="action-btn reject">Reject</a>
                                 </td>
                                 <td>
                                     <span class="notes-badge">No-show</span>
@@ -243,17 +175,7 @@
                                 <td class="appointment-date">2023-10-13</td>
                                 <td><span class="status-badge completed">Completed</span></td>
                                 <td>
-                                    <div class="assigned-doctor">
-                                        <div class="doctor-avatar">
-                                            <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
-                                        </div>
-                                        <div class="assigned-doctor-info">
-                                            <span class="assigned-doctor-name"><%= doctorName %></span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="#" class="action-btn view" title="View Details"><i class="fas fa-eye"></i></a>
+                                    <a href="#" class="action-btn view">View</a>
                                 </td>
                                 <td>
                                     <span class="notes-badge">Routine check-up</span>
@@ -265,18 +187,8 @@
                                 <td class="appointment-date">2023-10-14</td>
                                 <td><span class="status-badge active">Active</span></td>
                                 <td>
-                                    <div class="assigned-doctor">
-                                        <div class="doctor-avatar">
-                                            <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
-                                        </div>
-                                        <div class="assigned-doctor-info">
-                                            <span class="assigned-doctor-name"><%= doctorName %></span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="#" class="action-btn view" title="View Details"><i class="fas fa-eye"></i></a>
-                                    <a href="#" class="action-btn reschedule" title="Reschedule"><i class="fas fa-calendar-alt"></i></a>
+                                    <a href="#" class="action-btn view">View</a>
+                                    <a href="#" class="action-btn reschedule">Reschedule</a>
                                 </td>
                                 <td>
                                     <span class="notes-badge">Follow-up in 2 weeks</span>
@@ -312,30 +224,7 @@
                 });
             });
 
-            // Profile button functionality
-            const deleteProfileBtn = document.querySelector('.btn-danger');
-            if (deleteProfileBtn) {
-                deleteProfileBtn.addEventListener('click', function() {
-                    if (confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
-                        // Send delete request to server
-                        console.log('Profile deletion requested');
-                    }
-                });
-            }
 
-            const setActiveBtn = document.querySelector('.btn-outline');
-            if (setActiveBtn) {
-                setActiveBtn.addEventListener('click', function() {
-                    const isActive = this.textContent.includes('Off');
-                    if (isActive) {
-                        this.textContent = 'Set Active On';
-                        // Update status on server
-                    } else {
-                        this.textContent = 'Set Active Off';
-                        // Update status on server
-                    }
-                });
-            }
 
             // Appointment action buttons functionality
             const viewButtons = document.querySelectorAll('.action-btn.view');
@@ -511,8 +400,8 @@
                         // Replace approve/reject buttons with reschedule button
                         const actionCell = btn.closest('td');
                         actionCell.innerHTML = `
-                            <a href="#" class="action-btn view" title="View Details"><i class="fas fa-eye"></i></a>
-                            <a href="#" class="action-btn reschedule" title="Reschedule"><i class="fas fa-calendar-alt"></i></a>
+                            <a href="#" class="action-btn view">View</a>
+                            <a href="#" class="action-btn reschedule">Reschedule</a>
                         `;
 
                         // Show success message
@@ -593,7 +482,7 @@
                         // Update the action buttons
                         const actionCell = btn.closest('td');
                         actionCell.innerHTML = `
-                            <a href="#" class="action-btn view" title="View Details"><i class="fas fa-eye"></i></a>
+                            <a href="#" class="action-btn view">View</a>
                         `;
 
                         // Close the modal

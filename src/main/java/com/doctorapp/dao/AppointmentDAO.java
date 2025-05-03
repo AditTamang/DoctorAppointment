@@ -181,14 +181,25 @@ public class AppointmentDAO {
          try (Connection conn = DBConnection.getConnection();
               PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-             pstmt.setString(1, status);
+             // Convert status to match the ENUM values in the database
+             String dbStatus = status;
+             if ("APPROVED".equals(status)) {
+                 dbStatus = "CONFIRMED";
+             } else if ("REJECTED".equals(status)) {
+                 dbStatus = "CANCELLED";
+             }
+
+             LOGGER.info("Updating appointment " + id + " with status: " + dbStatus);
+             pstmt.setString(1, dbStatus);
              pstmt.setInt(2, id);
 
              int rowsAffected = pstmt.executeUpdate();
+             LOGGER.info("Rows affected: " + rowsAffected);
              return rowsAffected > 0;
 
          } catch (SQLException | ClassNotFoundException e) {
              LOGGER.log(Level.SEVERE, "Error updating appointment status for ID: " + id, e);
+             e.printStackTrace();
              return false;
          }
      }
@@ -315,6 +326,85 @@ public class AppointmentDAO {
          return 0.0;
      }
 
+     // Get appointments by doctor ID and status
+     public List<Appointment> getAppointmentsByDoctorIdAndStatus(int doctorId, String status) {
+         List<Appointment> appointments = new ArrayList<>();
+
+         // Convert UI status to database status if needed
+         String dbStatus = status;
+         if ("APPROVED".equals(status)) {
+             dbStatus = "CONFIRMED";
+         } else if ("REJECTED".equals(status)) {
+             dbStatus = "CANCELLED";
+         }
+
+         String query = "SELECT a.*, u.first_name as patient_first_name, u.last_name as patient_last_name " +
+                       "FROM appointments a " +
+                       "JOIN users u ON a.patient_id = u.id " +
+                       "WHERE a.doctor_id = ? AND a.status = ? " +
+                       "ORDER BY a.appointment_date, a.appointment_time";
+
+         try (Connection conn = DBConnection.getConnection();
+              PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+             pstmt.setInt(1, doctorId);
+             pstmt.setString(2, dbStatus);
+
+             try (ResultSet rs = pstmt.executeQuery()) {
+                 while (rs.next()) {
+                     Appointment appointment = new Appointment();
+                     appointment.setId(rs.getInt("id"));
+                     appointment.setPatientId(rs.getInt("patient_id"));
+                     appointment.setDoctorId(rs.getInt("doctor_id"));
+
+                     // Safely handle date conversion
+                     try {
+                         java.sql.Date sqlDate = rs.getDate("appointment_date");
+                         if (sqlDate != null) {
+                             appointment.setAppointmentDate(new java.util.Date(sqlDate.getTime()));
+                         }
+                     } catch (Exception e) {
+                         LOGGER.log(Level.WARNING, "Error converting appointment date: {0}", e.getMessage());
+                     }
+
+                     appointment.setAppointmentTime(rs.getString("appointment_time"));
+                     appointment.setStatus(rs.getString("status"));
+                     appointment.setReason(rs.getString("reason"));
+                     appointment.setNotes(rs.getString("notes"));
+                     appointment.setFee(rs.getDouble("fee"));
+
+                     // Safely handle patient name
+                     String firstName = rs.getString("patient_first_name");
+                     String lastName = rs.getString("patient_last_name");
+                     String patientName = "";
+
+                     if (firstName != null) {
+                         patientName += firstName;
+                     }
+
+                     if (lastName != null) {
+                         if (!patientName.isEmpty()) {
+                             patientName += " ";
+                         }
+                         patientName += lastName;
+                     }
+
+                     if (patientName.isEmpty()) {
+                         patientName = "Unknown";
+                     }
+
+                     appointment.setPatientName(patientName);
+
+                     appointments.add(appointment);
+                 }
+             }
+         } catch (SQLException | ClassNotFoundException e) {
+             LOGGER.log(Level.SEVERE, "Error getting appointments by doctor ID and status: " + doctorId + ", " + status, e);
+         }
+
+         return appointments;
+     }
+
      /**
       * Get new bookings count (pending appointments)
       * @return Count of pending appointments
@@ -329,10 +419,10 @@ public class AppointmentDAO {
      // Get recent appointments
      public List<Appointment> getRecentAppointments(int limit) {
          List<Appointment> appointments = new ArrayList<>();
-         String query = "SELECT a.*, p.first_name as patient_first_name, p.last_name as patient_last_name, " +
-                       "d.first_name as doctor_first_name, d.last_name as doctor_last_name " +
+         String query = "SELECT a.*, u.first_name as patient_first_name, u.last_name as patient_last_name, " +
+                       "d.name as doctor_name, d.specialization " +
                        "FROM appointments a " +
-                       "JOIN patients p ON a.patient_id = p.id " +
+                       "JOIN users u ON a.patient_id = u.id " +
                        "JOIN doctors d ON a.doctor_id = d.id " +
                        "ORDER BY a.appointment_date DESC, a.appointment_time DESC " +
                        "LIMIT ?";
@@ -355,7 +445,8 @@ public class AppointmentDAO {
                      appointment.setNotes(rs.getString("notes"));
                      appointment.setFee(rs.getDouble("fee"));
                      appointment.setPatientName(rs.getString("patient_first_name") + " " + rs.getString("patient_last_name"));
-                     appointment.setDoctorName(rs.getString("doctor_first_name") + " " + rs.getString("doctor_last_name"));
+                     appointment.setDoctorName(rs.getString("doctor_name"));
+                     appointment.setDoctorSpecialization(rs.getString("specialization"));
 
                      appointments.add(appointment);
                  }
@@ -371,9 +462,9 @@ public class AppointmentDAO {
      // Get today's appointments by doctor
      public List<Appointment> getTodayAppointmentsByDoctor(int doctorId) {
          List<Appointment> appointments = new ArrayList<>();
-         String query = "SELECT a.*, p.first_name as patient_first_name, p.last_name as patient_last_name " +
+         String query = "SELECT a.*, u.first_name as patient_first_name, u.last_name as patient_last_name " +
                        "FROM appointments a " +
-                       "JOIN patients p ON a.patient_id = p.id " +
+                       "JOIN users u ON a.patient_id = u.id " +
                        "WHERE a.doctor_id = ? AND a.appointment_date = CURRENT_DATE " +
                        "ORDER BY a.appointment_time";
 
@@ -487,9 +578,9 @@ public class AppointmentDAO {
      // Get upcoming appointments by doctor
      public List<Appointment> getUpcomingAppointmentsByDoctor(int doctorId, int limit) {
          List<Appointment> appointments = new ArrayList<>();
-         String query = "SELECT a.*, p.first_name as patient_first_name, p.last_name as patient_last_name " +
+         String query = "SELECT a.*, u.first_name as patient_first_name, u.last_name as patient_last_name " +
                        "FROM appointments a " +
-                       "JOIN patients p ON a.patient_id = p.id " +
+                       "JOIN users u ON a.patient_id = u.id " +
                        "WHERE a.doctor_id = ? AND (a.appointment_date > CURRENT_DATE OR " +
                        "(a.appointment_date = CURRENT_DATE AND a.appointment_time > CURRENT_TIME)) " +
                        "ORDER BY a.appointment_date, a.appointment_time " +
@@ -735,10 +826,10 @@ public class AppointmentDAO {
       * @return List of upcoming appointments
       */public List<Appointment> getUpcomingAppointments(int limit) {
          List<Appointment> appointments = new ArrayList<>();
-         String query = "SELECT a.*, p.first_name as patient_first_name, p.last_name as patient_last_name, " +
-                       "d.first_name as doctor_first_name, d.last_name as doctor_last_name, d.specialization " +
+         String query = "SELECT a.*, u.first_name as patient_first_name, u.last_name as patient_last_name, " +
+                       "d.name as doctor_name, d.specialization " +
                        "FROM appointments a " +
-                       "JOIN patients p ON a.patient_id = p.id " +
+                       "JOIN users u ON a.patient_id = u.id " +
                        "JOIN doctors d ON a.doctor_id = d.id " +
                        "WHERE (a.appointment_date > CURRENT_DATE OR " +
                        "(a.appointment_date = CURRENT_DATE AND a.appointment_time > CURRENT_TIME)) " +
@@ -763,7 +854,7 @@ public class AppointmentDAO {
                      appointment.setNotes(rs.getString("notes"));
                      appointment.setFee(rs.getDouble("fee"));
                      appointment.setPatientName(rs.getString("patient_first_name") + " " + rs.getString("patient_last_name"));
-                     appointment.setDoctorName(rs.getString("doctor_first_name") + " " + rs.getString("doctor_last_name"));
+                     appointment.setDoctorName(rs.getString("doctor_name"));
                      appointment.setDoctorSpecialization(rs.getString("specialization"));
 
                      appointments.add(appointment);
