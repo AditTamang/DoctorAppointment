@@ -1,21 +1,27 @@
-/* Doctor Dashboard CSS */
+/* Doctor Dashboard Styles - Simplified */
 :root {
-    --primary-color: #1976D2;
-    --primary-light: #BBDEFB;
-    --primary-dark: #0D47A1;
-    --secondary-color: #4CAF50;
-    --secondary-light: #C8E6C9;
-    --secondary-dark: #2E7D32;
-    --warning-color: #FF9800;
-    --danger-color: #F44336;
-    --text-dark: #333333;
-    --text-light: #757575;
-    --text-white: #FFFFFF;
+    --primary-color: #3CCFCF;
+    --primary-dark: #2AACAC;
+    --primary-light: #B3EDED;
+    --secondary-color: #2ecc71;
+    --secondary-dark: #27ae60;
+    --secondary-light: #a9f5bc;
+    --accent-color: #e74c3c;
+    --dark-color: #2c3e50;
+    --light-color: #f9f9f9;
+    --danger-color: #e74c3c;
+    --success-color: #2ecc71;
+    --warning-color: #f39c12;
+    --info-color: #3498db;
+    --text-dark: #2c3e50;
+    --text-light: #7f8c8d;
+    --border-color: #e0e0e0;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --white: #ffffff;
+    --transition-speed: 0.3s;
     --bg-light: #F5F7FA;
     --bg-white: #FFFFFF;
-    --border-color: #E0E0E0;
-    --shadow-color: rgba(0, 0, 0, 0.1);
-    --transition-speed: 0.3s;
+    --text-white: #FFFFFF;
 }
 
 /* Base Styles */
@@ -264,7 +270,7 @@ input:checked + .slider:before {
     justify-content: space-between;
     align-items: center;
     padding: 15px 30px;
-    background-color: var(--bg-white);
+    background-color: #00ffc0;
     border-bottom: 1px solid var(--border-color);
     box-shadow: 0 2px 5px var(--shadow-color);
 }

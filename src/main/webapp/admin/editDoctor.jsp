@@ -1,22 +1,7 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="com.doctorapp.model.User" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="com.doctorapp.model.Doctor" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%
-    // Check if user is logged in and is an admin
-    User user = (User) session.getAttribute("user");
-    if (user == null || !"ADMIN".equals(user.getRole())) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
-        return;
-    }
-    
-    // Get doctor data from request attribute
-    Doctor doctor = (Doctor) request.getAttribute("doctor");
-    if (doctor == null) {
-        response.sendRedirect(request.getContextPath() + "/admin/doctorDashboard");
-        return;
-    }
-%>
+<%@ page import="com.doctorapp.model.User" %>
+<%@ page import="com.doctorapp.dao.DoctorDAO" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,433 +10,355 @@
     <title>Edit Doctor | Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/adminDashboard.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
     <style>
-        .doctor-profile {
+        .form-container {
             background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
-        
-        .profile-header {
-            background: linear-gradient(135deg, #4e54c8, #8f94fb);
-            color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 30px;
-            position: relative;
-            display: flex;
-            align-items: center;
+            margin-top: 20px;
         }
-        
-        .profile-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 5px solid rgba(255, 255, 255, 0.7);
-            overflow: hidden;
-            margin-right: 30px;
-            background-color: #fff;
-        }
-        
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .profile-info h2 {
-            margin: 0 0 5px 0;
-            font-size: 24px;
-        }
-        
-        .profile-info p {
-            margin: 0 0 10px 0;
-            opacity: 0.9;
-            font-size: 16px;
-        }
-        
-        .profile-body {
-            padding: 30px;
-        }
-        
-        .profile-section {
-            margin-bottom: 30px;
-        }
-        
-        .profile-section h3 {
-            color: #333;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
+        .form-title {
+            font-size: 20px;
+            font-weight: 600;
             margin-bottom: 20px;
-            font-size: 18px;
+            color: #333;
         }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-        
         .form-group {
             margin-bottom: 20px;
         }
-        
-        .form-group label {
+        .form-label {
             display: block;
             margin-bottom: 8px;
-            color: #555;
             font-weight: 500;
+            color: #333;
         }
-        
         .form-control {
             width: 100%;
             padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 15px;
+            border: 1px solid #d1d3e2;
+            border-radius: 4px;
+            font-size: 14px;
             transition: border-color 0.3s;
         }
-        
         .form-control:focus {
-            border-color: #4e54c8;
+            border-color: #4e73df;
             outline: none;
-            box-shadow: 0 0 5px rgba(78, 84, 200, 0.2);
         }
-        
-        .form-group-full {
-            grid-column: span 2;
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
         }
-        
-        textarea.form-control {
-            min-height: 120px;
-            resize: vertical;
+        .form-col {
+            flex: 1;
         }
-        
-        .form-error {
-            color: #dc3545;
-            font-size: 13px;
-            margin-top: 5px;
-        }
-        
         .form-actions {
             display: flex;
             justify-content: flex-end;
             gap: 15px;
             margin-top: 30px;
         }
-        
         .btn {
             padding: 10px 20px;
-            border-radius: 5px;
+            border-radius: 4px;
+            font-size: 14px;
             font-weight: 500;
-            cursor: pointer;
-            border: none;
+            text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            text-decoration: none;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
         }
-        
+        .btn i {
+            margin-right: 5px;
+        }
         .btn-primary {
-            background-color: #4e54c8;
-            color: white;
+            background-color: #4e73df;
+            color: #fff;
         }
-        
-        .btn-primary:hover {
-            background-color: #3a3f9a;
+        .btn-success {
+            background-color: #1cc88a;
+            color: #fff;
         }
-        
+        .btn-danger {
+            background-color: #e74a3b;
+            color: #fff;
+        }
         .btn-secondary {
-            background-color: #f8f9fa;
-            color: #333;
-            border: 1px solid #ddd;
+            background-color: #858796;
+            color: #fff;
         }
-        
-        .btn-secondary:hover {
-            background-color: #e9ecef;
+        .btn:hover {
+            opacity: 0.9;
         }
-        
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .form-section {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #e3e6f0;
+            padding-bottom: 20px;
+        }
+        .form-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #4e73df;
+        }
         .checkbox-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
             margin-top: 10px;
         }
-        
         .checkbox-item {
             display: flex;
             align-items: center;
-            gap: 5px;
         }
-        
-        .checkbox-item input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
+        .checkbox-item input {
+            margin-right: 5px;
         }
-        
         @media (max-width: 768px) {
-            .profile-header {
+            .form-row {
                 flex-direction: column;
-                text-align: center;
-            }
-            
-            .profile-avatar {
-                margin-right: 0;
-                margin-bottom: 20px;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .form-group-full {
-                grid-column: span 1;
-            }
-            
-            .form-actions {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-                justify-content: center;
+                gap: 0;
             }
         }
     </style>
 </head>
 <body>
+    <%
+        // Check if user is logged in and is an admin
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null || !"ADMIN".equals(currentUser.getRole())) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+        
+        // Get doctor ID from request parameter
+        String doctorIdStr = request.getParameter("id");
+        int doctorId = 0;
+        Doctor doctor = null;
+        
+        if (doctorIdStr != null && !doctorIdStr.isEmpty()) {
+            try {
+                doctorId = Integer.parseInt(doctorIdStr);
+                DoctorDAO doctorDAO = new DoctorDAO();
+                doctor = doctorDAO.getDoctorById(doctorId);
+            } catch (NumberFormatException e) {
+                // Invalid doctor ID
+            }
+        }
+        
+        if (doctor == null) {
+            // Redirect to doctor list if doctor not found
+            response.sendRedirect(request.getContextPath() + "/admin/doctors");
+            return;
+        }
+        
+        // Check for success message
+        String successMessage = (String) request.getAttribute("successMessage");
+        String errorMessage = (String) request.getAttribute("errorMessage");
+    %>
+
     <div class="dashboard-container">
         <!-- Sidebar -->
         <div class="sidebar">
-            <div class="user-profile">
-                <div class="profile-image">
-                    <% if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) { %>
-                        <div class="profile-initials">AT</div>
-                    <% } else { %>
-                        <img src="${pageContext.request.contextPath}/assets/images/admin/default.jpg" alt="Admin">
-                    <% } %>
-                </div>
-                <h3 class="user-name"><%= user.getFirstName() + " " + user.getLastName() %></h3>
-                <p class="user-role">Administrator</p>
+            <div class="sidebar-header">
+                <h3>Admin Dashboard</h3>
             </div>
-
-            <ul class="sidebar-menu">
-                <li>
-                    <a href="${pageContext.request.contextPath}/admin/dashboard">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="active">
-                    <a href="${pageContext.request.contextPath}/admin/doctorDashboard">
-                        <i class="fas fa-user-md"></i>
-                        <span>Doctors</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="${pageContext.request.contextPath}/admin/doctor-requests">
-                        <i class="fas fa-user-plus"></i>
-                        <span>Doctor Requests</span>
-                        <%
-                        // Get the count of pending doctor requests
-                        com.doctorapp.service.DoctorRegistrationService doctorRegistrationService = new com.doctorapp.service.DoctorRegistrationService();
-                        int pendingRequestsCount = doctorRegistrationService.getPendingRequests().size();
-                        if (pendingRequestsCount > 0) {
-                        %>
-                        <span class="badge badge-primary"><%= pendingRequestsCount %></span>
-                        <% } %>
-                    </a>
-                </li>
-                <li>
-                    <a href="${pageContext.request.contextPath}/admin/patients">
-                        <i class="fas fa-users"></i>
-                        <span>Patients</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="${pageContext.request.contextPath}/admin/appointments">
-                        <i class="fas fa-calendar-check"></i>
-                        <span>Appointments</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="${pageContext.request.contextPath}/logout">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
-                    </a>
-                </li>
-            </ul>
+            
+            <div class="sidebar-menu">
+                <ul>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/admin/dashboard">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="${pageContext.request.contextPath}/admin/doctors">
+                            <i class="fas fa-user-md"></i>
+                            <span>Doctors</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/admin/patients">
+                            <i class="fas fa-user-injured"></i>
+                            <span>Patients</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/admin/appointments">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Appointments</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/admin/settings">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
-
+        
         <!-- Main Content -->
-        <div class="dashboard-main">
-            <!-- Top Navigation -->
-            <div class="dashboard-nav">
-                <div class="menu-toggle" id="menuToggle">
-                    <i class="fas fa-bars"></i>
-                </div>
-                
-                <div class="nav-right">
-                    <div class="nav-user">
-                        <div class="user-image">
-                            <% if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) { %>
-                                <div class="user-initials">AT</div>
-                            <% } else { %>
-                                <img src="${pageContext.request.contextPath}/assets/images/admin/default.jpg" alt="Admin">
-                            <% } %>
-                        </div>
-                        <div class="user-info">
-                            <h4><%= user.getFirstName() + " " + user.getLastName() %></h4>
-                            <p>Administrator</p>
-                        </div>
-                    </div>
-                </div>
+        <div class="main-content">
+            <div class="page-header">
+                <h1>Edit Doctor</h1>
+                <a href="${pageContext.request.contextPath}/admin/doctors" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Doctors
+                </a>
             </div>
-
-            <!-- Dashboard Content -->
-            <div class="dashboard-content">
-                <div class="page-header">
-                    <h1>Edit Doctor Profile</h1>
-                    <p>Update doctor information</p>
-                </div>
-
-                <div class="doctor-profile">
-                    <div class="profile-header">
-                        <div class="profile-avatar">
-                            <img src="${pageContext.request.contextPath}${doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty() ? doctor.getImageUrl() : '/assets/images/doctors/default.jpg'}" alt="Doctor Profile">
-                        </div>
-                        <div class="profile-info">
-                            <h2>Dr. <%= doctor.getName() %></h2>
-                            <p><i class="fas fa-stethoscope"></i> <%= doctor.getSpecialization() %></p>
-                            <p><i class="fas fa-envelope"></i> <%= doctor.getEmail() %></p>
-                            <p><i class="fas fa-phone"></i> <%= doctor.getPhone() %></p>
-                        </div>
-                    </div>
-
-                    <div class="profile-body">
-                        <form action="${pageContext.request.contextPath}/admin/doctors/update" method="post">
-                            <input type="hidden" name="id" value="<%= doctor.getId() %>">
-                            
-                            <div class="profile-section">
-                                <h3>Professional Information</h3>
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label for="specialization">Specialization</label>
-                                        <select id="specialization" name="specialization" class="form-control" required>
-                                            <option value="" <%= doctor.getSpecialization() == null ? "selected" : "" %>>Select Specialization</option>
-                                            <option value="Cardiology" <%= "Cardiology".equals(doctor.getSpecialization()) ? "selected" : "" %>>Cardiology</option>
-                                            <option value="Neurology" <%= "Neurology".equals(doctor.getSpecialization()) ? "selected" : "" %>>Neurology</option>
-                                            <option value="Dermatology" <%= "Dermatology".equals(doctor.getSpecialization()) ? "selected" : "" %>>Dermatology</option>
-                                            <option value="Orthopedics" <%= "Orthopedics".equals(doctor.getSpecialization()) ? "selected" : "" %>>Orthopedics</option>
-                                            <option value="Gynecology" <%= "Gynecology".equals(doctor.getSpecialization()) ? "selected" : "" %>>Gynecology</option>
-                                            <option value="Pediatrics" <%= "Pediatrics".equals(doctor.getSpecialization()) ? "selected" : "" %>>Pediatrics</option>
-                                            <option value="Psychiatry" <%= "Psychiatry".equals(doctor.getSpecialization()) ? "selected" : "" %>>Psychiatry</option>
-                                            <option value="Ophthalmology" <%= "Ophthalmology".equals(doctor.getSpecialization()) ? "selected" : "" %>>Ophthalmology</option>
-                                            <option value="Dentistry" <%= "Dentistry".equals(doctor.getSpecialization()) ? "selected" : "" %>>Dentistry</option>
-                                            <option value="General Medicine" <%= "General Medicine".equals(doctor.getSpecialization()) ? "selected" : "" %>>General Medicine</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="qualification">Qualification</label>
-                                        <input type="text" id="qualification" name="qualification" class="form-control" value="<%= doctor.getQualification() != null ? doctor.getQualification() : "" %>" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="experience">Experience (years)</label>
-                                        <input type="text" id="experience" name="experience" class="form-control" value="<%= doctor.getExperience() != null ? doctor.getExperience() : "" %>">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="consultationFee">Consultation Fee ($)</label>
-                                        <input type="text" id="consultationFee" name="consultationFee" class="form-control" value="<%= doctor.getConsultationFee() != null ? doctor.getConsultationFee() : "" %>">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="profile-section">
-                                <h3>Availability</h3>
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label>Available Days</label>
-                                        <div class="checkbox-group">
-                                            <% 
-                                            String[] availableDays = doctor.getAvailableDays() != null ? doctor.getAvailableDays().split(",") : new String[0];
-                                            String[] allDays = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-                                            
-                                            for (String day : allDays) {
-                                                boolean isChecked = false;
-                                                for (String availableDay : availableDays) {
-                                                    if (day.equals(availableDay.trim())) {
-                                                        isChecked = true;
-                                                        break;
-                                                    }
-                                                }
-                                            %>
-                                            <div class="checkbox-item">
-                                                <input type="checkbox" id="day_<%= day %>" name="availableDays" value="<%= day %>" <%= isChecked ? "checked" : "" %>>
-                                                <label for="day_<%= day %>"><%= day %></label>
-                                            </div>
-                                            <% } %>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="availableTime">Available Hours</label>
-                                        <input type="text" id="availableTime" name="availableTime" class="form-control" value="<%= doctor.getAvailableTime() != null ? doctor.getAvailableTime() : "" %>" placeholder="e.g., 09:00 AM - 05:00 PM">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="profile-section">
-                                <h3>Biography</h3>
+            
+            <% if (successMessage != null) { %>
+            <div class="alert alert-success">
+                <%= successMessage %>
+            </div>
+            <% } %>
+            
+            <% if (errorMessage != null) { %>
+            <div class="alert alert-danger">
+                <%= errorMessage %>
+            </div>
+            <% } %>
+            
+            <div class="form-container">
+                <form action="${pageContext.request.contextPath}/admin/update-doctor" method="post">
+                    <input type="hidden" name="doctorId" value="<%= doctor.getId() %>">
+                    
+                    <div class="form-section">
+                        <div class="form-section-title">Personal Information</div>
+                        <div class="form-row">
+                            <div class="form-col">
                                 <div class="form-group">
-                                    <textarea id="bio" name="bio" class="form-control"><%= doctor.getBio() != null ? doctor.getBio() : "" %></textarea>
+                                    <label class="form-label" for="firstName">First Name</label>
+                                    <input type="text" class="form-control" id="firstName" name="firstName" value="<%= doctor.getFirstName() %>" required>
                                 </div>
                             </div>
-
-                            <div class="form-actions">
-                                <a href="${pageContext.request.contextPath}/admin/doctors/view?id=<%= doctor.getId() %>" class="btn btn-secondary">
-                                    <i class="fas fa-times"></i> Cancel
-                                </a>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> Save Changes
-                                </button>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label class="form-label" for="lastName">Last Name</label>
+                                    <input type="text" class="form-control" id="lastName" name="lastName" value="<%= doctor.getLastName() %>" required>
+                                </div>
                             </div>
-                        </form>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label class="form-label" for="email">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="<%= doctor.getEmail() %>" required>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label class="form-label" for="phone">Phone</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" value="<%= doctor.getPhone() %>" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="address">Address</label>
+                            <input type="text" class="form-control" id="address" name="address" value="<%= doctor.getAddress() %>" required>
+                        </div>
                     </div>
-                </div>
+                    
+                    <div class="form-section">
+                        <div class="form-section-title">Professional Information</div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label class="form-label" for="specialization">Specialization</label>
+                                    <select class="form-control" id="specialization" name="specialization" required>
+                                        <option value="Cardiology" <%= "Cardiology".equals(doctor.getSpecialization()) ? "selected" : "" %>>Cardiology</option>
+                                        <option value="Neurology" <%= "Neurology".equals(doctor.getSpecialization()) ? "selected" : "" %>>Neurology</option>
+                                        <option value="Orthopedics" <%= "Orthopedics".equals(doctor.getSpecialization()) ? "selected" : "" %>>Orthopedics</option>
+                                        <option value="Pediatrics" <%= "Pediatrics".equals(doctor.getSpecialization()) ? "selected" : "" %>>Pediatrics</option>
+                                        <option value="Dermatology" <%= "Dermatology".equals(doctor.getSpecialization()) ? "selected" : "" %>>Dermatology</option>
+                                        <option value="Ophthalmology" <%= "Ophthalmology".equals(doctor.getSpecialization()) ? "selected" : "" %>>Ophthalmology</option>
+                                        <option value="Gynecology" <%= "Gynecology".equals(doctor.getSpecialization()) ? "selected" : "" %>>Gynecology</option>
+                                        <option value="Urology" <%= "Urology".equals(doctor.getSpecialization()) ? "selected" : "" %>>Urology</option>
+                                        <option value="Psychiatry" <%= "Psychiatry".equals(doctor.getSpecialization()) ? "selected" : "" %>>Psychiatry</option>
+                                        <option value="General Medicine" <%= "General Medicine".equals(doctor.getSpecialization()) ? "selected" : "" %>>General Medicine</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label class="form-label" for="experience">Years of Experience</label>
+                                    <input type="number" class="form-control" id="experience" name="experience" value="<%= doctor.getExperience() %>" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="qualifications">Qualifications</label>
+                            <input type="text" class="form-control" id="qualifications" name="qualifications" value="<%= doctor.getQualifications() %>" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="bio">Bio/Description</label>
+                            <textarea class="form-control" id="bio" name="bio" rows="4"><%= doctor.getBio() %></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <div class="form-section-title">Consultation Information</div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label class="form-label" for="consultationFee">Consultation Fee ($)</label>
+                                    <input type="number" class="form-control" id="consultationFee" name="consultationFee" value="<%= doctor.getConsultationFee() %>" min="0" step="0.01" required>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label class="form-label" for="status">Status</label>
+                                    <select class="form-control" id="status" name="status" required>
+                                        <option value="active" <%= "active".equals(doctor.getStatus()) ? "selected" : "" %>>Active</option>
+                                        <option value="inactive" <%= "inactive".equals(doctor.getStatus()) ? "selected" : "" %>>Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <a href="${pageContext.request.contextPath}/admin/doctors" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-
-    <script>
-        // Toggle sidebar on mobile
-        document.getElementById('menuToggle').addEventListener('click', function() {
-            document.querySelector('.sidebar').classList.toggle('active');
-        });
-        
-        // Handle checkbox group for available days
-        document.querySelectorAll('input[name="availableDays"]').forEach(function(checkbox) {
-            checkbox.addEventListener('change', function() {
-                const checkedDays = Array.from(document.querySelectorAll('input[name="availableDays"]:checked'))
-                    .map(cb => cb.value);
-                
-                // Create a hidden input to store the comma-separated list of days
-                let hiddenInput = document.getElementById('availableDaysHidden');
-                if (!hiddenInput) {
-                    hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.name = 'availableDaysHidden';
-                    hiddenInput.id = 'availableDaysHidden';
-                    this.parentNode.parentNode.appendChild(hiddenInput);
-                }
-                
-                hiddenInput.value = checkedDays.join(',');
-            });
-        });
-        
-        // Trigger change event on page load to initialize the hidden input
-        document.querySelectorAll('input[name="availableDays"]:checked')[0]?.dispatchEvent(new Event('change'));
-    </script>
 </body>
 </html>

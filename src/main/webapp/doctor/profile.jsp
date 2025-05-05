@@ -15,7 +15,7 @@
     Doctor doctor = (Doctor) request.getAttribute("doctor");
     if (doctor == null) {
         // Redirect to profile servlet to load the data
-        response.sendRedirect(request.getContextPath() + "/doctor/profile");
+        response.sendRedirect(request.getContextPath() + "/doctor/profile-legacy");
         return;
     }
 %>
@@ -27,8 +27,7 @@
     <title>Doctor Profile | Doctor Appointment System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctorDashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/doctor-dashboard-complete.css">
     <style>
         /* Main Profile Styles */
         .profile-container {

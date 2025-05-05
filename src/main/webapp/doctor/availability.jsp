@@ -25,7 +25,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-profile-dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/doctor-dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/doctor-profile.css">
     <style>
         .availability-container {
             background-color: #fff;
@@ -235,18 +236,7 @@
                             <span>Set Availability</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="health-packages.jsp">
-                            <i class="fas fa-box-open"></i>
-                            <span>Health Packages</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="preferences.jsp">
-                            <i class="fas fa-cog"></i>
-                            <span>UI Preferences</span>
-                        </a>
-                    </li>
+
                     <li class="logout">
                         <a href="../logout">
                             <i class="fas fa-sign-out-alt"></i>

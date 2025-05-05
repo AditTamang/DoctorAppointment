@@ -58,7 +58,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/healthpro-dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/doctor-dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/doctor-profile.css">
 </head>
 <body>
     <div class="dashboard-container">
@@ -103,21 +104,9 @@
                         </a>
                     </li>
                     <li>
-                        <a href="${pageContext.request.contextPath}/doctor/availability">
+                        <a href="${pageContext.request.contextPath}/doctor/schedule">
                             <i class="fas fa-clock"></i>
                             <span>Set Availability</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/doctor/health-packages">
-                            <i class="fas fa-box-open"></i>
-                            <span>Health Packages</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/doctor/preferences">
-                            <i class="fas fa-cog"></i>
-                            <span>UI Preferences</span>
                         </a>
                     </li>
                     <li class="logout">
@@ -259,7 +248,7 @@
                                         </td>
                                         <td>
                                             <div class="table-actions">
-                                                <a href="#" class="action-btn view"><i class="fas fa-eye"></i></a>
+                                                <a href="${pageContext.request.contextPath}/doctor/appointment?id=<%= appointment.getId() %>" class="action-btn view"><i class="fas fa-eye"></i></a>
                                             </div>
                                         </td>
                                         <td><%= notes %></td>
@@ -275,7 +264,7 @@
                                         </td>
                                         <td>
                                             <div class="table-actions">
-                                                <a href="#" class="action-btn view"><i class="fas fa-eye"></i></a>
+                                                <a href="${pageContext.request.contextPath}/doctor/appointment?id=1" class="action-btn view"><i class="fas fa-eye"></i></a>
                                             </div>
                                         </td>
                                         <td>Follow-up required</td>
@@ -290,7 +279,7 @@
                                         </td>
                                         <td>
                                             <div class="table-actions">
-                                                <a href="#" class="action-btn view"><i class="fas fa-eye"></i></a>
+                                                <a href="${pageContext.request.contextPath}/doctor/appointment?id=2" class="action-btn view"><i class="fas fa-eye"></i></a>
                                             </div>
                                         </td>
                                         <td>First consultation</td>
@@ -411,8 +400,8 @@
                                         <td><%= phone %></td>
                                         <td>
                                             <div class="table-actions">
-                                                <a href="#" class="action-btn view"><i class="fas fa-eye"></i></a>
-                                                <a href="#" class="action-btn edit"><i class="fas fa-edit"></i></a>
+                                                <a href="${pageContext.request.contextPath}/doctor/patient-details?id=<%= patient.getId() %>&doctorId=<%= doctor.getId() %>" class="action-btn view"><i class="fas fa-eye"></i></a>
+                                                <a href="${pageContext.request.contextPath}/doctor/edit-patient?id=<%= patient.getId() %>" class="action-btn edit"><i class="fas fa-edit"></i></a>
                                             </div>
                                         </td>
                                     </tr>
@@ -425,8 +414,8 @@
                                         <td>+1 234 567 890</td>
                                         <td>
                                             <div class="table-actions">
-                                                <a href="#" class="action-btn view"><i class="fas fa-eye"></i></a>
-                                                <a href="#" class="action-btn edit"><i class="fas fa-edit"></i></a>
+                                                <a href="${pageContext.request.contextPath}/doctor/patient-details?doctorId=${doctor.id}" class="action-btn view"><i class="fas fa-eye"></i></a>
+                                                <a href="${pageContext.request.contextPath}/doctor/edit-patient" class="action-btn edit"><i class="fas fa-edit"></i></a>
                                             </div>
                                         </td>
                                     </tr>
@@ -438,8 +427,8 @@
                                         <td>+1 234 567 891</td>
                                         <td>
                                             <div class="table-actions">
-                                                <a href="#" class="action-btn view"><i class="fas fa-eye"></i></a>
-                                                <a href="#" class="action-btn edit"><i class="fas fa-edit"></i></a>
+                                                <a href="${pageContext.request.contextPath}/doctor/patient-details?doctorId=${doctor.id}" class="action-btn view"><i class="fas fa-eye"></i></a>
+                                                <a href="${pageContext.request.contextPath}/doctor/edit-patient" class="action-btn edit"><i class="fas fa-edit"></i></a>
                                             </div>
                                         </td>
                                     </tr>

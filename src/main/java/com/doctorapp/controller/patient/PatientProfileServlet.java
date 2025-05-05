@@ -1,12 +1,6 @@
 package com.doctorapp.controller.patient;
 
 import java.io.IOException;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import com.doctorapp.model.Patient;
 import com.doctorapp.model.User;
@@ -14,23 +8,28 @@ import com.doctorapp.service.PatientService;
 import com.doctorapp.service.UserService;
 import com.doctorapp.util.ValidationUtil;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 /**
  * Servlet for handling patient profile operations
+ * Mapped in web.xml to /patient/profile and /patient/profile/update
  */
-@WebServlet(urlPatterns = {
-    "/patient/profile",
-    "/patient/profile/update"
-})
 public class PatientProfileServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private PatientService patientService;
     private UserService userService;
 
+    @Override
     public void init() {
         patientService = new PatientService();
         userService = new UserService();
     }
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getServletPath();
 
@@ -44,6 +43,7 @@ public class PatientProfileServlet extends HttpServlet {
         }
     }
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getServletPath();
 

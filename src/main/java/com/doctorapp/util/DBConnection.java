@@ -27,15 +27,11 @@ public class DBConnection {
             return conn;
         } catch (ClassNotFoundException e) {
             System.err.println("MySQL JDBC Driver not found: " + e.getMessage());
-            // Try to load the driver from the lib directory using class loader
             try {
-                // Try to find the JAR file using the class loader
                 ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
                 if (classLoader == null) {
                     classLoader = DBConnection.class.getClassLoader();
                 }
-
-                // Try to load the driver directly
                 try {
                     Class.forName("com.mysql.cj.jdbc.Driver", true, classLoader);
                     Connection conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);

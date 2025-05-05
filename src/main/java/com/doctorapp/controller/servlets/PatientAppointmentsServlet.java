@@ -1,12 +1,12 @@
 package com.doctorapp.controller.servlets;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.doctorapp.dao.AppointmentDAO;
-import com.doctorapp.dao.PatientDAO;
+import com.doctorapp.model.Appointment;
 import com.doctorapp.model.User;
 
 import jakarta.servlet.ServletException;
@@ -16,70 +16,109 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet("/patient/appointments")
+@WebServlet("/patient/appointments-legacy")
 public class PatientAppointmentsServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = Logger.getLogger(PatientAppointmentsServlet.class.getName());
 
-    private PatientDAO patientDAO;
     private AppointmentDAO appointmentDAO;
 
+    @Override
     public void init() {
-        patientDAO = new PatientDAO();
         appointmentDAO = new AppointmentDAO();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        User user = (User) session.getAttribute("user");
+        if (!"PATIENT".equals(user.getRole())) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
         try {
-            System.out.println("PatientAppointmentsServlet: doGet method called");
+            // Get filter parameters
+            String status = request.getParameter("status");
+            String sortBy = request.getParameter("sortBy");
 
-            // Get the session
-            HttpSession session = request.getSession(false);
-            if (session == null || session.getAttribute("user") == null) {
-                System.out.println("PatientAppointmentsServlet: No user in session, redirecting to login");
-                response.sendRedirect(request.getContextPath() + "/login.jsp");
-                return;
+            // Get appointments for the patient
+            List<Appointment> appointments;
+            if (status != null && !status.isEmpty()) {
+                appointments = appointmentDAO.getAppointmentsByPatientIdAndStatus(user.getId(), status);
+            } else {
+                appointments = appointmentDAO.getAppointmentsByPatientId(user.getId());
             }
 
-            User user = (User) session.getAttribute("user");
-            if (!"PATIENT".equals(user.getRole())) {
-                System.out.println("PatientAppointmentsServlet: User is not a patient, redirecting to login");
-                response.sendRedirect(request.getContextPath() + "/login.jsp");
-                return;
-            }
-
-            // Get patient ID
-            int patientId = patientDAO.getPatientIdByUserId(user.getId());
-            if (patientId == 0) {
-                // Patient profile not found, redirect to complete profile
-                response.sendRedirect(request.getContextPath() + "/complete-profile.jsp");
-                return;
-            }
-
-            // Get filter date if provided
-            String dateParam = request.getParameter("date");
-            Date filterDate = null;
-            if (dateParam != null && !dateParam.isEmpty()) {
-                try {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    filterDate = dateFormat.parse(dateParam);
-                } catch (ParseException e) {
-                    System.out.println("PatientAppointmentsServlet: Invalid date format: " + dateParam);
+            // Sort appointments if needed
+            if (sortBy != null && !sortBy.isEmpty()) {
+                if ("date-asc".equals(sortBy)) {
+                    appointments.sort((a1, a2) -> a1.getAppointmentDate().compareTo(a2.getAppointmentDate()));
+                } else if ("date-desc".equals(sortBy)) {
+                    appointments.sort((a1, a2) -> a2.getAppointmentDate().compareTo(a1.getAppointmentDate()));
+                } else if ("doctor".equals(sortBy)) {
+                    appointments.sort((a1, a2) -> a1.getDoctorName().compareTo(a2.getDoctorName()));
+                } else if ("status".equals(sortBy)) {
+                    appointments.sort((a1, a2) -> a1.getStatus().compareTo(a2.getStatus()));
                 }
             }
 
-            // Get appointments - use upcomingAppointments method
-            request.setAttribute("appointments", appointmentDAO.getUpcomingAppointments(10));
-
-            // Redirect back to the dashboard with appointments tab active
-            response.sendRedirect(request.getContextPath() + "/patient/dashboard?tab=appointments");
+            request.setAttribute("appointments", appointments);
+            request.getRequestDispatcher("/patient/appointments.jsp").forward(request, response);
         } catch (Exception e) {
-            System.err.println("Error loading patient appointments: " + e.getMessage());
-            e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/error.jsp");
+            LOGGER.log(Level.SEVERE, "Error retrieving patient appointments", e);
+            response.sendRedirect(request.getContextPath() + "/patient/dashboard");
         }
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doGet(request, response);
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        User user = (User) session.getAttribute("user");
+        if (!"PATIENT".equals(user.getRole())) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        String action = request.getParameter("action");
+        if (action == null || action.isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/patient/appointments");
+            return;
+        }
+
+        try {
+            if ("cancel".equals(action)) {
+                int appointmentId = Integer.parseInt(request.getParameter("appointmentId"));
+
+                // Verify that the appointment belongs to the current user
+                Appointment appointment = appointmentDAO.getAppointmentById(appointmentId);
+                if (appointment == null || appointment.getPatientId() != user.getId()) {
+                    response.sendRedirect(request.getContextPath() + "/patient/appointments");
+                    return;
+                }
+
+                // Cancel the appointment
+                boolean cancelled = appointmentDAO.updateAppointmentStatus(appointmentId, "CANCELLED");
+                if (cancelled) {
+                    request.setAttribute("successMessage", "Appointment cancelled successfully");
+                } else {
+                    request.setAttribute("errorMessage", "Failed to cancel appointment");
+                }
+            }
+
+            // Redirect to the appointments page
+            response.sendRedirect(request.getContextPath() + "/patient/appointments");
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error processing appointment action", e);
+            response.sendRedirect(request.getContextPath() + "/patient/appointments");
+        }
     }
 }

@@ -291,12 +291,12 @@ public class PatientDAO {
     // Get recent patients by doctor
     public List<Patient> getRecentPatientsByDoctor(int doctorId, int limit) {
         List<Patient> patients = new ArrayList<>();
-        String query = "SELECT DISTINCT p.*, u.email, MAX(a.appointment_date) as last_visit " +
+        String query = "SELECT DISTINCT p.*, u.first_name, u.last_name, u.email, u.date_of_birth, u.gender, u.phone, u.address, MAX(a.appointment_date) as last_visit " +
                       "FROM patients p " +
                       "JOIN appointments a ON p.id = a.patient_id " +
                       "JOIN users u ON p.user_id = u.id " +
                       "WHERE a.doctor_id = ? " +
-                      "GROUP BY p.id " +
+                      "GROUP BY p.id, u.first_name, u.last_name, u.email, u.date_of_birth, u.gender, u.phone, u.address " +
                       "ORDER BY last_visit DESC " +
                       "LIMIT ?";
 
@@ -320,7 +320,15 @@ public class PatientDAO {
                     patient.setBloodGroup(rs.getString("blood_group"));
                     patient.setAllergies(rs.getString("allergies"));
                     patient.setEmail(rs.getString("email"));
-                    patient.setLastVisit(rs.getString("last_visit"));
+
+                    // Set last visit date if available
+                    java.sql.Date lastVisit = rs.getDate("last_visit");
+                    if (lastVisit != null) {
+                        patient.setLastVisit(lastVisit.toString());
+                    }
+
+                    // Set status to Active
+                    patient.setStatus("Active");
 
                     patients.add(patient);
                 }
@@ -484,6 +492,62 @@ public class PatientDAO {
 
         } catch (SQLException | ClassNotFoundException e) {
             LOGGER.log(Level.SEVERE, "Error getting recent patients", e);
+        }
+
+        return patients;
+    }
+
+    // Get patients by doctor ID
+    public List<Patient> getPatientsByDoctorId(int doctorId) {
+        List<Patient> patients = new ArrayList<>();
+        String query = "SELECT DISTINCT p.*, u.first_name, u.last_name, u.email, u.phone, u.address, u.gender, u.date_of_birth, " +
+                      "(SELECT MAX(a.appointment_date) FROM appointments a WHERE a.patient_id = p.id AND a.doctor_id = ?) as last_visit, " +
+                      "(SELECT a.status FROM appointments a WHERE a.patient_id = p.id AND a.doctor_id = ? ORDER BY a.appointment_date DESC LIMIT 1) as status " +
+                      "FROM patients p " +
+                      "JOIN appointments a ON p.id = a.patient_id " +
+                      "JOIN users u ON p.user_id = u.id " +
+                      "WHERE a.doctor_id = ? " +
+                      "ORDER BY last_visit DESC";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, doctorId);
+            pstmt.setInt(2, doctorId);
+            pstmt.setInt(3, doctorId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Patient patient = new Patient();
+                    patient.setId(rs.getInt("id"));
+                    patient.setUserId(rs.getInt("user_id"));
+                    patient.setFirstName(rs.getString("first_name"));
+                    patient.setLastName(rs.getString("last_name"));
+                    patient.setEmail(rs.getString("email"));
+                    patient.setPhone(rs.getString("phone"));
+                    patient.setAddress(rs.getString("address"));
+                    patient.setGender(rs.getString("gender"));
+                    patient.setDateOfBirth(rs.getString("date_of_birth"));
+                    patient.setBloodGroup(rs.getString("blood_group"));
+                    patient.setAllergies(rs.getString("allergies"));
+                    patient.setMedicalHistory(rs.getString("medical_history"));
+
+                    // Set last visit date if available
+                    java.sql.Date lastVisit = rs.getDate("last_visit");
+                    if (lastVisit != null) {
+                        patient.setLastVisit(lastVisit.toString());
+                    }
+
+                    // Set status from the most recent appointment
+                    String status = rs.getString("status");
+                    patient.setStatus(status != null ? status : "Unknown");
+
+                    patients.add(patient);
+                }
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            LOGGER.log(Level.SEVERE, "Error getting patients by doctor ID: " + doctorId, e);
         }
 
         return patients;

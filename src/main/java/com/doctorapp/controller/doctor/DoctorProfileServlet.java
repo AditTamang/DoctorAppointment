@@ -9,7 +9,6 @@ import com.doctorapp.service.UserService;
 import com.doctorapp.util.ValidationUtil;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,20 +17,20 @@ import jakarta.servlet.http.HttpSession;
 /**
  * Servlet for handling doctor profile operations
  */
-@WebServlet(urlPatterns = {
-    "/doctor/profile",
-    "/doctor/profile/update"
-})
+// Removing WebServlet annotation to use web.xml mapping instead
+// This servlet is mapped to /doctor/profile and /doctor/profile/update in web.xml
 public class DoctorProfileServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private DoctorService doctorService;
     private UserService userService;
 
+    @Override
     public void init() {
         doctorService = new DoctorService();
         userService = new UserService();
     }
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getServletPath();
 
@@ -45,6 +44,7 @@ public class DoctorProfileServlet extends HttpServlet {
         }
     }
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getServletPath();
 

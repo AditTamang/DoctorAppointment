@@ -87,8 +87,8 @@
 
         <%
         // Get status code
-        Integer statusCode = (Integer)request.getAttribute("javax.servlet.error.status_code");
-        String errorMessage = (String)request.getAttribute("javax.servlet.error.message");
+        Integer statusCode = (Integer)request.getAttribute("jakarta.servlet.error.status_code");
+        String errorMessage = (String)request.getAttribute("jakarta.servlet.error.message");
 
         if (statusCode != null) {
         %>

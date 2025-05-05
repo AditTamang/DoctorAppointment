@@ -107,9 +107,39 @@ public class AppointmentBookingServlet extends HttpServlet {
             patientId = patientService.getPatientIdByUserId(user.getId());
         }
 
+        // Get available time slots for the doctor
+        List<String> availableTimeSlots = appointmentService.getAvailableTimeSlots(doctorId);
+
+        // Get booked time slots for the selected date (if date is provided)
+        String selectedDate = request.getParameter("appointmentDate");
+        List<String> bookedTimeSlots = new java.util.ArrayList<>();
+
+        if (selectedDate != null && !selectedDate.isEmpty()) {
+            // Get all appointments for this doctor
+            List<Appointment> doctorAppointments = appointmentService.getAppointmentsByDoctorId(doctorId);
+
+            // Filter out the booked time slots for the selected date
+            for (Appointment appointment : doctorAppointments) {
+                if (appointment.getAppointmentDate() != null &&
+                    !appointment.getStatus().equals("CANCELLED")) {
+
+                    // Convert appointment date to string for comparison
+                    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+                    String appointmentDateStr = dateFormat.format(appointment.getAppointmentDate());
+
+                    // If this appointment is on the selected date, add its time to booked slots
+                    if (appointmentDateStr.equals(selectedDate)) {
+                        bookedTimeSlots.add(appointment.getAppointmentTime());
+                    }
+                }
+            }
+        }
+
         // Set attributes for the confirmation form
         request.setAttribute("doctor", doctor);
         request.setAttribute("patientId", patientId);
+        request.setAttribute("availableTimeSlots", availableTimeSlots);
+        request.setAttribute("bookedTimeSlots", bookedTimeSlots);
 
         // Forward to confirmation form
         request.getRequestDispatcher("/patient/appointment-confirm.jsp").forward(request, response);
@@ -191,8 +221,17 @@ public class AppointmentBookingServlet extends HttpServlet {
         request.setAttribute("patientId", patientId);
         request.setAttribute("availableTimeSlots", availableTimeSlots);
 
-        // Forward to booking form
-        request.getRequestDispatcher("/patient/bookAppointment.jsp").forward(request, response);
+        // Get the current URL for redirection
+        String currentUrl = request.getRequestURL().toString();
+        if (request.getQueryString() != null) {
+            currentUrl += "?" + request.getQueryString();
+        }
+
+        // Set the redirect URL in the session
+        session.setAttribute("redirectUrl", currentUrl);
+
+        // Forward to dynamic booking form
+        request.getRequestDispatcher("/patient/dynamic-appointment-booking.jsp").forward(request, response);
     }
 
     /**
@@ -259,10 +298,34 @@ public class AppointmentBookingServlet extends HttpServlet {
             // Get available time slots for the doctor
             List<String> availableTimeSlots = appointmentService.getAvailableTimeSlots(doctorId);
 
+            // Get booked time slots for the selected date
+            List<String> bookedTimeSlots = new java.util.ArrayList<>();
+
+            if (appointmentDate != null && !appointmentDate.isEmpty()) {
+                List<Appointment> doctorAppointments = appointmentService.getAppointmentsByDoctorId(doctorId);
+
+                // Filter out the booked time slots for the selected date
+                for (Appointment appt : doctorAppointments) {
+                    if (appt.getAppointmentDate() != null &&
+                        !appt.getStatus().equals("CANCELLED")) {
+
+                        // Convert appointment date to string for comparison
+                        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+                        String appointmentDateStr = dateFormat.format(appt.getAppointmentDate());
+
+                        // If this appointment is on the selected date, add its time to booked slots
+                        if (appointmentDateStr.equals(appointmentDate)) {
+                            bookedTimeSlots.add(appt.getAppointmentTime());
+                        }
+                    }
+                }
+            }
+
             // Set attributes for the booking form
             request.setAttribute("doctor", doctor);
             request.setAttribute("patientId", patientIdParam);
             request.setAttribute("availableTimeSlots", availableTimeSlots);
+            request.setAttribute("bookedTimeSlots", bookedTimeSlots);
             request.setAttribute("appointmentDate", appointmentDate);
             request.setAttribute("appointmentTime", appointmentTime);
             request.setAttribute("reason", reason);
@@ -297,6 +360,22 @@ public class AppointmentBookingServlet extends HttpServlet {
         appointment.setReason(reason);
         appointment.setSymptoms(symptoms);
         appointment.setStatus("PENDING");
+        appointment.setNotes("Appointment booked by patient");
+
+        // Get doctor details to set fee
+        Doctor doctorDetails = doctorService.getDoctorById(doctorId);
+
+        // Set fee from doctor's consultation fee if available
+        if (doctorDetails != null && doctorDetails.getConsultationFee() != null && !doctorDetails.getConsultationFee().isEmpty()) {
+            try {
+                double fee = Double.parseDouble(doctorDetails.getConsultationFee());
+                appointment.setFee(fee);
+            } catch (NumberFormatException e) {
+                appointment.setFee(0.0);
+            }
+        } else {
+            appointment.setFee(0.0);
+        }
 
         // Check if the time slot is already booked
         boolean isTimeSlotAvailable = appointmentService.isTimeSlotAvailable(doctorId, appointmentDate, appointmentTime);
@@ -306,15 +385,36 @@ public class AppointmentBookingServlet extends HttpServlet {
             request.setAttribute("timeError", "This time slot is no longer available. Please select another time.");
 
             // Get doctor details again
-            Doctor doctor = doctorService.getDoctorById(doctorId);
+            doctorDetails = doctorService.getDoctorById(doctorId);
 
             // Get available time slots for the doctor (refresh the list)
             List<String> availableTimeSlots = appointmentService.getAvailableTimeSlots(doctorId);
 
+            // Get booked time slots for the selected date
+            List<String> bookedTimeSlots = new java.util.ArrayList<>();
+            List<Appointment> doctorAppointments = appointmentService.getAppointmentsByDoctorId(doctorId);
+
+            // Filter out the booked time slots for the selected date
+            for (Appointment appt : doctorAppointments) {
+                if (appt.getAppointmentDate() != null &&
+                    !appt.getStatus().equals("CANCELLED")) {
+
+                    // Convert appointment date to string for comparison
+                    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+                    String appointmentDateStr = dateFormat.format(appt.getAppointmentDate());
+
+                    // If this appointment is on the selected date, add its time to booked slots
+                    if (appointmentDateStr.equals(appointmentDate)) {
+                        bookedTimeSlots.add(appt.getAppointmentTime());
+                    }
+                }
+            }
+
             // Set attributes for the booking form
-            request.setAttribute("doctor", doctor);
+            request.setAttribute("doctor", doctorDetails);
             request.setAttribute("patientId", patientId);
             request.setAttribute("availableTimeSlots", availableTimeSlots);
+            request.setAttribute("bookedTimeSlots", bookedTimeSlots);
             request.setAttribute("appointmentDate", appointmentDate);
             request.setAttribute("reason", reason);
             request.setAttribute("symptoms", symptoms);
@@ -332,10 +432,10 @@ public class AppointmentBookingServlet extends HttpServlet {
             doctorService.incrementPatientCount(doctorId);
 
             // Get doctor details for confirmation page
-            Doctor doctor = doctorService.getDoctorById(doctorId);
+            doctorDetails = doctorService.getDoctorById(doctorId);
 
             // Set doctor name in appointment for display
-            appointment.setDoctorName(doctor.getName());
+            appointment.setDoctorName(doctorDetails.getName());
 
             // Set patient name in appointment for display
             String patientName = user.getFirstName() + " " + user.getLastName();
@@ -344,22 +444,43 @@ public class AppointmentBookingServlet extends HttpServlet {
             // Redirect to success page
             request.setAttribute("successMessage", "Appointment booked successfully");
             request.setAttribute("appointment", appointment);
-            request.setAttribute("doctor", doctor);
+            request.setAttribute("doctor", doctorDetails);
             request.getRequestDispatcher("/patient/appointmentConfirmation.jsp").forward(request, response);
         } else {
             // Redirect back to booking form with error
             request.setAttribute("errorMessage", "Failed to book appointment. Please try again.");
 
             // Get doctor details again
-            Doctor doctor = doctorService.getDoctorById(doctorId);
+            doctorDetails = doctorService.getDoctorById(doctorId);
 
             // Get available time slots for the doctor
             List<String> availableTimeSlots = appointmentService.getAvailableTimeSlots(doctorId);
 
+            // Get booked time slots for the selected date
+            List<String> bookedTimeSlots = new java.util.ArrayList<>();
+            List<Appointment> doctorAppointments = appointmentService.getAppointmentsByDoctorId(doctorId);
+
+            // Filter out the booked time slots for the selected date
+            for (Appointment appt : doctorAppointments) {
+                if (appt.getAppointmentDate() != null &&
+                    !appt.getStatus().equals("CANCELLED")) {
+
+                    // Convert appointment date to string for comparison
+                    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+                    String appointmentDateStr = dateFormat.format(appt.getAppointmentDate());
+
+                    // If this appointment is on the selected date, add its time to booked slots
+                    if (appointmentDateStr.equals(appointmentDate)) {
+                        bookedTimeSlots.add(appt.getAppointmentTime());
+                    }
+                }
+            }
+
             // Set attributes for the booking form
-            request.setAttribute("doctor", doctor);
+            request.setAttribute("doctor", doctorDetails);
             request.setAttribute("patientId", patientId);
             request.setAttribute("availableTimeSlots", availableTimeSlots);
+            request.setAttribute("bookedTimeSlots", bookedTimeSlots);
             request.setAttribute("appointmentDate", appointmentDate);
             request.setAttribute("appointmentTime", appointmentTime);
             request.setAttribute("reason", reason);

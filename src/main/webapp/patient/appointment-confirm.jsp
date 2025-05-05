@@ -35,12 +35,7 @@
     <title>Book Appointment | Doctor Appointment System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patientDashboard.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-booking.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-confirmation.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-confirm-fix.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-sidebar-fix.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/appointment-confirm.css">
 </head>
 <body>
     <div class="dashboard-container">
@@ -84,7 +79,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/patient/profile">
+                    <a href="${pageContext.request.contextPath}/patient/profile-legacy">
                         <i class="fas fa-user"></i>
                         <span>My Profile</span>
                     </a>
@@ -155,12 +150,35 @@
                             <div class="form-group">
                                 <label>Appointment Time</label>
                                 <div class="time-slots">
+                                    <%
+                                    if (availableTimeSlots != null && !availableTimeSlots.isEmpty()) {
+                                        for (String timeSlot : availableTimeSlots) {
+                                            // Create a unique ID for each time slot
+                                            String timeId = timeSlot.replace(":", "_").replace(" ", "_");
+
+                                            // Check if this time slot is already booked
+                                            boolean isUnavailable = false;
+                                            if (request.getAttribute("bookedTimeSlots") != null) {
+                                                List<String> bookedTimeSlots = (List<String>) request.getAttribute("bookedTimeSlots");
+                                                isUnavailable = bookedTimeSlots.contains(timeSlot);
+                                            }
+                                    %>
+                                    <div class="time-slot <%= isUnavailable ? "unavailable" : "" %>">
+                                        <input type="radio" id="time_<%= timeId %>" name="appointmentTime" value="<%= timeSlot %>"
+                                               <%= isUnavailable ? "disabled" : "required" %>>
+                                        <label for="time_<%= timeId %>"><%= timeSlot %></label>
+                                    </div>
+                                    <%
+                                        }
+                                    } else {
+                                        // Fallback to default time slots if none are available
+                                    %>
                                     <div class="time-slot">
                                         <input type="radio" id="time_09_00" name="appointmentTime" value="09:00 AM" required>
                                         <label for="time_09_00">09:00 AM</label>
                                     </div>
-                                    <div class="time-slot unavailable">
-                                        <input type="radio" id="time_10_00" name="appointmentTime" value="10:00 AM" disabled>
+                                    <div class="time-slot">
+                                        <input type="radio" id="time_10_00" name="appointmentTime" value="10:00 AM">
                                         <label for="time_10_00">10:00 AM</label>
                                     </div>
                                     <div class="time-slot">
@@ -171,22 +189,7 @@
                                         <input type="radio" id="time_12_00" name="appointmentTime" value="12:00 PM">
                                         <label for="time_12_00">12:00 PM</label>
                                     </div>
-                                    <div class="time-slot">
-                                        <input type="radio" id="time_02_00" name="appointmentTime" value="02:00 PM">
-                                        <label for="time_02_00">02:00 PM</label>
-                                    </div>
-                                    <div class="time-slot">
-                                        <input type="radio" id="time_03_00" name="appointmentTime" value="03:00 PM">
-                                        <label for="time_03_00">03:00 PM</label>
-                                    </div>
-                                    <div class="time-slot">
-                                        <input type="radio" id="time_04_00" name="appointmentTime" value="04:00 PM">
-                                        <label for="time_04_00">04:00 PM</label>
-                                    </div>
-                                    <div class="time-slot">
-                                        <input type="radio" id="time_05_00" name="appointmentTime" value="05:00 PM">
-                                        <label for="time_05_00">05:00 PM</label>
-                                    </div>
+                                    <% } %>
                                 </div>
                                 <div class="time-unavailable-message">This time slot is no longer available. Please select another time.</div>
                                 <c:if test="${not empty timeError}">
@@ -241,7 +244,45 @@
                     timeInput.checked = true;
                 }
             }
+
+            // Handle unavailable time slots
+            updateUnavailableSlots();
+
+            // Add event listener to date picker to check availability when date changes
+            document.getElementById('appointmentDate').addEventListener('change', function() {
+                // Redirect to the same page with the selected date as a parameter
+                const selectedDate = this.value;
+                if (selectedDate) {
+                    window.location.href = '${pageContext.request.contextPath}/appointment/confirm?doctorId=<%= doctor.getId() %>&appointmentDate=' + selectedDate;
+                }
+            });
         });
+
+        // Function to update unavailable time slots
+        function updateUnavailableSlots() {
+            const unavailableSlots = document.querySelectorAll('.time-slot.unavailable');
+            if (unavailableSlots.length > 0) {
+                const unavailableMessage = document.querySelector('.time-unavailable-message');
+                if (unavailableMessage) {
+                    unavailableMessage.style.display = 'flex';
+                }
+
+                // Disable radio buttons for unavailable slots
+                unavailableSlots.forEach(slot => {
+                    const radio = slot.querySelector('input[type="radio"]');
+                    if (radio) {
+                        radio.disabled = true;
+                        radio.required = false;
+                    }
+                });
+            } else {
+                // Hide the unavailable message if no slots are unavailable
+                const unavailableMessage = document.querySelector('.time-unavailable-message');
+                if (unavailableMessage) {
+                    unavailableMessage.style.display = 'none';
+                }
+            }
+        }
     </script>
 </body>
 </html>

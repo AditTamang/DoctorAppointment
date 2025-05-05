@@ -10,6 +10,7 @@
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
         <welcome-file>index.html</welcome-file>
+        <welcome-file>home.jsp</welcome-file>
     </welcome-file-list>
 
     <!-- Default Servlet for static resources -->
@@ -108,7 +109,7 @@
 
     <!-- Listeners -->
     <listener>
-        <listener-class>com.doctorapp.listener.DatabaseInitListener</listener-class>
+        <listener-class>com.doctorapp.util.AppInitializer</listener-class>
     </listener>
 
     <!-- Multipart Configuration -->
@@ -124,7 +125,121 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>AppointmentServlet</servlet-name>
-        <url-pattern>/appointment/*</url-pattern>
+        <url-pattern>/appointments</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AppointmentServlet</servlet-name>
+        <url-pattern>/appointment/details</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AppointmentServlet</servlet-name>
+        <url-pattern>/appointment/cancel</url-pattern>
+    </servlet-mapping>
+
+    <!-- Doctor Profile Servlets -->
+    <!-- Legacy servlet from servlets package -->
+    <servlet>
+        <servlet-name>DoctorProfileServletLegacy</servlet-name>
+        <servlet-class>com.doctorapp.controller.servlets.DoctorProfileServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DoctorProfileServletLegacy</servlet-name>
+        <url-pattern>/doctor/profile-legacy</url-pattern>
+    </servlet-mapping>
+
+    <!-- New servlet from doctor package -->
+    <servlet>
+        <servlet-name>DoctorProfileServlet</servlet-name>
+        <servlet-class>com.doctorapp.controller.doctor.DoctorProfileServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DoctorProfileServlet</servlet-name>
+        <url-pattern>/doctor/profile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DoctorProfileServlet</servlet-name>
+        <url-pattern>/doctor/profile/update</url-pattern>
+    </servlet-mapping>
+
+    <!-- Patient Profile Servlets -->
+    <!-- Legacy servlet from servlets package -->
+    <servlet>
+        <servlet-name>PatientProfileServletLegacy</servlet-name>
+        <servlet-class>com.doctorapp.controller.servlets.ProfileServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PatientProfileServletLegacy</servlet-name>
+        <url-pattern>/patient/profile-legacy</url-pattern>
+    </servlet-mapping>
+
+    <!-- New servlet from patient package -->
+    <servlet>
+        <servlet-name>PatientProfileServlet</servlet-name>
+        <servlet-class>com.doctorapp.controller.patient.PatientProfileServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PatientProfileServlet</servlet-name>
+        <url-pattern>/patient/profile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PatientProfileServlet</servlet-name>
+        <url-pattern>/patient/profile/update</url-pattern>
+    </servlet-mapping>
+
+    <!-- Doctor Dashboard Fix Servlet -->
+    <servlet>
+        <servlet-name>DoctorDashboardFixServlet</servlet-name>
+        <servlet-class>com.doctorapp.controller.doctor.DoctorDashboardFixServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DoctorDashboardFixServlet</servlet-name>
+        <url-pattern>/doctor/dashboard-fix</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DoctorDashboardFixServlet</servlet-name>
+        <url-pattern>/doctor/appointments-fix</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DoctorDashboardFixServlet</servlet-name>
+        <url-pattern>/doctor/appointment/update-status-fix</url-pattern>
+    </servlet-mapping>
+
+    <!-- Dynamic Appointment Booking -->
+    <servlet>
+        <servlet-name>DynamicBookingServlet</servlet-name>
+        <servlet-class>com.doctorapp.controller.patient.AppointmentBookingServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DynamicBookingServlet</servlet-name>
+        <url-pattern>/patient/dynamic-booking</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DynamicBookingServlet</servlet-name>
+        <url-pattern>/appointment/confirm</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DynamicBookingServlet</servlet-name>
+        <url-pattern>/appointment/book</url-pattern>
+    </servlet-mapping>
+
+    <!-- Legacy Book Appointment Servlet -->
+    <servlet>
+        <servlet-name>BookAppointmentServlet</servlet-name>
+        <servlet-class>com.doctorapp.controller.patient.BookAppointmentServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BookAppointmentServlet</servlet-name>
+        <url-pattern>/patient/legacy-booking</url-pattern>
+    </servlet-mapping>
+
+    <!-- Redirect for old URL pattern -->
+    <servlet>
+        <servlet-name>RedirectServlet</servlet-name>
+        <jsp-file>/patient/redirect-to-dynamic.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RedirectServlet</servlet-name>
+        <url-pattern>/patient/book-appointment</url-pattern>
     </servlet-mapping>
 
 </web-app>

@@ -77,6 +77,11 @@ public class Doctor {
         this.qualification = qualification;
     }
 
+    // Added method to fix JSP error
+    public String getQualifications() {
+        return qualification;
+    }
+
     public String getExperience() {
         return experience;
     }
@@ -229,6 +234,25 @@ public class Doctor {
             return name;
         } else {
             return "";
+        }
+    }
+
+    // Helper method to get appointment count
+    // This method uses the AppointmentDAO to get the actual count
+    public int getAppointmentCount() {
+        try {
+            com.doctorapp.dao.AppointmentDAO appointmentDAO = new com.doctorapp.dao.AppointmentDAO();
+            // Get total appointments for this doctor (all statuses)
+            int pendingCount = appointmentDAO.getAppointmentCountByDoctorIdAndStatus(this.id, "PENDING");
+            int confirmedCount = appointmentDAO.getAppointmentCountByDoctorIdAndStatus(this.id, "CONFIRMED");
+            int completedCount = appointmentDAO.getAppointmentCountByDoctorIdAndStatus(this.id, "COMPLETED");
+
+            // Return the total count (excluding cancelled appointments)
+            return pendingCount + confirmedCount + completedCount;
+        } catch (Exception e) {
+            // If there's any error, return 0
+            System.err.println("Error getting appointment count for doctor ID " + this.id + ": " + e.getMessage());
+            return 0;
         }
     }
 }

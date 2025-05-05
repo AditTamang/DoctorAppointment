@@ -23,7 +23,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patientDashboard.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-sidebar-fix.css">
     <style>
         /* Profile Page Specific Styles */
         .profile-container {
@@ -295,7 +294,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/patient/profile" class="active">
+                    <a href="${pageContext.request.contextPath}/patient/profile-legacy" class="active">
                         <i class="fas fa-user"></i>
                         <span>My Profile</span>
                     </a>
@@ -357,7 +356,7 @@
                 </c:if>
 
                 <!-- Profile Form -->
-                <form action="${pageContext.request.contextPath}/patient/profile/update" method="post">
+                <form action="${pageContext.request.contextPath}/patient/profile-legacy" method="post">
                     <div class="profile-details">
                         <div class="detail-card">
                             <h3><i class="fas fa-user"></i> Personal Information</h3>
@@ -381,7 +380,11 @@
                             </div>
                             <div class="detail-item">
                                 <div class="detail-label">Email</div>
-                                <div class="detail-value"><%= user.getEmail() %></div>
+                                <div class="detail-value">
+                                    <%= user.getEmail() %>
+                                    <!-- Add hidden input field for email to prevent null value -->
+                                    <input type="hidden" name="email" value="<%= user.getEmail() %>">
+                                </div>
                             </div>
                             <div class="detail-item">
                                 <div class="detail-label">Phone</div>

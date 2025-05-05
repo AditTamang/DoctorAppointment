@@ -283,7 +283,21 @@ public class UserDAO {
                 String hashedPassword = PasswordHasher.hashPassword(user.getPassword());
 
                 pstmt.setString(1, user.getUsername());
-                pstmt.setString(2, user.getEmail());
+
+                // Make sure email is not null
+                String email = user.getEmail();
+                if (email == null || email.trim().isEmpty()) {
+                    // Get the existing user to get the email
+                    User existingUser = getUserById(user.getId());
+                    if (existingUser != null && existingUser.getEmail() != null) {
+                        email = existingUser.getEmail();
+                    } else {
+                        // This should not happen, but just in case
+                        throw new SQLException("Email cannot be null");
+                    }
+                }
+                pstmt.setString(2, email);
+
                 pstmt.setString(3, hashedPassword);
                 pstmt.setString(4, user.getPhone());
                 pstmt.setString(5, user.getRole());
@@ -306,7 +320,21 @@ public class UserDAO {
                  PreparedStatement pstmt = conn.prepareStatement(query)) {
 
                 pstmt.setString(1, user.getUsername());
-                pstmt.setString(2, user.getEmail());
+
+                // Make sure email is not null
+                String email = user.getEmail();
+                if (email == null || email.trim().isEmpty()) {
+                    // Get the existing user to get the email
+                    User existingUser = getUserById(user.getId());
+                    if (existingUser != null && existingUser.getEmail() != null) {
+                        email = existingUser.getEmail();
+                    } else {
+                        // This should not happen, but just in case
+                        throw new SQLException("Email cannot be null");
+                    }
+                }
+                pstmt.setString(2, email);
+
                 pstmt.setString(3, user.getPhone());
                 pstmt.setString(4, user.getRole());
                 pstmt.setString(5, user.getFirstName());

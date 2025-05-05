@@ -49,7 +49,8 @@ public class UserServlet extends HttpServlet {
 
 
 
-    private void showProfile(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void showProfile(HttpServletRequest request, HttpServletResponse response) 
+    		throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("user") != null) {
             User user = (User) session.getAttribute("user");

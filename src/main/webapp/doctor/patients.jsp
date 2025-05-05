@@ -12,7 +12,7 @@
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
-    
+
     // Get doctor information
     String doctorName = "Dr. " + user.getFirstName() + " " + user.getLastName();
 %>
@@ -24,8 +24,11 @@
     <title>Patient Details | HealthPro Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-profile-dashboard.css">
+    <!-- Favicon -->
+    <link rel="icon" href="${pageContext.request.contextPath}/assets/images/favicon.ico" type="image/x-icon">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/doctor-dashboard-complete.css">
     <style>
         .patients-container {
             background-color: #fff;
@@ -34,7 +37,7 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
-        
+
         .patients-header {
             display: flex;
             justify-content: space-between;
@@ -43,46 +46,46 @@
             padding-bottom: 10px;
             border-bottom: 1px solid #e0e0e0;
         }
-        
+
         .patients-header h2 {
             font-size: 20px;
             font-weight: 600;
         }
-        
+
         .patients-filter {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
-        
+
         .patients-table {
             width: 100%;
             border-collapse: collapse;
         }
-        
+
         .patients-table th,
         .patients-table td {
             padding: 15px;
             text-align: left;
             border-bottom: 1px solid #e0e0e0;
         }
-        
+
         .patients-table th {
             font-weight: 600;
             color: #333;
             background-color: #f8f9fa;
         }
-        
+
         .patients-table tr:hover {
             background-color: #f8f9fa;
         }
-        
+
         .patient-info {
             display: flex;
             align-items: center;
         }
-        
+
         .patient-avatar {
             width: 40px;
             height: 40px;
@@ -90,28 +93,28 @@
             overflow: hidden;
             margin-right: 10px;
         }
-        
+
         .patient-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        
+
         .patient-details {
             display: flex;
             flex-direction: column;
         }
-        
+
         .patient-name {
             font-weight: 500;
             color: #333;
         }
-        
+
         .patient-email {
             font-size: 12px;
             color: #6c757d;
         }
-        
+
         .status-badge {
             display: inline-block;
             padding: 5px 10px;
@@ -119,17 +122,17 @@
             font-size: 12px;
             font-weight: 500;
         }
-        
+
         .status-badge.active {
             background-color: #e8f5e9;
             color: #2e7d32;
         }
-        
+
         .status-badge.inactive {
             background-color: #ffebee;
             color: #c62828;
         }
-        
+
         .action-btn {
             width: 30px;
             height: 30px;
@@ -141,25 +144,25 @@
             margin-right: 5px;
             cursor: pointer;
         }
-        
+
         .action-btn.view {
             background-color: #2196f3;
         }
-        
+
         .action-btn.edit {
             background-color: #ff9800;
         }
-        
+
         .action-btn.delete {
             background-color: #f44336;
         }
-        
+
         .pagination {
             display: flex;
             justify-content: center;
             margin-top: 20px;
         }
-        
+
         .pagination-item {
             width: 35px;
             height: 35px;
@@ -171,12 +174,12 @@
             cursor: pointer;
             font-weight: 500;
         }
-        
+
         .pagination-item.active {
             background-color: #2196f3;
             color: #fff;
         }
-        
+
         .pagination-item:hover:not(.active) {
             background-color: #e0e0e0;
         }
@@ -185,56 +188,53 @@
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="HealthPro Logo">
                 <h2>HealthPro Portal</h2>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
-            
+
             <div class="profile-overview">
-                <h3><i class="fas fa-user-md"></i> <span>Profile Overview</span></h3>
+                <h3><i class="fas fa-user-md"></i> <span>Doctor Dashboard</span></h3>
             </div>
-            
+
             <div class="sidebar-menu">
                 <ul>
                     <li>
-                        <a href="index.jsp">
+                        <a href="${pageContext.request.contextPath}/doctor/dashboard">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/doctor/profile">
                             <i class="fas fa-user"></i>
                             <span>Profile</span>
                         </a>
                     </li>
                     <li>
-                        <a href="appointments.jsp">
+                        <a href="${pageContext.request.contextPath}/doctor/appointments">
                             <i class="fas fa-calendar-check"></i>
-                            <span>Appointment Management</span>
+                            <span>Appointments</span>
                         </a>
                     </li>
                     <li class="active">
-                        <a href="patients.jsp">
+                        <a href="${pageContext.request.contextPath}/doctor/patients">
                             <i class="fas fa-user-injured"></i>
-                            <span>Patient Details</span>
+                            <span>Patients</span>
                         </a>
                     </li>
                     <li>
-                        <a href="availability.jsp">
+                        <a href="${pageContext.request.contextPath}/doctor/schedule">
                             <i class="fas fa-clock"></i>
-                            <span>Set Availability</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="health-packages.jsp">
-                            <i class="fas fa-box-open"></i>
-                            <span>Health Packages</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="preferences.jsp">
-                            <i class="fas fa-cog"></i>
-                            <span>UI Preferences</span>
+                            <span>Availability</span>
                         </a>
                     </li>
                     <li class="logout">
-                        <a href="../logout">
+                        <a href="${pageContext.request.contextPath}/logout">
                             <i class="fas fa-sign-out-alt"></i>
                             <span>Logout</span>
                         </a>
@@ -242,9 +242,9 @@
                 </ul>
             </div>
         </div>
-        
+
         <!-- Main Content -->
-        <div class="main-content">
+        <div class="main-content" id="main-content">
             <!-- Top Header -->
             <div class="top-header">
                 <div class="top-header-left">
@@ -252,7 +252,7 @@
                     <a href="appointments.jsp">Appointment Management</a>
                     <a href="patients.jsp" class="active">Patient Details</a>
                 </div>
-                
+
                 <div class="top-header-right">
                     <div class="search-icon">
                         <i class="fas fa-search"></i>
@@ -262,7 +262,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Patients List -->
             <div class="patients-container">
                 <div class="patients-header">
@@ -271,7 +271,7 @@
                         <i class="fas fa-plus"></i> Add New Patient
                     </button>
                 </div>
-                
+
                 <div class="patients-filter">
                     <div class="search-box">
                         <i class="fas fa-search"></i>
@@ -281,7 +281,7 @@
                         <i class="fas fa-filter"></i> Filter
                     </button>
                 </div>
-                
+
                 <table class="patients-table">
                     <thead>
                         <tr>
@@ -412,7 +412,7 @@
                         </tr>
                     </tbody>
                 </table>
-                
+
                 <div class="pagination">
                     <div class="pagination-item"><i class="fas fa-chevron-left"></i></div>
                     <div class="pagination-item active">1</div>
@@ -423,8 +423,16 @@
             </div>
         </div>
     </div>
-    
+
     <script>
+        // Toggle sidebar
+        if (document.getElementById('sidebar-toggle')) {
+            document.getElementById('sidebar-toggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('sidebar-collapsed');
+                document.getElementById('main-content').classList.toggle('main-content-expanded');
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // Search functionality
             const searchInput = document.querySelector('.search-box input');
@@ -432,11 +440,11 @@
                 searchInput.addEventListener('input', function() {
                     const searchTerm = this.value.toLowerCase();
                     const rows = document.querySelectorAll('.patients-table tbody tr');
-                    
+
                     rows.forEach(row => {
                         const patientName = row.querySelector('.patient-name').textContent.toLowerCase();
                         const patientEmail = row.querySelector('.patient-email').textContent.toLowerCase();
-                        
+
                         if (patientName.includes(searchTerm) || patientEmail.includes(searchTerm)) {
                             row.style.display = '';
                         } else {
@@ -445,7 +453,7 @@
                     });
                 });
             }
-            
+
             // Action buttons functionality
             const viewButtons = document.querySelectorAll('.action-btn.view');
             viewButtons.forEach(btn => {
@@ -456,7 +464,7 @@
                     // In a real application, you would redirect to the patient details page
                 });
             });
-            
+
             const editButtons = document.querySelectorAll('.action-btn.edit');
             editButtons.forEach(btn => {
                 btn.addEventListener('click', function(e) {
@@ -466,7 +474,7 @@
                     // In a real application, you would redirect to the edit patient page
                 });
             });
-            
+
             const deleteButtons = document.querySelectorAll('.action-btn.delete');
             deleteButtons.forEach(btn => {
                 btn.addEventListener('click', function(e) {
@@ -479,19 +487,19 @@
                     }
                 });
             });
-            
+
             // Pagination functionality
             const paginationItems = document.querySelectorAll('.pagination-item');
             paginationItems.forEach(item => {
                 item.addEventListener('click', function() {
                     // Remove active class from all pagination items
                     paginationItems.forEach(i => i.classList.remove('active'));
-                    
+
                     // Add active class to clicked pagination item
                     if (!this.querySelector('i')) {
                         this.classList.add('active');
                     }
-                    
+
                     // In a real application, you would fetch data for the selected page
                 });
             });

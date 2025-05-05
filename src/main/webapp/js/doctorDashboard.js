@@ -67,7 +67,7 @@ function updateAppointmentStatus(appointmentId, status) {
     }
 
     // Send AJAX request
-    fetch(contextPath + '/doctor/appointment/update', {
+    fetch(contextPath + '/doctor/appointment/update-status', {
         method: 'POST',
         body: formData,
         headers: {
@@ -94,7 +94,7 @@ function updateAppointmentStatus(appointmentId, status) {
         if (appointmentRow) {
             const statusCell = appointmentRow.querySelector('.status-cell');
             if (statusCell) {
-                statusCell.innerHTML = '<span class="status-badge pending">PENDING</span>';
+                statusCell.innerHTML = '<span class="status-badge pending">Pending</span>';
             }
         }
     });
@@ -124,9 +124,9 @@ function updateAppointmentUI(appointmentId, status, data) {
     const actionCell = appointmentRow.querySelector('.action-cell');
     if (actionCell) {
         if (status === 'APPROVED') {
-            actionCell.innerHTML = '<button class="view-details-btn" data-appointment-id="' + appointmentId + '">View Details</button>';
+            actionCell.innerHTML = '<button class="action-btn view-details-btn" data-appointment-id="' + appointmentId + '"><i class="fas fa-eye"></i> View Details</button>';
         } else if (status === 'REJECTED') {
-            actionCell.innerHTML = '<span class="rejected-text">Appointment Rejected</span>';
+            actionCell.innerHTML = '<button class="action-btn view-details-btn" data-appointment-id="' + appointmentId + '"><i class="fas fa-eye"></i> View Details</button>';
         }
 
         // Re-initialize any new buttons

@@ -26,12 +26,29 @@
     <title>My Appointments | Doctor Appointment System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patientDashboard.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-pages.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-confirmation.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-confirm-fix.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-sidebar-fix.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/appointment-booking.css">
+    <style>
+        /* Fix for doctor initials */
+        .doctor-small-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+
+        .doctor-small-avatar .initials {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
@@ -75,7 +92,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/patient/profile">
+                    <a href="${pageContext.request.contextPath}/patient/profile-legacy">
                         <i class="fas fa-user"></i>
                         <span>My Profile</span>
                     </a>
@@ -161,10 +178,10 @@
                                 <div class="appointment-card-body">
                                     <div class="appointment-doctor">
                                         <div class="doctor-small-avatar">
-                                            <div class="initials"><%= appointment.getDoctorName().charAt(0) %></div>
+                                            <div class="initials"><%= appointment.getDoctorName() != null ? appointment.getDoctorName().charAt(0) : 'D' %></div>
                                         </div>
                                         <div class="appointment-doctor-info">
-                                            <div class="appointment-doctor-name"><%= appointment.getDoctorName() %></div>
+                                            <div class="appointment-doctor-name"><%= appointment.getDoctorName() != null ? appointment.getDoctorName() : "Doctor" %></div>
                                             <div class="appointment-doctor-specialty">
                                                 <%= appointment.getDoctorSpecialization() != null ? appointment.getDoctorSpecialization() : "Specialist" %>
                                             </div>
@@ -181,13 +198,13 @@
                                 </div>
                                 <div class="appointment-card-footer">
                                     <div class="appointment-actions">
-                                        <a href="${pageContext.request.contextPath}/appointment/details?id=<%= appointment.getId() %>" class="btn btn-sm btn-outline">
+                                        <a href="${pageContext.request.contextPath}/patient/appointment?id=<%= appointment.getId() %>" class="btn btn-sm btn-outline">
                                             <i class="fas fa-eye"></i> View Details
                                         </a>
                                         <% if ("PENDING".equals(appointment.getStatus()) || "APPROVED".equals(appointment.getStatus())) { %>
-                                            <button class="btn btn-sm btn-danger cancel-appointment" data-id="<%= appointment.getId() %>">
+                                            <a href="${pageContext.request.contextPath}/patient/cancel-appointment?id=<%= appointment.getId() %>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to cancel this appointment?')">
                                                 <i class="fas fa-times"></i> Cancel
-                                            </button>
+                                            </a>
                                         <% } %>
                                     </div>
                                 </div>
@@ -195,24 +212,6 @@
                         <% } %>
                     <% } %>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Confirmation Modal -->
-    <div id="confirmationModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Cancel Appointment</h3>
-                <span class="close">&times;</span>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to cancel this appointment?</p>
-                <p>This action cannot be undone.</p>
-            </div>
-            <div class="modal-footer">
-                <button id="confirmCancel" class="btn btn-danger">Yes, Cancel</button>
-                <button id="cancelAction" class="btn btn-outline">No, Keep It</button>
             </div>
         </div>
     </div>
@@ -254,83 +253,6 @@
                     });
                 }
             });
-        });
-
-        // Cancel appointment functionality
-        const modal = document.getElementById('confirmationModal');
-        const closeBtn = document.querySelector('.close');
-        const cancelBtn = document.getElementById('cancelAction');
-        const confirmBtn = document.getElementById('confirmCancel');
-        let appointmentToCancel = null;
-
-        // Open modal when cancel button is clicked
-        document.querySelectorAll('.cancel-appointment').forEach(button => {
-            button.addEventListener('click', function() {
-                appointmentToCancel = this.getAttribute('data-id');
-                modal.style.display = 'block';
-            });
-        });
-
-        // Close modal when X is clicked
-        closeBtn.addEventListener('click', function() {
-            modal.style.display = 'none';
-        });
-
-        // Close modal when "No, Keep It" is clicked
-        cancelBtn.addEventListener('click', function() {
-            modal.style.display = 'none';
-        });
-
-        // Close modal when clicking outside of it
-        window.addEventListener('click', function(event) {
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
-        });
-
-        // Handle appointment cancellation
-        confirmBtn.addEventListener('click', function() {
-            if (appointmentToCancel) {
-                // Send AJAX request to cancel appointment
-                fetch('${pageContext.request.contextPath}/appointment/cancel', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: 'id=' + appointmentToCancel
-                })
-                .then(response => {
-                    if (response.ok) {
-                        // Update UI to show appointment as cancelled
-                        const appointmentCard = document.querySelector(`.appointment-card .cancel-appointment[data-id="${appointmentToCancel}"]`).closest('.appointment-card');
-
-                        // Update status badge
-                        const statusBadge = appointmentCard.querySelector('.status-badge');
-                        statusBadge.className = 'status-badge status-cancelled';
-                        statusBadge.textContent = 'CANCELLED';
-
-                        // Update data-status attribute
-                        appointmentCard.setAttribute('data-status', 'cancelled');
-
-                        // Remove cancel button
-                        appointmentCard.querySelector('.cancel-appointment').remove();
-
-                        // Close modal
-                        modal.style.display = 'none';
-
-                        // Show success message
-                        alert('Appointment cancelled successfully');
-                    } else {
-                        throw new Error('Failed to cancel appointment');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to cancel appointment. Please try again.');
-                    modal.style.display = 'none';
-                });
-            }
         });
     </script>
 </body>

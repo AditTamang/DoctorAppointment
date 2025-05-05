@@ -27,9 +27,19 @@ public class HomeServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            // Get top doctors for the home page (featured doctors)
-            List<Doctor> featuredDoctors = doctorService.getTopDoctors(3);
-            request.setAttribute("featuredDoctors", featuredDoctors);
+            // Initialize the database if needed
+            com.doctorapp.util.DatabaseInitializer.initialize();
+
+            try {
+                // Get top doctors for the home page (featured doctors)
+                List<Doctor> featuredDoctors = doctorService.getTopDoctors(3);
+                request.setAttribute("featuredDoctors", featuredDoctors);
+            } catch (Exception e) {
+                // Log the error but continue
+                getServletContext().log("Error getting featured doctors: " + e.getMessage(), e);
+                // Set an empty list to avoid null pointer exceptions
+                request.setAttribute("featuredDoctors", java.util.Collections.emptyList());
+            }
 
             // Check if there's a redirect parameter
             String redirect = request.getParameter("redirect");

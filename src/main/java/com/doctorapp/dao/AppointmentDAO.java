@@ -17,27 +17,139 @@ public class AppointmentDAO {
 
      // Book a new appointment
      public boolean bookAppointment(Appointment appointment) {
-         String query = "INSERT INTO appointments (patient_id, doctor_id, patient_name, doctor_name, " +
-                       "appointment_date, appointment_time, status, symptoms) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+         String query = "INSERT INTO appointments (patient_id, doctor_id, appointment_date, appointment_time, " +
+                       "status, reason, symptoms, notes, fee) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-         try (Connection conn = DBConnection.getConnection();
-              PreparedStatement pstmt = conn.prepareStatement(query)) {
+         LOGGER.info("Attempting to book appointment for patient " + appointment.getPatientId() +
+                    " with doctor " + appointment.getDoctorId() + " on " +
+                    appointment.getAppointmentDate() + " at " + appointment.getAppointmentTime());
 
+         // Validate appointment data
+         if (appointment.getPatientId() <= 0 || appointment.getDoctorId() <= 0 ||
+             appointment.getAppointmentDate() == null || appointment.getAppointmentTime() == null) {
+             LOGGER.severe("Invalid appointment data: patientId=" + appointment.getPatientId() +
+                          ", doctorId=" + appointment.getDoctorId() +
+                          ", date=" + appointment.getAppointmentDate() +
+                          ", time=" + appointment.getAppointmentTime());
+             return false;
+         }
+
+         Connection conn = null;
+         PreparedStatement pstmt = null;
+
+         try {
+             // Get database connection
+             conn = DBConnection.getConnection();
+
+             // Check if connection is valid
+             if (conn == null || conn.isClosed()) {
+                 LOGGER.severe("Database connection is null or closed");
+                 return false;
+             }
+
+             // Prepare statement
+             pstmt = conn.prepareStatement(query, java.sql.Statement.RETURN_GENERATED_KEYS);
+
+             // Set parameters
              pstmt.setInt(1, appointment.getPatientId());
              pstmt.setInt(2, appointment.getDoctorId());
-             pstmt.setString(3, appointment.getPatientName());
-             pstmt.setString(4, appointment.getDoctorName());
-             pstmt.setDate(5, new java.sql.Date(appointment.getAppointmentDate().getTime()));
-             pstmt.setString(6, appointment.getAppointmentTime());
-             pstmt.setString(7, appointment.getStatus());
-             pstmt.setString(8, appointment.getSymptoms());
+             pstmt.setDate(3, new java.sql.Date(appointment.getAppointmentDate().getTime()));
+             pstmt.setString(4, appointment.getAppointmentTime());
+             pstmt.setString(5, appointment.getStatus() != null ? appointment.getStatus() : "PENDING");
+             pstmt.setString(6, appointment.getReason());
+             pstmt.setString(7, appointment.getSymptoms());
+             pstmt.setString(8, appointment.getNotes());
+             pstmt.setDouble(9, appointment.getFee());
+
+             // Execute query
+             LOGGER.info("Executing SQL: " + query + " with parameters: " +
+                        appointment.getPatientId() + ", " +
+                        appointment.getDoctorId() + ", " +
+                        appointment.getAppointmentDate() + ", " +
+                        appointment.getAppointmentTime() + ", " +
+                        (appointment.getStatus() != null ? appointment.getStatus() : "PENDING") + ", " +
+                        appointment.getReason() + ", " +
+                        appointment.getSymptoms() + ", " +
+                        appointment.getNotes() + ", " +
+                        appointment.getFee());
+
+             // Print debug information
+             System.out.println("Executing SQL: " + query);
+             System.out.println("Parameters:");
+             System.out.println("1. Patient ID: " + appointment.getPatientId());
+             System.out.println("2. Doctor ID: " + appointment.getDoctorId());
+             System.out.println("3. Appointment Date: " + new java.sql.Date(appointment.getAppointmentDate().getTime()));
+             System.out.println("4. Appointment Time: " + appointment.getAppointmentTime());
+             System.out.println("5. Status: " + (appointment.getStatus() != null ? appointment.getStatus() : "PENDING"));
+             System.out.println("6. Reason: " + appointment.getReason());
+             System.out.println("7. Symptoms: " + appointment.getSymptoms());
+             System.out.println("8. Notes: " + appointment.getNotes());
+             System.out.println("9. Fee: " + appointment.getFee());
 
              int rowsAffected = pstmt.executeUpdate();
-             return rowsAffected > 0;
+             System.out.println("Rows affected: " + rowsAffected);
 
-         } catch (SQLException | ClassNotFoundException e) {
-             LOGGER.log(Level.SEVERE, "Error booking appointment", e);
+             // Check if insert was successful
+             if (rowsAffected > 0) {
+                 // Get generated ID
+                 try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                     if (generatedKeys.next()) {
+                         int id = generatedKeys.getInt(1);
+                         appointment.setId(id);
+                         LOGGER.info("Successfully booked appointment with ID: " + id);
+                         System.out.println("Successfully booked appointment with ID: " + id);
+                     } else {
+                         System.out.println("No generated keys returned");
+                     }
+                 }
+
+                 LOGGER.info("Successfully booked appointment for patient " + appointment.getPatientId() +
+                            " with doctor " + appointment.getDoctorId() + " on " +
+                            appointment.getAppointmentDate() + " at " + appointment.getAppointmentTime());
+                 return true;
+             } else {
+                 LOGGER.warning("No rows affected when booking appointment");
+                 System.out.println("No rows affected when booking appointment");
+                 return false;
+             }
+         } catch (SQLException e) {
+             LOGGER.log(Level.SEVERE, "SQL Error booking appointment: " + e.getMessage(), e);
+             System.out.println("SQL Error booking appointment: " + e.getMessage());
+             e.printStackTrace();
+
+             // Check for foreign key constraint violation
+             if (e.getMessage().contains("foreign key constraint")) {
+                 LOGGER.severe("Foreign key constraint violation. Make sure patient_id and doctor_id exist in their respective tables.");
+                 System.out.println("Foreign key constraint violation. Make sure patient_id and doctor_id exist in their respective tables.");
+             }
+
              return false;
+         } catch (ClassNotFoundException e) {
+             LOGGER.log(Level.SEVERE, "Database driver not found: " + e.getMessage(), e);
+             System.out.println("Database driver not found: " + e.getMessage());
+             e.printStackTrace();
+             return false;
+         } catch (Exception e) {
+             LOGGER.log(Level.SEVERE, "Unexpected error booking appointment: " + e.getMessage(), e);
+             System.out.println("Unexpected error booking appointment: " + e.getMessage());
+             e.printStackTrace();
+             return false;
+         } finally {
+             // Close resources
+             try {
+                 if (pstmt != null) {
+                     pstmt.close();
+                     System.out.println("PreparedStatement closed");
+                 }
+                 if (conn != null) {
+                     DBConnection.closeConnection(conn);
+                     System.out.println("Database connection closed");
+                 }
+             } catch (SQLException e) {
+                 LOGGER.log(Level.WARNING, "Error closing database resources", e);
+                 System.out.println("Error closing database resources: " + e.getMessage());
+                 e.printStackTrace();
+             }
          }
      }
 
@@ -405,6 +517,67 @@ public class AppointmentDAO {
          return appointments;
      }
 
+     // Get count of appointments by doctor ID and status
+     public int getAppointmentCountByDoctorIdAndStatus(int doctorId, String status) {
+         // Convert UI status to database status if needed
+         String dbStatus = status;
+         if ("APPROVED".equals(status)) {
+             dbStatus = "CONFIRMED";
+         } else if ("REJECTED".equals(status)) {
+             dbStatus = "CANCELLED";
+         }
+
+         String query = "SELECT COUNT(*) FROM appointments WHERE doctor_id = ? AND status = ?";
+
+         try (Connection conn = DBConnection.getConnection();
+              PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+             pstmt.setInt(1, doctorId);
+             pstmt.setString(2, dbStatus);
+
+             try (ResultSet rs = pstmt.executeQuery()) {
+                 if (rs.next()) {
+                     return rs.getInt(1);
+                 }
+             }
+         } catch (SQLException | ClassNotFoundException e) {
+             LOGGER.log(Level.SEVERE, "Error getting appointment count by doctor ID and status: " + doctorId + ", " + status, e);
+         }
+
+         return 0;
+     }
+
+     // Update appointment status with reason
+     public boolean updateAppointmentStatusWithReason(int id, String status, String reason) {
+         String query = "UPDATE appointments SET status = ?, notes = ? WHERE id = ?";
+
+         try (Connection conn = DBConnection.getConnection();
+              PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+             // Convert status to match the ENUM values in the database
+             String dbStatus = status;
+             if ("APPROVED".equals(status)) {
+                 dbStatus = "CONFIRMED";
+             } else if ("REJECTED".equals(status)) {
+                 dbStatus = "CANCELLED";
+             }
+
+             LOGGER.info("Updating appointment " + id + " with status: " + dbStatus + " and reason: " + reason);
+             pstmt.setString(1, dbStatus);
+             pstmt.setString(2, reason);
+             pstmt.setInt(3, id);
+
+             int rowsAffected = pstmt.executeUpdate();
+             LOGGER.info("Rows affected: " + rowsAffected);
+             return rowsAffected > 0;
+
+         } catch (SQLException | ClassNotFoundException e) {
+             LOGGER.log(Level.SEVERE, "Error updating appointment status with reason for ID: " + id, e);
+             e.printStackTrace();
+             return false;
+         }
+     }
+
      /**
       * Get new bookings count (pending appointments)
       * @return Count of pending appointments
@@ -412,6 +585,66 @@ public class AppointmentDAO {
      public int getNewBookingsCount() {
          // This is the same as getPendingAppointmentsCount, just with a different name for UI
          return getPendingAppointmentsCount();
+     }
+
+     // Get appointments by patient and doctor ID
+     public List<Appointment> getAppointmentsByPatientAndDoctorId(int patientId, int doctorId) {
+         List<Appointment> appointments = new ArrayList<>();
+         String query = "SELECT a.*, " +
+                       "p.id as patient_db_id, CONCAT(pu.first_name, ' ', pu.last_name) as patient_name, " +
+                       "d.id as doctor_db_id, CONCAT(du.first_name, ' ', du.last_name) as doctor_name, " +
+                       "d.specialization as doctor_specialization " +
+                       "FROM appointments a " +
+                       "JOIN patients p ON a.patient_id = p.id " +
+                       "JOIN users pu ON p.user_id = pu.id " +
+                       "JOIN doctors d ON a.doctor_id = d.id " +
+                       "JOIN users du ON d.user_id = du.id " +
+                       "WHERE a.patient_id = ? AND a.doctor_id = ? " +
+                       "ORDER BY a.appointment_date DESC, a.appointment_time DESC";
+
+         try (Connection conn = DBConnection.getConnection();
+              PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+             pstmt.setInt(1, patientId);
+             pstmt.setInt(2, doctorId);
+
+             try (ResultSet rs = pstmt.executeQuery()) {
+                 while (rs.next()) {
+                     Appointment appointment = new Appointment();
+                     appointment.setId(rs.getInt("id"));
+                     appointment.setPatientId(rs.getInt("patient_id"));
+                     appointment.setDoctorId(rs.getInt("doctor_id"));
+                     appointment.setPatientName(rs.getString("patient_name"));
+                     appointment.setDoctorName(rs.getString("doctor_name"));
+                     appointment.setDoctorSpecialization(rs.getString("doctor_specialization"));
+
+                     // Safely handle date conversion
+                     try {
+                         java.sql.Date sqlDate = rs.getDate("appointment_date");
+                         if (sqlDate != null) {
+                             appointment.setAppointmentDate(new java.util.Date(sqlDate.getTime()));
+                         }
+                     } catch (Exception e) {
+                         LOGGER.log(Level.WARNING, "Error converting appointment date: {0}", e.getMessage());
+                     }
+
+                     appointment.setAppointmentTime(rs.getString("appointment_time"));
+                     appointment.setStatus(rs.getString("status"));
+                     appointment.setReason(rs.getString("reason"));
+                     appointment.setSymptoms(rs.getString("symptoms"));
+                     appointment.setNotes(rs.getString("notes"));
+                     appointment.setPrescription(rs.getString("prescription"));
+                     appointment.setFee(rs.getDouble("fee"));
+
+                     appointments.add(appointment);
+                 }
+             }
+
+         } catch (SQLException | ClassNotFoundException e) {
+             LOGGER.log(Level.SEVERE, "Error getting appointments by patient ID and doctor ID: " + patientId + ", " + doctorId, e);
+         }
+
+         return appointments;
      }
 
      // These methods are replaced by the JavaDoc versions below
@@ -919,5 +1152,158 @@ public class AppointmentDAO {
          }
 
          return 0;
+     }
+
+     /**
+      * Get count of pending appointments by doctor ID
+      * @param doctorId Doctor ID
+      * @return Count of pending appointments for the specified doctor
+      */
+     public int getPendingAppointmentCountByDoctorId(int doctorId) {
+         String query = "SELECT COUNT(*) FROM appointments WHERE doctor_id = ? AND status = 'PENDING'";
+
+         try (Connection conn = DBConnection.getConnection();
+              PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+             pstmt.setInt(1, doctorId);
+
+             try (ResultSet rs = pstmt.executeQuery()) {
+                 if (rs.next()) {
+                     return rs.getInt(1);
+                 }
+             }
+
+         } catch (SQLException | ClassNotFoundException e) {
+             LOGGER.log(Level.SEVERE, "Error getting pending appointments count by doctor ID: " + doctorId, e);
+         }
+
+         return 0;
+     }
+
+     /**
+      * Get total number of appointments by patient ID
+      * @param patientId Patient ID
+      * @return Total number of appointments for the specified patient
+      */
+     public int getTotalAppointmentsByPatientId(int patientId) {
+         return getTotalAppointmentsByPatient(patientId);
+     }
+
+     /**
+      * Get count of upcoming appointments by patient ID
+      * @param patientId Patient ID
+      * @return Count of upcoming appointments for the specified patient
+      */
+     public int getUpcomingAppointmentCountByPatientId(int patientId) {
+         return getUpcomingAppointmentCountByPatient(patientId);
+     }
+
+     /**
+      * Get count of completed appointments by patient ID
+      * @param patientId Patient ID
+      * @return Count of completed appointments for the specified patient
+      */
+     public int getCompletedAppointmentCountByPatientId(int patientId) {
+         String query = "SELECT COUNT(*) FROM appointments WHERE patient_id = ? AND status = 'COMPLETED'";
+
+         try (Connection conn = DBConnection.getConnection();
+              PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+             pstmt.setInt(1, patientId);
+
+             try (ResultSet rs = pstmt.executeQuery()) {
+                 if (rs.next()) {
+                     return rs.getInt(1);
+                 }
+             }
+
+         } catch (SQLException | ClassNotFoundException e) {
+             LOGGER.log(Level.SEVERE, "Error getting completed appointments count by patient ID: " + patientId, e);
+         }
+
+         return 0;
+     }
+
+     /**
+      * Get count of cancelled appointments by patient ID
+      * @param patientId Patient ID
+      * @return Count of cancelled appointments for the specified patient
+      */
+     public int getCancelledAppointmentCountByPatientId(int patientId) {
+         String query = "SELECT COUNT(*) FROM appointments WHERE patient_id = ? AND status = 'CANCELLED'";
+
+         try (Connection conn = DBConnection.getConnection();
+              PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+             pstmt.setInt(1, patientId);
+
+             try (ResultSet rs = pstmt.executeQuery()) {
+                 if (rs.next()) {
+                     return rs.getInt(1);
+                 }
+             }
+
+         } catch (SQLException | ClassNotFoundException e) {
+             LOGGER.log(Level.SEVERE, "Error getting cancelled appointments count by patient ID: " + patientId, e);
+         }
+
+         return 0;
+     }
+
+     /**
+      * Get upcoming appointments by patient ID (without limit)
+      * @param patientId Patient ID
+      * @return List of upcoming appointments for the specified patient
+      */
+     public List<Appointment> getUpcomingAppointmentsByPatientId(int patientId) {
+         // Default to 5 upcoming appointments
+         return getUpcomingAppointmentsByPatient(patientId, 5);
+     }
+
+     /**
+      * Get recent appointments by patient ID
+      * @param patientId Patient ID
+      * @return List of recent appointments for the specified patient
+      */
+     public List<Appointment> getRecentAppointmentsByPatientId(int patientId) {
+         List<Appointment> appointments = new ArrayList<>();
+         String query = "SELECT a.*, d.name as doctor_name, d.specialization " +
+                       "FROM appointments a " +
+                       "JOIN doctors d ON a.doctor_id = d.id " +
+                       "WHERE a.patient_id = ? AND ((a.appointment_date < CURRENT_DATE) OR " +
+                       "(a.appointment_date = CURRENT_DATE AND a.appointment_time < CURRENT_TIME)) " +
+                       "ORDER BY a.appointment_date DESC, a.appointment_time DESC " +
+                       "LIMIT 5";
+
+         try (Connection conn = DBConnection.getConnection();
+              PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+             pstmt.setInt(1, patientId);
+
+             try (ResultSet rs = pstmt.executeQuery()) {
+                 while (rs.next()) {
+                     Appointment appointment = new Appointment();
+                     appointment.setId(rs.getInt("id"));
+                     appointment.setPatientId(rs.getInt("patient_id"));
+                     appointment.setDoctorId(rs.getInt("doctor_id"));
+                     appointment.setAppointmentDate(rs.getDate("appointment_date"));
+                     appointment.setAppointmentTime(rs.getString("appointment_time"));
+                     appointment.setStatus(rs.getString("status"));
+                     appointment.setReason(rs.getString("reason"));
+                     appointment.setSymptoms(rs.getString("symptoms"));
+                     appointment.setNotes(rs.getString("notes"));
+                     appointment.setFee(rs.getDouble("fee"));
+                     appointment.setDoctorName(rs.getString("doctor_name"));
+                     appointment.setDoctorSpecialization(rs.getString("specialization"));
+
+                     appointments.add(appointment);
+                 }
+             }
+
+         } catch (SQLException | ClassNotFoundException e) {
+             LOGGER.log(Level.SEVERE, "Error getting recent appointments by patient ID: " + patientId, e);
+         }
+
+         return appointments;
      }
  }

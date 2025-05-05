@@ -9,8 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Include CSS files using JSP include directive -->
     <style>
-        <%@ include file="../css/common.css" %>
-        <%@ include file="../css/adminDashboard.css" %>
+        <%@ include file="../assets/css/style.css" %>
+        <%@ include file="../assets/css/dashboard.css" %>
     </style>
     <style>
         .form-container {

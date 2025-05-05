@@ -1,506 +1,722 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
- <%@ page import="java.util.List" %>
- <%@ page import="com.doctorapp.model.User" %>
- <%@ page import="com.doctorapp.model.Patient" %>
- <%@ page import="com.doctorapp.model.Doctor" %>
- <%@ page import="com.doctorapp.model.Appointment" %>
- <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
- <%
-     // Check if user is logged in and is a patient
-     User user = (User) session.getAttribute("user");
-     if (user == null || !"PATIENT".equals(user.getRole())) {
-         response.sendRedirect(request.getContextPath() + "/login.jsp");
-         return;
-     }
+<%@ page import="java.util.List" %>
+<%@ page import="com.doctorapp.model.Appointment" %>
+<%@ page import="com.doctorapp.model.User" %>
+<%@ page import="com.doctorapp.dao.AppointmentDAO" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard | HealthCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/patientDashboard.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fc;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
 
-     // Get patient data from request attributes
-     Patient patient = (Patient) request.getAttribute("patient");
-     List<Appointment> upcomingAppointments = (List<Appointment>) request.getAttribute("upcomingAppointments");
-     List<Appointment> pastAppointments = (List<Appointment>) request.getAttribute("pastAppointments");
-     List<Appointment> cancelledAppointments = (List<Appointment>) request.getAttribute("cancelledAppointments");
-     Integer totalVisits = (Integer) request.getAttribute("totalVisits");
-     Integer upcomingVisitsCount = (Integer) request.getAttribute("upcomingVisitsCount");
-     Integer totalDoctors = (Integer) request.getAttribute("totalDoctors");
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
 
-     // Set default values if attributes are null
-     if (totalVisits == null) totalVisits = 0;
-     if (upcomingVisitsCount == null) upcomingVisitsCount = 0;
-     if (totalDoctors == null) totalDoctors = 0;
-     if (upcomingAppointments == null) upcomingAppointments = new java.util.ArrayList<>();
-     if (pastAppointments == null) pastAppointments = new java.util.ArrayList<>();
-     if (cancelledAppointments == null) cancelledAppointments = new java.util.ArrayList<>();
- %>
- <!DOCTYPE html>
- <html lang="en">
- <head>
-     <meta charset="UTF-8">
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>Patient Dashboard | Doctor Appointment System</title>
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patientDashboard.css">
-     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-sidebar-fix.css">
- </head>
- <body>
-     <div class="dashboard-container">
-         <!-- Sidebar -->
-         <div class="sidebar">
-             <div class="user-profile">
-                 <div class="profile-image">
-                     <% if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) { %>
-                         <div class="profile-initials">AT</div>
-                     <% } else { %>
-                         <img src="${pageContext.request.contextPath}/assets/images/patients/default.jpg" alt="Patient">
-                     <% } %>
-                 </div>
-                 <h3 class="user-name"><%= user.getFirstName() + " " + user.getLastName() %></h3>
-                 <p class="user-email"><%= user.getEmail() %></p>
-                 <p class="user-phone"><%= user.getPhone() %></p>
-             </div>
+        .sidebar {
+            width: 250px;
+            background-color: #4e73df;
+            color: #fff;
+            transition: all 0.3s;
+        }
 
-             <ul class="sidebar-menu">
-                 <li>
-                     <a href="${pageContext.request.contextPath}/patient/dashboard" class="active">
-                         <i class="fas fa-home"></i>
-                         <span>Dashboard</span>
-                     </a>
-                 </li>
-                 <li>
-                     <a href="${pageContext.request.contextPath}/doctors">
-                         <i class="fas fa-user-md"></i>
-                         <span>Find Doctors</span>
-                     </a>
-                 </li>
-                 <li>
-                     <a href="${pageContext.request.contextPath}/patient/profile">
-                         <i class="fas fa-user"></i>
-                         <span>My Profile</span>
-                     </a>
-                 </li>
-                 <li>
-                     <a href="${pageContext.request.contextPath}/patient/changePassword.jsp">
-                         <i class="fas fa-lock"></i>
-                         <span>Change Password</span>
-                     </a>
-                 </li>
-             </ul>
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-             <div class="logout-btn">
-                 <a href="${pageContext.request.contextPath}/logout">
-                     <i class="fas fa-sign-out-alt"></i>
-                     <span>Logout</span>
-                 </a>
-             </div>
-         </div>
+        .sidebar-header h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
 
-         <!-- Main Content -->
-         <div class="main-content">
-             <!-- Header -->
-             <div class="dashboard-header">
-                 <div class="welcome-text">
-                     <h2>Welcome, <%= user.getFirstName() %>!</h2>
-                     <p>Here's an overview of your health appointments</p>
-                 </div>
+        .sidebar-menu {
+            padding: 20px 0;
+        }
 
-                 <a href="${pageContext.request.contextPath}/doctors" class="new-appointment-btn" style="background-color: #4CAF50; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; display: inline-flex; align-items: center;">
-                     <i class="fas fa-plus" style="margin-right: 8px;"></i> New Appointment
-                 </a>
-             </div>
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
 
-             <!-- Stats Cards -->
-             <div class="stats-container">
-                 <div class="stat-card">
-                     <div class="stat-icon" style="background-color: rgba(76, 175, 80, 0.1); color: #4CAF50;">
-                         <i class="fas fa-calendar-check"></i>
-                     </div>
-                     <div class="stat-content">
-                         <div class="stat-value"><%= totalVisits %></div>
-                         <div class="stat-label">Total Visits</div>
-                     </div>
-                 </div>
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
 
-                 <div class="stat-card">
-                     <div class="stat-icon" style="background-color: rgba(33, 150, 243, 0.1); color: #2196F3;">
-                         <i class="fas fa-calendar-alt"></i>
-                     </div>
-                     <div class="stat-content">
-                         <div class="stat-value"><%= upcomingVisitsCount %></div>
-                         <div class="stat-label">Upcoming Visits</div>
-                     </div>
-                 </div>
+        .sidebar-menu li a {
+            display: block;
+            padding: 10px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
 
-                 <div class="stat-card">
-                     <div class="stat-icon" style="background-color: rgba(255, 152, 0, 0.1); color: #FF9800;">
-                         <i class="fas fa-user-md"></i>
-                     </div>
-                     <div class="stat-content">
-                         <div class="stat-value"><%= totalDoctors %></div>
-                         <div class="stat-label">Total Doctors</div>
-                     </div>
-                 </div>
-             </div>
+        .sidebar-menu li a:hover,
+        .sidebar-menu li.active a {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
 
-             <!-- Appointment Section -->
-             <div class="appointment-section">
-                 <h3 style="font-size: 1.5rem; margin-bottom: 15px; color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px;">
-                     <i class="fas fa-calendar-check" style="color: #4CAF50; margin-right: 10px;"></i>Latest Appointments
-                 </h3>
+        .sidebar-menu li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
 
-                 <!-- Appointment Tabs -->
-                 <div class="appointment-tabs" style="display: flex; margin-bottom: 20px; border-bottom: 1px solid #eee; gap: 5px;">
-                     <button class="tab-button active" data-tab="upcoming" style="padding: 12px 20px; background: none; border: none; cursor: pointer; font-weight: 600; color: #4CAF50; border-bottom: 3px solid #4CAF50; transition: all 0.3s ease; position: relative;">
-                         <i class="fas fa-calendar-alt" style="margin-right: 8px;"></i>Upcoming
-                         <span class="tab-count" style="position: absolute; top: 5px; right: 5px; background-color: #4CAF50; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px;"><%= upcomingAppointments.size() %></span>
-                     </button>
-                     <button class="tab-button" data-tab="past" style="padding: 12px 20px; background: none; border: none; cursor: pointer; font-weight: 600; color: #666; transition: all 0.3s ease; position: relative;">
-                         <i class="fas fa-history" style="margin-right: 8px;"></i>Past
-                         <span class="tab-count" style="position: absolute; top: 5px; right: 5px; background-color: #2196F3; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px;"><%= pastAppointments.size() %></span>
-                     </button>
-                     <button class="tab-button" data-tab="cancelled" style="padding: 12px 20px; background: none; border: none; cursor: pointer; font-weight: 600; color: #666; transition: all 0.3s ease; position: relative;">
-                         <i class="fas fa-ban" style="margin-right: 8px;"></i>Cancelled
-                         <span class="tab-count" style="position: absolute; top: 5px; right: 5px; background-color: #F44336; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px;"><%= cancelledAppointments.size() %></span>
-                     </button>
-                 </div>
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
 
-                 <!-- Appointment Lists -->
-                 <div class="appointment-list" id="upcoming-appointments">
-                     <% if (upcomingAppointments.isEmpty()) { %>
-                         <div class="no-appointments" style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
-                             <i class="fas fa-calendar-times" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
-                             <p style="margin-bottom: 15px;">No upcoming appointments.</p>
-                             <a href="${pageContext.request.contextPath}/doctors" style="background-color: #4CAF50; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; display: inline-flex; align-items: center;">
-                                 <i class="fas fa-plus" style="margin-right: 8px;"></i> Book an appointment
-                             </a>
-                         </div>
-                     <% } else { %>
-                         <% for (Appointment appointment : upcomingAppointments) { %>
-                             <div class="appointment-card" data-appointment-id="<%= appointment.getId() %>" data-status="<%= appointment.getStatus() %>">
-                                 <div class="appointment-header">
-                                     <div class="appointment-date">
-                                         <div class="date-box">
-                                             <%
-                                                 java.text.SimpleDateFormat monthFormat = new java.text.SimpleDateFormat("MMM");
-                                                 java.text.SimpleDateFormat dayFormat = new java.text.SimpleDateFormat("dd");
-                                                 java.text.SimpleDateFormat yearFormat = new java.text.SimpleDateFormat("yyyy");
-                                                 String month = monthFormat.format(appointment.getAppointmentDate());
-                                                 String day = dayFormat.format(appointment.getAppointmentDate());
-                                                 String year = yearFormat.format(appointment.getAppointmentDate());
-                                             %>
-                                             <div class="month"><%= month.toUpperCase() %></div>
-                                             <div class="day"><%= day %></div>
-                                             <div class="year"><%= year %></div>
-                                         </div>
-                                         <div class="time"><%= appointment.getAppointmentTime() %></div>
-                                     </div>
-                                     <div class="appointment-status" data-status="<%= appointment.getStatus() %>">
-                                         <%= appointment.getStatus() %>
-                                     </div>
-                                 </div>
-                                 <div class="appointment-body">
-                                     <div class="doctor-info">
-                                         <div class="doctor-image">
-                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
-                                         </div>
-                                         <div class="doctor-details">
-                                             <h4><%= appointment.getDoctorName() %></h4>
-                                             <p><%= appointment.getDoctorSpecialization() != null ? appointment.getDoctorSpecialization() : "Specialist" %></p>
-                                         </div>
-                                     </div>
-                                     <div class="appointment-info">
-                                         <div class="info-item">
-                                             <i class="fas fa-stethoscope"></i>
-                                             <span>Consultation</span>
-                                         </div>
-                                         <div class="info-item">
-                                             <i class="fas fa-map-marker-alt"></i>
-                                             <span>In-Person</span>
-                                         </div>
-                                         <% if (appointment.getSymptoms() != null && !appointment.getSymptoms().isEmpty()) { %>
-                                             <div class="info-item">
-                                                 <i class="fas fa-comment-medical"></i>
-                                                 <span><%= appointment.getSymptoms() %></span>
-                                             </div>
-                                         <% } %>
-                                     </div>
-                                     <div class="appointment-actions">
-                                         <a href="${pageContext.request.contextPath}/appointment/details?id=<%= appointment.getId() %>" class="action-btn" style="background-color: #4CAF50; color: white; padding: 8px 12px; border-radius: 4px; text-decoration: none; margin-right: 5px;">
-                                             <i class="fas fa-calendar-alt"></i> Reschedule
-                                         </a>
-                                         <a href="javascript:void(0);" onclick="confirmCancel(<%= appointment.getId() %>)" class="action-btn" style="background-color: #F44336; color: white; padding: 8px 12px; border-radius: 4px; text-decoration: none;">
-                                             <i class="fas fa-times"></i> Cancel
-                                         </a>
-                                     </div>
-                                 </div>
-                             </div>
-                         <% } %>
-                     <% } %>
-                 </div>
+        .page-header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-                 <div class="appointment-list" id="past-appointments" style="display: none;">
-                     <% if (pastAppointments.isEmpty()) { %>
-                         <div class="no-appointments" style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
-                             <i class="fas fa-history" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
-                             <p>No past appointments found.</p>
-                         </div>
-                     <% } else { %>
-                         <% for (Appointment appointment : pastAppointments) { %>
-                             <div class="appointment-card" data-appointment-id="<%= appointment.getId() %>" data-status="COMPLETED">
-                                 <div class="appointment-header">
-                                     <div class="appointment-date">
-                                         <div class="date-box">
-                                             <%
-                                                 java.text.SimpleDateFormat monthFormat = new java.text.SimpleDateFormat("MMM");
-                                                 java.text.SimpleDateFormat dayFormat = new java.text.SimpleDateFormat("dd");
-                                                 java.text.SimpleDateFormat yearFormat = new java.text.SimpleDateFormat("yyyy");
-                                                 String month = monthFormat.format(appointment.getAppointmentDate());
-                                                 String day = dayFormat.format(appointment.getAppointmentDate());
-                                                 String year = yearFormat.format(appointment.getAppointmentDate());
-                                             %>
-                                             <div class="month"><%= month.toUpperCase() %></div>
-                                             <div class="day"><%= day %></div>
-                                             <div class="year"><%= year %></div>
-                                         </div>
-                                         <div class="time"><%= appointment.getAppointmentTime() %></div>
-                                     </div>
-                                     <div class="appointment-status" data-status="COMPLETED">
-                                         COMPLETED
-                                     </div>
-                                 </div>
-                                 <div class="appointment-body">
-                                     <div class="doctor-info">
-                                         <div class="doctor-image">
-                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
-                                         </div>
-                                         <div class="doctor-details">
-                                             <h4><%= appointment.getDoctorName() %></h4>
-                                             <p><%= appointment.getDoctorSpecialization() != null ? appointment.getDoctorSpecialization() : "Specialist" %></p>
-                                         </div>
-                                     </div>
-                                     <div class="appointment-info">
-                                         <div class="info-item">
-                                             <i class="fas fa-stethoscope"></i>
-                                             <span>Consultation</span>
-                                         </div>
-                                         <div class="info-item">
-                                             <i class="fas fa-map-marker-alt"></i>
-                                             <span>In-Person</span>
-                                         </div>
-                                         <% if (appointment.getSymptoms() != null && !appointment.getSymptoms().isEmpty()) { %>
-                                             <div class="info-item">
-                                                 <i class="fas fa-comment-medical"></i>
-                                                 <span><%= appointment.getSymptoms() %></span>
-                                             </div>
-                                         <% } %>
-                                     </div>
-                                     <div class="appointment-actions">
-                                         <a href="${pageContext.request.contextPath}/appointment/details?id=<%= appointment.getId() %>" class="action-btn" style="background-color: #2196F3; color: white; padding: 8px 12px; border-radius: 4px; text-decoration: none;">
-                                             <i class="fas fa-eye"></i> View Details
-                                         </a>
-                                     </div>
-                                 </div>
-                             </div>
-                         <% } %>
-                     <% } %>
-                 </div>
+        .page-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
 
-                 <div class="appointment-list" id="cancelled-appointments" style="display: none;">
-                     <% if (cancelledAppointments.isEmpty()) { %>
-                         <div class="no-appointments" style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
-                             <i class="fas fa-ban" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
-                             <p>No cancelled appointments found.</p>
-                         </div>
-                     <% } else { %>
-                         <% for (Appointment appointment : cancelledAppointments) { %>
-                             <div class="appointment-card" data-appointment-id="<%= appointment.getId() %>" data-status="CANCELLED">
-                                 <div class="appointment-header">
-                                     <div class="appointment-date">
-                                         <div class="date-box">
-                                             <%
-                                                 java.text.SimpleDateFormat monthFormat = new java.text.SimpleDateFormat("MMM");
-                                                 java.text.SimpleDateFormat dayFormat = new java.text.SimpleDateFormat("dd");
-                                                 java.text.SimpleDateFormat yearFormat = new java.text.SimpleDateFormat("yyyy");
-                                                 String month = monthFormat.format(appointment.getAppointmentDate());
-                                                 String day = dayFormat.format(appointment.getAppointmentDate());
-                                                 String year = yearFormat.format(appointment.getAppointmentDate());
-                                             %>
-                                             <div class="month"><%= month.toUpperCase() %></div>
-                                             <div class="day"><%= day %></div>
-                                             <div class="year"><%= year %></div>
-                                         </div>
-                                         <div class="time"><%= appointment.getAppointmentTime() %></div>
-                                     </div>
-                                     <div class="appointment-status" data-status="CANCELLED">
-                                         CANCELLED
-                                     </div>
-                                 </div>
-                                 <div class="appointment-body">
-                                     <div class="doctor-info">
-                                         <div class="doctor-image">
-                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
-                                         </div>
-                                         <div class="doctor-details">
-                                             <h4><%= appointment.getDoctorName() %></h4>
-                                             <p><%= appointment.getDoctorSpecialization() != null ? appointment.getDoctorSpecialization() : "Specialist" %></p>
-                                         </div>
-                                     </div>
-                                     <div class="appointment-info">
-                                         <div class="info-item">
-                                             <i class="fas fa-stethoscope"></i>
-                                             <span>Consultation</span>
-                                         </div>
-                                         <div class="info-item">
-                                             <i class="fas fa-map-marker-alt"></i>
-                                             <span>In-Person</span>
-                                         </div>
-                                         <% if (appointment.getSymptoms() != null && !appointment.getSymptoms().isEmpty()) { %>
-                                             <div class="info-item">
-                                                 <i class="fas fa-comment-medical"></i>
-                                                 <span><%= appointment.getSymptoms() %></span>
-                                             </div>
-                                         <% } %>
-                                     </div>
-                                     <div class="appointment-actions">
-                                         <a href="${pageContext.request.contextPath}/doctors" class="action-btn" style="background-color: #FF9800; color: white; padding: 8px 12px; border-radius: 4px; text-decoration: none;">
-                                             <i class="fas fa-redo"></i> Book Again
-                                         </a>
-                                     </div>
-                                 </div>
-                             </div>
-                         <% } %>
-                     <% } %>
-                 </div>
-             </div>
-         </div>
-     </div>
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4e73df;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
 
+        .btn:hover {
+            background-color: #2e59d9;
+        }
 
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
 
-     <!-- JavaScript for Tab Switching -->
-     <script>
-         document.addEventListener('DOMContentLoaded', function() {
-             // Add hover effect to appointment cards
-             const appointmentCards = document.querySelectorAll('.appointment-card');
-             appointmentCards.forEach(card => {
-                 card.addEventListener('mouseenter', function() {
-                     this.style.transform = 'translateY(-5px)';
-                     this.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
-                 });
-                 card.addEventListener('mouseleave', function() {
-                     this.style.transform = 'translateY(0)';
-                     this.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-                 });
-             });
+        .stat-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+        }
 
-             // Tab switching functionality
-             const tabButtons = document.querySelectorAll('.tab-button');
-             const appointmentLists = document.querySelectorAll('.appointment-list');
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 24px;
+        }
 
-             tabButtons.forEach(button => {
-                 button.addEventListener('click', function() {
-                     // Remove active class and styling from all buttons
-                     tabButtons.forEach(btn => {
-                         btn.classList.remove('active');
-                         btn.style.color = '#666';
-                         btn.style.borderBottom = 'none';
-                     });
+        .stat-icon.appointments {
+            background-color: rgba(78, 115, 223, 0.1);
+            color: #4e73df;
+        }
 
-                     // Add active class and styling to clicked button
-                     this.classList.add('active');
+        .stat-icon.upcoming {
+            background-color: rgba(28, 200, 138, 0.1);
+            color: #1cc88a;
+        }
 
-                     // Set color based on tab type
-                     const tabType = this.getAttribute('data-tab');
-                     let tabColor = '#4CAF50'; // Default green for upcoming
+        .stat-icon.completed {
+            background-color: rgba(246, 194, 62, 0.1);
+            color: #f6c23e;
+        }
 
-                     if (tabType === 'past') {
-                         tabColor = '#2196F3'; // Blue for past
-                     } else if (tabType === 'cancelled') {
-                         tabColor = '#F44336'; // Red for cancelled
-                     }
+        .stat-icon.cancelled {
+            background-color: rgba(231, 74, 59, 0.1);
+            color: #e74a3b;
+        }
 
-                     this.style.color = tabColor;
-                     this.style.borderBottom = '3px solid ' + tabColor;
+        .stat-info h3 {
+            margin: 0 0 5px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+        }
 
-                     // Hide all appointment lists
-                     appointmentLists.forEach(list => list.style.display = 'none');
+        .stat-info p {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
 
-                     // Show the selected appointment list
-                     const tabId = this.getAttribute('data-tab');
-                     document.getElementById(tabId + '-appointments').style.display = 'block';
-                 });
-             });
-         });
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
 
-         // Function to confirm appointment cancellation
-         function confirmCancel(appointmentId) {
-             if (confirm('Are you sure you want to cancel this appointment?')) {
-                 // Send POST request to cancel the appointment
-                 fetch('${pageContext.request.contextPath}/appointment/cancel', {
-                     method: 'POST',
-                     headers: {
-                         'Content-Type': 'application/x-www-form-urlencoded',
-                         'X-Requested-With': 'XMLHttpRequest'
-                     },
-                     body: 'id=' + appointmentId
-                 })
-                 .then(response => {
-                     if (response.ok) {
-                         // Update UI to show appointment as cancelled
-                         const appointmentCard = document.querySelector(`[data-appointment-id="${appointmentId}"]`);
-                         if (appointmentCard) {
-                             // Update status badge
-                             const statusBadge = appointmentCard.querySelector('.appointment-status');
-                             if (statusBadge) {
-                                 statusBadge.style.backgroundColor = 'rgba(244, 67, 54, 0.1)';
-                                 statusBadge.style.color = '#F44336';
-                                 statusBadge.textContent = 'CANCELLED';
-                             }
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-                             // Update actions
-                             const actionsDiv = appointmentCard.querySelector('.appointment-actions');
-                             if (actionsDiv) {
-                                 actionsDiv.innerHTML = '<a href="${pageContext.request.contextPath}/doctors" class="action-btn" style="background-color: #FF9800; color: white; padding: 8px 12px; border-radius: 4px; text-decoration: none;"><i class="fas fa-redo"></i> Book Again</a>';
-                             }
+        .card-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
 
-                             // Move the appointment to cancelled tab
-                             const cancelledTab = document.getElementById('cancelled-appointments');
-                             const upcomingTab = document.getElementById('upcoming-appointments');
-                             if (cancelledTab && upcomingTab) {
-                                 upcomingTab.removeChild(appointmentCard);
+        .card-body {
+            padding: 20px;
+        }
 
-                                 // Check if there are no more upcoming appointments
-                                 if (upcomingTab.children.length === 0) {
-                                     upcomingTab.innerHTML = `
-                                         <div class="no-appointments" style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
-                                             <i class="fas fa-calendar-times" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
-                                             <p style="margin-bottom: 15px;">No upcoming appointments.</p>
-                                             <a href="${pageContext.request.contextPath}/doctors" style="background-color: #4CAF50; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; display: inline-flex; align-items: center;">
-                                                 <i class="fas fa-plus" style="margin-right: 8px;"></i> Book an appointment
-                                             </a>
-                                         </div>
-                                     `;
-                                 }
+        .appointment-list {
+            margin-top: 20px;
+        }
 
-                                 // Add to cancelled tab
-                                 if (cancelledTab.querySelector('.no-appointments')) {
-                                     cancelledTab.innerHTML = '';
-                                 }
-                                 cancelledTab.appendChild(appointmentCard);
-                             }
-                         }
+        .appointment-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s;
+        }
 
-                         // Show success message
-                         alert('Appointment cancelled successfully!');
-                     } else {
-                         alert('Failed to cancel appointment. Please try again.');
-                     }
-                 })
-                 .catch(error => {
-                     console.error('Error cancelling appointment:', error);
-                     alert('An error occurred while cancelling the appointment. Please try again.');
-                 });
-             }
-         }
-     </script>
- </body>
- </html>
+        .appointment-item:hover {
+            background-color: #f8f9fc;
+        }
+
+        .appointment-item:last-child {
+            border-bottom: none;
+        }
+
+        .appointment-date {
+            width: 80px;
+            text-align: center;
+            margin-right: 20px;
+        }
+
+        .appointment-day {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4e73df;
+        }
+
+        .appointment-month {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .appointment-info {
+            flex: 1;
+        }
+
+        .appointment-doctor {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .appointment-time {
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            align-items: center;
+        }
+
+        .appointment-time i {
+            margin-right: 5px;
+            color: #4e73df;
+        }
+
+        .appointment-status {
+            margin-left: 20px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .appointment-status.confirmed {
+            background-color: rgba(28, 200, 138, 0.1);
+            color: #1cc88a;
+        }
+
+        .appointment-status.pending {
+            background-color: rgba(246, 194, 62, 0.1);
+            color: #f6c23e;
+        }
+
+        .appointment-status.cancelled {
+            background-color: rgba(231, 74, 59, 0.1);
+            color: #e74a3b;
+        }
+
+        .appointment-status.completed {
+            background-color: rgba(78, 115, 223, 0.1);
+            color: #4e73df;
+        }
+
+        .appointment-actions {
+            margin-left: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .action-btn.view {
+            background-color: #4e73df;
+        }
+
+        .action-btn.edit {
+            background-color: #1cc88a;
+        }
+
+        .action-btn.cancel {
+            background-color: #e74a3b;
+        }
+
+        .action-btn:hover {
+            opacity: 0.8;
+            transform: scale(1.1);
+        }
+
+        .doctor-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .doctor-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .doctor-header {
+            background-color: #f8f9fc;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .doctor-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 30px;
+            color: #4e73df;
+        }
+
+        .doctor-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .doctor-specialization {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .doctor-body {
+            padding: 15px;
+        }
+
+        .doctor-info {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .doctor-info i {
+            margin-right: 10px;
+            color: #4e73df;
+            width: 20px;
+            text-align: center;
+        }
+
+        .doctor-actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .doctor-btn {
+            padding: 8px 15px;
+            background-color: #4e73df;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .doctor-btn:hover {
+            background-color: #2e59d9;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+
+        .no-data i {
+            font-size: 50px;
+            color: #ddd;
+            margin-bottom: 15px;
+        }
+
+        .no-data p {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .appointment-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .appointment-date {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .appointment-status {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+
+            .appointment-actions {
+                margin-left: 0;
+                margin-top: 10px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%
+        // Check if user is logged in
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        // Get appointments for the current user
+        AppointmentDAO appointmentDAO = new AppointmentDAO();
+        List<Appointment> upcomingAppointments = appointmentDAO.getUpcomingAppointmentsByPatientId(currentUser.getId());
+        List<Appointment> recentAppointments = appointmentDAO.getRecentAppointmentsByPatientId(currentUser.getId());
+
+        // Count appointments by status
+        int totalAppointments = appointmentDAO.getTotalAppointmentsByPatientId(currentUser.getId());
+        int upcomingCount = appointmentDAO.getUpcomingAppointmentCountByPatientId(currentUser.getId());
+        int completedCount = appointmentDAO.getCompletedAppointmentCountByPatientId(currentUser.getId());
+        int cancelledCount = appointmentDAO.getCancelledAppointmentCountByPatientId(currentUser.getId());
+    %>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>Patient Dashboard</h3>
+            </div>
+
+            <div class="sidebar-menu">
+                <ul>
+                    <li class="active">
+                        <a href="${pageContext.request.contextPath}/patient/dashboard">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/patient/appointments">
+                            <i class="fas fa-calendar-check"></i>
+                            My Appointments
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/patient/book-appointment">
+                            <i class="fas fa-calendar-plus"></i>
+                            Book Appointment
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/patient/medical-records">
+                            <i class="fas fa-file-medical"></i>
+                            Medical Records
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/patient/prescriptions">
+                            <i class="fas fa-prescription"></i>
+                            Prescriptions
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/patient/profile-legacy">
+                            <i class="fas fa-user"></i>
+                            My Profile
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <h1>Welcome, <%= currentUser.getFirstName() %>!</h1>
+                <a href="${pageContext.request.contextPath}/doctors" class="btn">
+                    <i class="fas fa-plus"></i> Book New Appointment
+                </a>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon appointments">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Appointments</h3>
+                        <p><%= totalAppointments %></p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon upcoming">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Upcoming Appointments</h3>
+                        <p><%= upcomingCount %></p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon completed">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Completed Appointments</h3>
+                        <p><%= completedCount %></p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon cancelled">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Cancelled Appointments</h3>
+                        <p><%= cancelledCount %></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Appointments -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Upcoming Appointments</h2>
+                    <a href="${pageContext.request.contextPath}/patient/appointments" class="btn">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="appointment-list">
+                        <% if (upcomingAppointments != null && !upcomingAppointments.isEmpty()) {
+                            for (Appointment appointment : upcomingAppointments) {
+                                String statusClass = "pending";
+                                if ("CONFIRMED".equals(appointment.getStatus())) {
+                                    statusClass = "confirmed";
+                                } else if ("CANCELLED".equals(appointment.getStatus())) {
+                                    statusClass = "cancelled";
+                                } else if ("COMPLETED".equals(appointment.getStatus())) {
+                                    statusClass = "completed";
+                                }
+
+                                // Format date
+                                java.util.Date appointmentDate = appointment.getAppointmentDate();
+                                java.text.SimpleDateFormat dayFormat = new java.text.SimpleDateFormat("dd");
+                                java.text.SimpleDateFormat monthFormat = new java.text.SimpleDateFormat("MMM");
+                                String day = dayFormat.format(appointmentDate);
+                                String month = monthFormat.format(appointmentDate);
+                        %>
+                        <div class="appointment-item">
+                            <div class="appointment-date">
+                                <div class="appointment-day"><%= day %></div>
+                                <div class="appointment-month"><%= month %></div>
+                            </div>
+                            <div class="appointment-info">
+                                <div class="appointment-doctor">Dr. <%= appointment.getDoctorName() %></div>
+                                <div class="appointment-time">
+                                    <i class="fas fa-clock"></i>
+                                    <%= appointment.getAppointmentTime() %> | <%= appointment.getDoctorSpecialization() %>
+                                </div>
+                            </div>
+                            <div class="appointment-status <%= statusClass %>">
+                                <%= appointment.getStatus() %>
+                            </div>
+                            <div class="appointment-actions">
+                                <a href="${pageContext.request.contextPath}/patient/appointment?id=<%= appointment.getId() %>" class="action-btn view">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <% if (!"CANCELLED".equals(appointment.getStatus()) && !"COMPLETED".equals(appointment.getStatus())) { %>
+                                <a href="${pageContext.request.contextPath}/patient/cancel-appointment?id=<%= appointment.getId() %>" class="action-btn cancel" onclick="return confirm('Are you sure you want to cancel this appointment?')">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                                <% } %>
+                            </div>
+                        </div>
+                        <% } } else { %>
+                        <div class="no-data">
+                            <i class="fas fa-calendar-times"></i>
+                            <p>You have no upcoming appointments.</p>
+                            <a href="${pageContext.request.contextPath}/doctors" class="btn" style="margin-top: 15px;">Book an Appointment</a>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Appointments -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Recent Appointments</h2>
+                </div>
+                <div class="card-body">
+                    <div class="appointment-list">
+                        <% if (recentAppointments != null && !recentAppointments.isEmpty()) {
+                            for (Appointment appointment : recentAppointments) {
+                                String statusClass = "pending";
+                                if ("CONFIRMED".equals(appointment.getStatus())) {
+                                    statusClass = "confirmed";
+                                } else if ("CANCELLED".equals(appointment.getStatus())) {
+                                    statusClass = "cancelled";
+                                } else if ("COMPLETED".equals(appointment.getStatus())) {
+                                    statusClass = "completed";
+                                }
+
+                                // Format date
+                                java.util.Date appointmentDate = appointment.getAppointmentDate();
+                                java.text.SimpleDateFormat dayFormat = new java.text.SimpleDateFormat("dd");
+                                java.text.SimpleDateFormat monthFormat = new java.text.SimpleDateFormat("MMM");
+                                String day = dayFormat.format(appointmentDate);
+                                String month = monthFormat.format(appointmentDate);
+                        %>
+                        <div class="appointment-item">
+                            <div class="appointment-date">
+                                <div class="appointment-day"><%= day %></div>
+                                <div class="appointment-month"><%= month %></div>
+                            </div>
+                            <div class="appointment-info">
+                                <div class="appointment-doctor">Dr. <%= appointment.getDoctorName() %></div>
+                                <div class="appointment-time">
+                                    <i class="fas fa-clock"></i>
+                                    <%= appointment.getAppointmentTime() %> | <%= appointment.getDoctorSpecialization() %>
+                                </div>
+                            </div>
+                            <div class="appointment-status <%= statusClass %>">
+                                <%= appointment.getStatus() %>
+                            </div>
+                            <div class="appointment-actions">
+                                <a href="${pageContext.request.contextPath}/patient/appointment?id=<%= appointment.getId() %>" class="action-btn view">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <% } } else { %>
+                        <div class="no-data">
+                            <i class="fas fa-history"></i>
+                            <p>You have no recent appointments.</p>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

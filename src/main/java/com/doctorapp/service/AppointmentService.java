@@ -5,6 +5,7 @@ package com.doctorapp.service;
 
  import com.doctorapp.dao.AppointmentDAO;
  import com.doctorapp.model.Appointment;
+ import com.doctorapp.model.Doctor;
 
  /**
   * Service layer for Appointment-related operations.
@@ -216,27 +217,134 @@ package com.doctorapp.service;
      }
 
      /**
+      * Get count of appointments by doctor ID and status
+      * @param doctorId Doctor ID
+      * @param status Appointment status
+      * @return Count of appointments for the doctor with the specified status
+      */
+     public int getAppointmentCountByDoctorIdAndStatus(int doctorId, String status) {
+         return appointmentDAO.getAppointmentCountByDoctorIdAndStatus(doctorId, status);
+     }
+
+     /**
+      * Update appointment status with reason
+      * @param id Appointment ID
+      * @param status New status
+      * @param reason Reason for status change
+      * @return true if update was successful, false otherwise
+      */
+     public boolean updateAppointmentStatusWithReason(int id, String status, String reason) {
+         return appointmentDAO.updateAppointmentStatusWithReason(id, status, reason);
+     }
+
+     /**
+      * Get appointments by patient and doctor ID
+      * @param patientId Patient ID
+      * @param doctorId Doctor ID
+      * @return List of appointments for the patient with the specified doctor
+      */
+     public List<Appointment> getAppointmentsByPatientAndDoctorId(int patientId, int doctorId) {
+         return appointmentDAO.getAppointmentsByPatientAndDoctorId(patientId, doctorId);
+     }
+
+     /**
       * Get available time slots for a doctor
       * @param doctorId Doctor ID
       * @return List of available time slots
       */
      public List<String> getAvailableTimeSlots(int doctorId) {
-         // Default time slots if not implemented in DAO
-         List<String> timeSlots = new java.util.ArrayList<>();
-         timeSlots.add("09:00 AM");
-         timeSlots.add("10:00 AM");
-         timeSlots.add("11:00 AM");
-         timeSlots.add("12:00 PM");
-         timeSlots.add("01:00 PM");
-         timeSlots.add("02:00 PM");
-         timeSlots.add("03:00 PM");
-         timeSlots.add("04:00 PM");
-         timeSlots.add("05:00 PM");
+         // Get the doctor's available time from the database
+         DoctorService doctorService = new DoctorService();
+         Doctor doctor = doctorService.getDoctorById(doctorId);
 
-         // TODO: Implement actual time slot availability check in DAO
-         // This would check the doctor's schedule and return only available slots
+         // Default time slots if doctor has no specific availability
+         List<String> timeSlots = new java.util.ArrayList<>();
+
+         if (doctor != null && doctor.getAvailableTime() != null && !doctor.getAvailableTime().isEmpty()) {
+             // Parse the doctor's available time
+             // Format could be "09:00-17:00" or similar
+             String availableTime = doctor.getAvailableTime();
+
+             // Split by dash to get start and end times
+             if (availableTime.contains("-")) {
+                 String[] times = availableTime.split("-");
+                 if (times.length == 2) {
+                     try {
+                         // Parse start and end times
+                         java.time.LocalTime startTime = parseTime(times[0]);
+                         java.time.LocalTime endTime = parseTime(times[1]);
+
+                         // Generate hourly slots between start and end times
+                         java.time.LocalTime currentTime = startTime;
+                         while (currentTime.isBefore(endTime)) {
+                             timeSlots.add(formatTime(currentTime));
+                             currentTime = currentTime.plusHours(1);
+                         }
+
+                         return timeSlots;
+                     } catch (Exception e) {
+                         System.err.println("Error parsing doctor's available time: " + e.getMessage());
+                     }
+                 }
+             }
+         }
+
+         // If we couldn't parse the doctor's available time, return default slots with 30-minute intervals
+         timeSlots.add("08:00 AM");
+         timeSlots.add("08:30 AM");
+         timeSlots.add("09:00 AM");
+         timeSlots.add("09:30 AM");
+         timeSlots.add("10:00 AM");
+         timeSlots.add("10:30 AM");
+         timeSlots.add("11:00 AM");
+         timeSlots.add("11:30 AM");
+         timeSlots.add("12:00 PM");
+         timeSlots.add("12:30 PM");
+         timeSlots.add("01:00 PM");
+         timeSlots.add("01:30 PM");
+         timeSlots.add("02:00 PM");
+         timeSlots.add("02:30 PM");
+         timeSlots.add("03:00 PM");
+         timeSlots.add("03:30 PM");
+         timeSlots.add("04:00 PM");
+         timeSlots.add("04:30 PM");
+         timeSlots.add("05:00 PM");
+         timeSlots.add("05:30 PM");
 
          return timeSlots;
+     }
+
+     /**
+      * Parse time string to LocalTime
+      */
+     private java.time.LocalTime parseTime(String timeStr) {
+         timeStr = timeStr.trim();
+
+         // Try different formats
+         try {
+             // Try 24-hour format (HH:mm)
+             return java.time.LocalTime.parse(timeStr, java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
+         } catch (Exception e1) {
+             try {
+                 // Try 12-hour format (h:mm a)
+                 return java.time.LocalTime.parse(timeStr, java.time.format.DateTimeFormatter.ofPattern("h:mm a"));
+             } catch (Exception e2) {
+                 try {
+                     // Try 12-hour format without minutes (ha)
+                     return java.time.LocalTime.parse(timeStr, java.time.format.DateTimeFormatter.ofPattern("ha"));
+                 } catch (Exception e3) {
+                     // Default to 9 AM if parsing fails
+                     return java.time.LocalTime.of(9, 0);
+                 }
+             }
+         }
+     }
+
+     /**
+      * Format LocalTime to string in 12-hour format
+      */
+     private String formatTime(java.time.LocalTime time) {
+         return time.format(java.time.format.DateTimeFormatter.ofPattern("hh:mm a"));
      }
 
      /**

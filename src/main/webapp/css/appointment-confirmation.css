@@ -1,238 +1,286 @@
-/* Appointment Confirmation Styles - Updated Version */
-.confirmation-container {
+/* Appointment Confirmation Styles */
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fc;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+}
+
+.confirmation-card {
     background-color: #fff;
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    margin-bottom: 30px;
-    text-align: center;
 }
 
 .confirmation-header {
-    background: linear-gradient(135deg, #4CAF50, #8BC34A);
-    color: white;
-    padding: 40px 30px;
-    position: relative;
+    background-color: #1cc88a;
+    color: #fff;
+    padding: 30px;
+    text-align: center;
 }
 
 .confirmation-icon {
-    width: 100px;
-    height: 100px;
-    background-color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-    color: #4CAF50;
-    font-size: 50px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    font-size: 60px;
+    margin-bottom: 20px;
 }
 
-.confirmation-header h2 {
-    margin: 0 0 10px 0;
-    font-size: 28px;
+.confirmation-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 10px;
 }
 
-.confirmation-header p {
-    margin: 0;
-    opacity: 0.9;
+.confirmation-subtitle {
     font-size: 16px;
+    opacity: 0.9;
 }
 
 .confirmation-body {
     padding: 30px;
 }
 
+.confirmation-message {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.confirmation-message p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #666;
+}
+
 .appointment-details {
     background-color: #f8f9fc;
     border-radius: 10px;
-    padding: 30px;
+    padding: 20px;
     margin-bottom: 30px;
-    text-align: left;
-    border: 1px solid #e3e6f0;
 }
 
-.detail-row {
+.detail-item {
     display: flex;
     margin-bottom: 15px;
-    border-bottom: 1px solid #e3e6f0;
-    padding-bottom: 15px;
 }
 
-.detail-row:last-child {
-    border-bottom: none;
+.detail-item:last-child {
     margin-bottom: 0;
-    padding-bottom: 0;
+}
+
+.detail-icon {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(78, 115, 223, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: #4e73df;
+}
+
+.detail-content {
+    flex: 1;
 }
 
 .detail-label {
-    flex: 0 0 150px;
-    font-weight: 600;
-    color: #5a5c69;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
 }
 
 .detail-value {
-    flex: 1;
+    font-size: 16px;
+    font-weight: 600;
     color: #333;
 }
 
 .doctor-info {
     display: flex;
     align-items: center;
-    background-color: #f1f8e9;
+    background-color: #f8f9fc;
     border-radius: 10px;
     padding: 20px;
     margin-bottom: 30px;
-    border: 1px solid #c5e1a5;
 }
 
 .doctor-avatar {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    overflow: hidden;
+    background-color: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-right: 20px;
-    background-color: #fff;
-    border: 3px solid #fff;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-}
-
-.doctor-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    font-size: 30px;
+    color: #4e73df;
 }
 
 .doctor-details {
     flex: 1;
-    text-align: left;
 }
 
-.doctor-details h3 {
-    margin: 0 0 5px 0;
-    color: #333;
-    font-size: 1.2rem;
+.doctor-name {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 5px;
 }
 
-.doctor-details p {
-    margin: 0 0 5px 0;
+.doctor-specialization {
+    font-size: 14px;
     color: #666;
+    margin-bottom: 10px;
+}
+
+.doctor-contact {
     display: flex;
     align-items: center;
-}
-
-.doctor-details p i {
-    margin-right: 8px;
-    color: #4CAF50;
-    width: 16px;
-    text-align: center;
-}
-
-.status-badge {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: 20px;
     font-size: 14px;
-    font-weight: 500;
+    color: #666;
 }
 
-.status-pending {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
-}
-
-.status-confirmed {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.status-cancelled {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.status-completed {
-    background-color: #cce5ff;
-    color: #004085;
-    border: 1px solid #b8daff;
-}
-
-.action-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 30px;
+.doctor-contact i {
+    margin-right: 5px;
+    color: #4e73df;
 }
 
 .instructions {
-    background-color: #fff3cd;
-    border-left: 4px solid #f6c23e;
-    padding: 15px 20px;
-    margin-top: 30px;
-    text-align: left;
-    border-radius: 5px;
+    margin-bottom: 30px;
 }
 
 .instructions h3 {
-    margin-top: 0;
-    color: #856404;
     font-size: 18px;
-    display: flex;
-    align-items: center;
-}
-
-.instructions h3 i {
-    margin-right: 10px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #333;
 }
 
 .instructions ul {
-    margin: 10px 0 0 0;
     padding-left: 20px;
-    color: #856404;
 }
 
 .instructions li {
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    color: #666;
+    line-height: 1.6;
 }
 
-/* Responsive styles */
+.confirmation-footer {
+    text-align: center;
+    padding: 20px;
+    border-top: 1px solid #eee;
+}
+
+.btn {
+    padding: 12px 25px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+    margin: 0 10px;
+}
+
+.btn-primary {
+    background-color: #4e73df;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #2e59d9;
+}
+
+.btn-secondary {
+    background-color: #f8f9fc;
+    color: #666;
+    border: 1px solid #ddd;
+}
+
+.btn-secondary:hover {
+    background-color: #eee;
+}
+
+.qr-code {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.qr-code img {
+    width: 150px;
+    height: 150px;
+    border: 1px solid #eee;
+    border-radius: 10px;
+}
+
+.qr-code p {
+    font-size: 14px;
+    color: #666;
+    margin-top: 10px;
+}
+
+.contact-support {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 14px;
+    color: #666;
+}
+
+.contact-support a {
+    color: #4e73df;
+    text-decoration: none;
+}
+
+.contact-support a:hover {
+    text-decoration: underline;
+}
+
 @media (max-width: 768px) {
-    .detail-row {
-        flex-direction: column;
+    .container {
+        padding: 10px;
+        margin: 20px auto;
     }
-
-    .detail-label {
-        margin-bottom: 5px;
+    
+    .confirmation-header {
+        padding: 20px;
     }
-
+    
+    .confirmation-icon {
+        font-size: 40px;
+    }
+    
+    .confirmation-title {
+        font-size: 20px;
+    }
+    
+    .confirmation-body {
+        padding: 20px;
+    }
+    
     .doctor-info {
         flex-direction: column;
         text-align: center;
     }
-
+    
     .doctor-avatar {
         margin-right: 0;
         margin-bottom: 15px;
     }
-
-    .doctor-details {
-        text-align: center;
-    }
-
-    .doctor-details p {
-        justify-content: center;
-    }
-
-    .action-buttons {
-        flex-direction: column;
-    }
-
+    
     .btn {
+        display: block;
         width: 100%;
-        justify-content: center;
+        margin: 10px 0;
     }
 }

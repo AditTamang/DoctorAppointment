@@ -196,104 +196,145 @@
             </div>
 
             <div class="doctors-grid">
-                <div class="doctor-card">
-                    <div class="doctor-status">Available Today</div>
-                    <div class="doctor-img">
-                        <img src="${pageContext.request.contextPath}/assets/images/doctors/d7.png" alt="Doctor">
-                        <div class="doctor-rating">
-                            <i class="fas fa-star"></i>
-                            <span>4.9</span>
-                            <span>(120)</span>
-                        </div>
-                    </div>
-                    <div class="doctor-info">
-                        <h3>Dr. John Smith</h3>
-                        <p class="specialization">Cardiologist</p>
-                        <p>MD in Cardiology, 15+ years of experience in treating heart-related issues.</p>
+                <c:choose>
+                    <c:when test="${not empty featuredDoctors}">
+                        <c:forEach var="doctor" items="${featuredDoctors}">
+                            <div class="doctor-card">
+                                <div class="doctor-status">Available Today</div>
+                                <div class="doctor-img">
+                                    <img src="${pageContext.request.contextPath}${doctor.imageUrl != null && !doctor.imageUrl.isEmpty() ? doctor.imageUrl : '/assets/images/doctors/default.jpg'}" alt="Doctor">
+                                    <div class="doctor-rating">
+                                        <i class="fas fa-star"></i>
+                                        <span>4.8</span>
+                                        <span>(95)</span>
+                                    </div>
+                                </div>
+                                <div class="doctor-info">
+                                    <h3>Dr. ${doctor.name}</h3>
+                                    <p class="specialization">${doctor.specialization}</p>
+                                    <p>${doctor.bio != null && !doctor.bio.isEmpty() ? doctor.bio : 'Experienced specialist providing quality healthcare services.'}</p>
 
-                        <div class="doctor-meta">
-                            <div class="doctor-meta-item">
-                                <i class="fas fa-briefcase"></i>
-                                <span>15 Years</span>
+                                    <div class="doctor-meta">
+                                        <div class="doctor-meta-item">
+                                            <i class="fas fa-briefcase"></i>
+                                            <span>${doctor.experience != null ? doctor.experience : '5+'} Years</span>
+                                        </div>
+                                        <div class="doctor-meta-item">
+                                            <i class="fas fa-money-bill-wave"></i>
+                                            <span>$${doctor.consultationFee != null ? doctor.consultationFee : '150'}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="doctor-actions">
+                                        <a href="${pageContext.request.contextPath}/doctor/details?id=${doctor.id}" class="btn btn-primary"><i class="fas fa-eye"></i> View Profile</a>
+                                        <a href="${pageContext.request.contextPath}/appointment/book?doctorId=${doctor.id}" class="btn btn-outline"><i class="fas fa-calendar-check"></i> Book</a>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="doctor-meta-item">
-                                <i class="fas fa-money-bill-wave"></i>
-                                <span>$150</span>
+                        </c:forEach>
+                    </c:when>
+                    <c:otherwise>
+                        <!-- Default doctors when no featured doctors are available -->
+                        <div class="doctor-card">
+                            <div class="doctor-status">Available Today</div>
+                            <div class="doctor-img">
+                                <img src="${pageContext.request.contextPath}/assets/images/doctors/d7.png" alt="Doctor">
+                                <div class="doctor-rating">
+                                    <i class="fas fa-star"></i>
+                                    <span>4.9</span>
+                                    <span>(120)</span>
+                                </div>
                             </div>
-                        </div>
+                            <div class="doctor-info">
+                                <h3>Dr. John Smith</h3>
+                                <p class="specialization">Cardiologist</p>
+                                <p>MD in Cardiology, 15+ years of experience in treating heart-related issues.</p>
 
-                        <div class="doctor-actions">
-                            <a href="${pageContext.request.contextPath}/doctor/details?id=1" class="btn btn-primary"><i class="fas fa-eye"></i> View Profile</a>
-                            <a href="${pageContext.request.contextPath}/appointment/book?doctorId=1" class="btn btn-outline"><i class="fas fa-calendar-check"></i> Book</a>
-                        </div>
-                    </div>
-                </div>
+                                <div class="doctor-meta">
+                                    <div class="doctor-meta-item">
+                                        <i class="fas fa-briefcase"></i>
+                                        <span>15 Years</span>
+                                    </div>
+                                    <div class="doctor-meta-item">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                        <span>$150</span>
+                                    </div>
+                                </div>
 
-                <div class="doctor-card">
-                    <div class="doctor-status">Available Today</div>
-                    <div class="doctor-img">
-                        <img src="${pageContext.request.contextPath}/assets/images/doctors/d2.png" alt="Doctor">
-                        <div class="doctor-rating">
-                            <i class="fas fa-star"></i>
-                            <span>4.8</span>
-                            <span>(95)</span>
-                        </div>
-                    </div>
-                    <div class="doctor-info">
-                        <h3>Dr. Sarah Johnson</h3>
-                        <p class="specialization">Neurologist</p>
-                        <p>Specialized in treating neurological disorders with 10+ years of experience.</p>
-
-                        <div class="doctor-meta">
-                            <div class="doctor-meta-item">
-                                <i class="fas fa-briefcase"></i>
-                                <span>10 Years</span>
-                            </div>
-                            <div class="doctor-meta-item">
-                                <i class="fas fa-money-bill-wave"></i>
-                                <span>$180</span>
-                            </div>
-                        </div>
-
-                        <div class="doctor-actions">
-                            <a href="${pageContext.request.contextPath}/doctor/details?id=2" class="btn btn-primary"><i class="fas fa-eye"></i> View Profile</a>
-                            <a href="${pageContext.request.contextPath}/appointment/book?doctorId=2" class="btn btn-outline"><i class="fas fa-calendar-check"></i> Book</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="doctor-card">
-                    <div class="doctor-status">Available Today</div>
-                    <div class="doctor-img">
-                        <img src="${pageContext.request.contextPath}/assets/images/doctors/d1.png" alt="Doctor">
-                        <div class="doctor-rating">
-                            <i class="fas fa-star"></i>
-                            <span>4.7</span>
-                            <span>(87)</span>
-                        </div>
-                    </div>
-                    <div class="doctor-info">
-                        <h3>Dr. Michael Brown</h3>
-                        <p class="specialization">Orthopedic Surgeon</p>
-                        <p>Expert in orthopedic surgeries with 12+ years of experience in joint replacements.</p>
-
-                        <div class="doctor-meta">
-                            <div class="doctor-meta-item">
-                                <i class="fas fa-briefcase"></i>
-                                <span>12 Years</span>
-                            </div>
-                            <div class="doctor-meta-item">
-                                <i class="fas fa-money-bill-wave"></i>
-                                <span>$200</span>
+                                <div class="doctor-actions">
+                                    <a href="${pageContext.request.contextPath}/doctor/details?id=1" class="btn btn-primary"><i class="fas fa-eye"></i> View Profile</a>
+                                    <a href="${pageContext.request.contextPath}/appointment/book?doctorId=1" class="btn btn-outline"><i class="fas fa-calendar-check"></i> Book</a>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="doctor-actions">
-                            <a href="${pageContext.request.contextPath}/doctor/details?id=3" class="btn btn-primary"><i class="fas fa-eye"></i> View Profile</a>
-                            <a href="${pageContext.request.contextPath}/appointment/book?doctorId=3" class="btn btn-outline"><i class="fas fa-calendar-check"></i> Book</a>
+                        <div class="doctor-card">
+                            <div class="doctor-status">Available Today</div>
+                            <div class="doctor-img">
+                                <img src="${pageContext.request.contextPath}/assets/images/doctors/d2.png" alt="Doctor">
+                                <div class="doctor-rating">
+                                    <i class="fas fa-star"></i>
+                                    <span>4.8</span>
+                                    <span>(95)</span>
+                                </div>
+                            </div>
+                            <div class="doctor-info">
+                                <h3>Dr. Sarah Johnson</h3>
+                                <p class="specialization">Neurologist</p>
+                                <p>Specialized in treating neurological disorders with 10+ years of experience.</p>
+
+                                <div class="doctor-meta">
+                                    <div class="doctor-meta-item">
+                                        <i class="fas fa-briefcase"></i>
+                                        <span>10 Years</span>
+                                    </div>
+                                    <div class="doctor-meta-item">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                        <span>$180</span>
+                                    </div>
+                                </div>
+
+                                <div class="doctor-actions">
+                                    <a href="${pageContext.request.contextPath}/doctor/details?id=2" class="btn btn-primary"><i class="fas fa-eye"></i> View Profile</a>
+                                    <a href="${pageContext.request.contextPath}/appointment/book?doctorId=2" class="btn btn-outline"><i class="fas fa-calendar-check"></i> Book</a>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+
+                        <div class="doctor-card">
+                            <div class="doctor-status">Available Today</div>
+                            <div class="doctor-img">
+                                <img src="${pageContext.request.contextPath}/assets/images/doctors/d1.png" alt="Doctor">
+                                <div class="doctor-rating">
+                                    <i class="fas fa-star"></i>
+                                    <span>4.7</span>
+                                    <span>(87)</span>
+                                </div>
+                            </div>
+                            <div class="doctor-info">
+                                <h3>Dr. Michael Brown</h3>
+                                <p class="specialization">Orthopedic Surgeon</p>
+                                <p>Expert in orthopedic surgeries with 12+ years of experience in joint replacements.</p>
+
+                                <div class="doctor-meta">
+                                    <div class="doctor-meta-item">
+                                        <i class="fas fa-briefcase"></i>
+                                        <span>12 Years</span>
+                                    </div>
+                                    <div class="doctor-meta-item">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                        <span>$200</span>
+                                    </div>
+                                </div>
+
+                                <div class="doctor-actions">
+                                    <a href="${pageContext.request.contextPath}/doctor/details?id=3" class="btn btn-primary"><i class="fas fa-eye"></i> View Profile</a>
+                                    <a href="${pageContext.request.contextPath}/appointment/book?doctorId=3" class="btn btn-outline"><i class="fas fa-calendar-check"></i> Book</a>
+                                </div>
+                            </div>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
             </div>
         </div>
     </section>

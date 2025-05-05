@@ -247,6 +247,30 @@ package com.doctorapp.dao;
                      }
                      doctor.setImageUrl(imageUrl);
 
+                     // Set profile image if available
+                     try {
+                         String profileImage = rs.getString("profile_image");
+                         if (profileImage != null && !profileImage.isEmpty()) {
+                             doctor.setProfileImage(profileImage);
+                         } else {
+                             doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                         }
+                     } catch (SQLException e) {
+                         // Profile image column might not exist yet
+                         doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                         System.out.println("Profile image column not found in getDoctorById: " + e.getMessage());
+                     }
+
+                     // Set bio if available
+                     try {
+                         String bio = rs.getString("bio");
+                         doctor.setBio(bio);
+                         System.out.println("Retrieved bio for doctor: " + bio);
+                     } catch (SQLException e) {
+                         // Bio column might not exist yet
+                         System.out.println("Bio column not found in getDoctorById: " + e.getMessage());
+                     }
+
                      return doctor;
                  }
              }
@@ -360,6 +384,30 @@ package com.doctorapp.dao;
                      }
                      doctor.setImageUrl(imageUrl);
 
+                     // Set profile image if available
+                     try {
+                         String profileImage = rs.getString("profile_image");
+                         if (profileImage != null && !profileImage.isEmpty()) {
+                             doctor.setProfileImage(profileImage);
+                         } else {
+                             doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                         }
+                     } catch (SQLException e) {
+                         // Profile image column might not exist yet
+                         doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                         System.out.println("Profile image column not found in getDoctorByUserId: " + e.getMessage());
+                     }
+
+                     // Set bio if available
+                     try {
+                         String bio = rs.getString("bio");
+                         doctor.setBio(bio);
+                         System.out.println("Retrieved bio for doctor: " + bio);
+                     } catch (SQLException e) {
+                         // Bio column might not exist yet
+                         System.out.println("Bio column not found in getDoctorByUserId: " + e.getMessage());
+                     }
+
                      return doctor;
                  }
              }
@@ -471,6 +519,27 @@ package com.doctorapp.dao;
                      imageUrl = "/assets/images/doctors/default-doctor.png";
                  }
                  doctor.setImageUrl(imageUrl);
+
+                 // Set profile image if available
+                 try {
+                     String profileImage = rs.getString("profile_image");
+                     if (profileImage != null && !profileImage.isEmpty()) {
+                         doctor.setProfileImage(profileImage);
+                     } else {
+                         doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                     }
+                 } catch (SQLException e) {
+                     // Profile image column might not exist yet
+                     doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                 }
+
+                 // Set bio if available
+                 try {
+                     String bio = rs.getString("bio");
+                     doctor.setBio(bio);
+                 } catch (SQLException e) {
+                     // Bio column might not exist yet
+                 }
 
                  // Only add doctors with valid information
                  if (name != null && !name.isEmpty() &&
@@ -594,6 +663,27 @@ package com.doctorapp.dao;
                      }
                      doctor.setImageUrl(imageUrl);
 
+                     // Set profile image if available
+                     try {
+                         String profileImage = rs.getString("profile_image");
+                         if (profileImage != null && !profileImage.isEmpty()) {
+                             doctor.setProfileImage(profileImage);
+                         } else {
+                             doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                         }
+                     } catch (SQLException e) {
+                         // Profile image column might not exist yet
+                         doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                     }
+
+                     // Set bio if available
+                     try {
+                         String bio = rs.getString("bio");
+                         doctor.setBio(bio);
+                     } catch (SQLException e) {
+                         // Bio column might not exist yet
+                     }
+
                      // Only add doctors with valid information
                      if (name != null && !name.isEmpty() &&
                          doctor.getSpecialization() != null && !doctor.getSpecialization().isEmpty()) {
@@ -697,6 +787,27 @@ package com.doctorapp.dao;
                      }
                      doctor.setImageUrl(imageUrl);
 
+                     // Set profile image if available
+                     try {
+                         String profileImage = rs.getString("profile_image");
+                         if (profileImage != null && !profileImage.isEmpty()) {
+                             doctor.setProfileImage(profileImage);
+                         } else {
+                             doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                         }
+                     } catch (SQLException e) {
+                         // Profile image column might not exist yet
+                         doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                     }
+
+                     // Set bio if available
+                     try {
+                         String bio = rs.getString("bio");
+                         doctor.setBio(bio);
+                     } catch (SQLException e) {
+                         // Bio column might not exist yet
+                     }
+
                      // Only add doctors with valid information
                      if (name != null && !name.isEmpty() &&
                          doctor.getSpecialization() != null && !doctor.getSpecialization().isEmpty()) {
@@ -714,31 +825,83 @@ package com.doctorapp.dao;
 
      // Update doctor
      public boolean updateDoctor(Doctor doctor) {
-         String query = "UPDATE doctors SET name = ?, department_id = ?, specialization = ?, qualification = ?, experience = ?, " +
-                       "email = ?, phone = ?, address = ?, consultation_fee = ?, available_days = ?, " +
-                       "available_time = ?, image_url = ?, status = ? WHERE id = ?";
+         try (Connection conn = DBConnection.getConnection()) {
+             // First, check if bio column exists
+             boolean bioColumnExists = false;
+             boolean profileImageColumnExists = false;
 
-         try (Connection conn = DBConnection.getConnection();
-              PreparedStatement pstmt = conn.prepareStatement(query)) {
+             try {
+                 // Check if columns exist by executing a simple query
+                 String checkQuery = "SELECT bio, profile_image FROM doctors WHERE id = ?";
+                 try (PreparedStatement checkStmt = conn.prepareStatement(checkQuery)) {
+                     checkStmt.setInt(1, doctor.getId());
+                     try (ResultSet rs = checkStmt.executeQuery()) {
+                         if (rs.next()) {
+                             try {
+                                 rs.getString("bio");
+                                 bioColumnExists = true;
+                             } catch (SQLException e) {
+                                 // Bio column doesn't exist
+                             }
 
-             pstmt.setString(1, doctor.getName());
-             pstmt.setInt(2, doctor.getDepartmentId() > 0 ? doctor.getDepartmentId() : 1); // Default to first department if not specified
-             pstmt.setString(3, doctor.getSpecialization());
-             pstmt.setString(4, doctor.getQualification());
-             pstmt.setString(5, doctor.getExperience());
-             pstmt.setString(6, doctor.getEmail());
-             pstmt.setString(7, doctor.getPhone());
-             pstmt.setString(8, doctor.getAddress());
-             pstmt.setString(9, doctor.getConsultationFee());
-             pstmt.setString(10, doctor.getAvailableDays());
-             pstmt.setString(11, doctor.getAvailableTime());
-             pstmt.setString(12, doctor.getImageUrl());
-             pstmt.setString(13, doctor.getStatus() != null ? doctor.getStatus() : "ACTIVE");
-             pstmt.setInt(14, doctor.getId());
+                             try {
+                                 rs.getString("profile_image");
+                                 profileImageColumnExists = true;
+                             } catch (SQLException e) {
+                                 // Profile image column doesn't exist
+                             }
+                         }
+                     }
+                 }
+             } catch (SQLException e) {
+                 // Columns don't exist, continue with basic update
+             }
 
-             int rowsAffected = pstmt.executeUpdate();
-             return rowsAffected > 0;
+             // Build the query based on column existence
+             StringBuilder queryBuilder = new StringBuilder("UPDATE doctors SET name = ?, department_id = ?, specialization = ?, qualification = ?, experience = ?, " +
+                                                          "email = ?, phone = ?, address = ?, consultation_fee = ?, available_days = ?, " +
+                                                          "available_time = ?, image_url = ?, status = ?");
 
+             if (bioColumnExists) {
+                 queryBuilder.append(", bio = ?");
+             }
+
+             if (profileImageColumnExists) {
+                 queryBuilder.append(", profile_image = ?");
+             }
+
+             queryBuilder.append(" WHERE id = ?");
+
+             try (PreparedStatement pstmt = conn.prepareStatement(queryBuilder.toString())) {
+                 pstmt.setString(1, doctor.getName());
+                 pstmt.setInt(2, doctor.getDepartmentId() > 0 ? doctor.getDepartmentId() : 1); // Default to first department if not specified
+                 pstmt.setString(3, doctor.getSpecialization());
+                 pstmt.setString(4, doctor.getQualification());
+                 pstmt.setString(5, doctor.getExperience());
+                 pstmt.setString(6, doctor.getEmail());
+                 pstmt.setString(7, doctor.getPhone());
+                 pstmt.setString(8, doctor.getAddress());
+                 pstmt.setString(9, doctor.getConsultationFee());
+                 pstmt.setString(10, doctor.getAvailableDays());
+                 pstmt.setString(11, doctor.getAvailableTime());
+                 pstmt.setString(12, doctor.getImageUrl());
+                 pstmt.setString(13, doctor.getStatus() != null ? doctor.getStatus() : "ACTIVE");
+
+                 int paramIndex = 14;
+
+                 if (bioColumnExists) {
+                     pstmt.setString(paramIndex++, doctor.getBio());
+                 }
+
+                 if (profileImageColumnExists) {
+                     pstmt.setString(paramIndex++, doctor.getProfileImage());
+                 }
+
+                 pstmt.setInt(paramIndex, doctor.getId());
+
+                 int rowsAffected = pstmt.executeUpdate();
+                 return rowsAffected > 0;
+             }
          } catch (SQLException | ClassNotFoundException e) {
              e.printStackTrace();
              return false;
@@ -871,6 +1034,27 @@ package com.doctorapp.dao;
                          imageUrl = "/assets/images/doctors/default-doctor.png";
                      }
                      doctor.setImageUrl(imageUrl);
+
+                     // Set profile image if available
+                     try {
+                         String profileImage = rs.getString("profile_image");
+                         if (profileImage != null && !profileImage.isEmpty()) {
+                             doctor.setProfileImage(profileImage);
+                         } else {
+                             doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                         }
+                     } catch (SQLException e) {
+                         // Profile image column might not exist yet
+                         doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                     }
+
+                     // Set bio if available
+                     try {
+                         String bio = rs.getString("bio");
+                         doctor.setBio(bio);
+                     } catch (SQLException e) {
+                         // Bio column might not exist yet
+                     }
 
                      // Only add doctors with valid information
                      if (name != null && !name.isEmpty() &&

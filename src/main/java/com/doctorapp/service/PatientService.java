@@ -1,14 +1,14 @@
 package com.doctorapp.service;
 
-import com.doctorapp.dao.PatientDAO;
-import com.doctorapp.model.Patient;
-import com.doctorapp.model.MedicalRecord;
-import com.doctorapp.model.Prescription;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.doctorapp.dao.PatientDAO;
+import com.doctorapp.model.MedicalRecord;
+import com.doctorapp.model.Patient;
+import com.doctorapp.model.Prescription;
 
 /**
  * Service layer for Patient-related operations.
@@ -157,6 +157,46 @@ public class PatientService {
             return patientDAO.getCurrentPrescriptions(patientId);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error getting current prescriptions for patient ID: " + patientId, e);
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Get patients by doctor ID
+     * @param doctorId Doctor ID
+     * @return List of patients who have appointments with this doctor
+     */
+    public List<Patient> getPatientsByDoctorId(int doctorId) {
+        try {
+            return patientDAO.getPatientsByDoctorId(doctorId);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error getting patients by doctor ID: " + doctorId, e);
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Search patients by name or email
+     * @param searchTerm Term to search for in name or email
+     * @return List of patients matching the search term
+     */
+    public List<Patient> searchPatients(String searchTerm) {
+        try {
+            // For now, just return all patients since we don't have a search method in DAO
+            // In a real implementation, you would call a search method in the DAO
+            List<Patient> allPatients = patientDAO.getAllPatients();
+            if (searchTerm == null || searchTerm.trim().isEmpty()) {
+                return allPatients;
+            }
+
+            // Filter patients by name or email containing the search term (case-insensitive)
+            String term = searchTerm.toLowerCase();
+            return allPatients.stream()
+                .filter(p -> (p.getFirstName() + " " + p.getLastName()).toLowerCase().contains(term) ||
+                       (p.getEmail() != null && p.getEmail().toLowerCase().contains(term)))
+                .collect(java.util.stream.Collectors.toList());
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error searching patients with term: " + searchTerm, e);
             return Collections.emptyList();
         }
     }

@@ -32,8 +32,7 @@
     <title>Appointment Management | Doctor Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctorDashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/doctor-dashboard-complete.css">
 </head>
 <body>
     <div class="dashboard-container">
@@ -51,7 +50,7 @@
                         </a>
                     </li>
                     <li class="active">
-                        <a href="${pageContext.request.contextPath}/doctor/appointments">
+                        <a href="${pageContext.request.contextPath}/doctor/appointments-list">
                             Appointment Management
                         </a>
                     </li>
@@ -133,11 +132,11 @@
                                             <td><%= appointment.getPatientName() %></td>
                                             <td><%= appointment.getAppointmentDate() %></td>
                                             <td><%= appointment.getAppointmentTime() %></td>
-                                            <td class="status-cell"><span class="status-badge pending">PENDING</span></td>
+                                            <td class="status-cell"><span class="status-badge pending">Pending</span></td>
                                             <td class="action-cell">
                                                 <div class="action-buttons">
-                                                    <button class="approve-btn" data-appointment-id="<%= appointment.getId() %>">Approve</button>
-                                                    <button class="reject-btn" data-appointment-id="<%= appointment.getId() %>">Reject</button>
+                                                    <button class="action-btn approve-btn" data-appointment-id="<%= appointment.getId() %>"><i class="fas fa-check"></i> Approve</button>
+                                                    <button class="action-btn reject-btn" data-appointment-id="<%= appointment.getId() %>"><i class="fas fa-times"></i> Reject</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -145,7 +144,6 @@
                                 <% } else { %>
                                     <tr>
                                         <td colspan="5" class="empty-state">
-                                            <i class="fas fa-calendar-times"></i>
                                             <h4>No pending appointments</h4>
                                             <p>There are no pending appointments at this time.</p>
                                         </td>
@@ -176,16 +174,15 @@
                                             <td><%= appointment.getPatientName() %></td>
                                             <td><%= appointment.getAppointmentDate() %></td>
                                             <td><%= appointment.getAppointmentTime() %></td>
-                                            <td class="status-cell"><span class="status-badge approved">APPROVED</span></td>
+                                            <td class="status-cell"><span class="status-badge approved">Approved</span></td>
                                             <td class="action-cell">
-                                                <button class="view-details-btn" data-appointment-id="<%= appointment.getId() %>">View Details</button>
+                                                <button class="action-btn view-details-btn" data-appointment-id="<%= appointment.getId() %>"><i class="fas fa-eye"></i> View Details</button>
                                             </td>
                                         </tr>
                                     <% } %>
                                 <% } else { %>
                                     <tr>
                                         <td colspan="5" class="empty-state">
-                                            <i class="fas fa-calendar-check"></i>
                                             <h4>No approved appointments</h4>
                                             <p>There are no approved appointments at this time.</p>
                                         </td>
@@ -216,16 +213,15 @@
                                             <td><%= appointment.getPatientName() %></td>
                                             <td><%= appointment.getAppointmentDate() %></td>
                                             <td><%= appointment.getAppointmentTime() %></td>
-                                            <td class="status-cell"><span class="status-badge completed">COMPLETED</span></td>
+                                            <td class="status-cell"><span class="status-badge completed">Completed</span></td>
                                             <td class="action-cell">
-                                                <button class="view-details-btn" data-appointment-id="<%= appointment.getId() %>">View Details</button>
+                                                <button class="action-btn view-details-btn" data-appointment-id="<%= appointment.getId() %>"><i class="fas fa-eye"></i> View Details</button>
                                             </td>
                                         </tr>
                                     <% } %>
                                 <% } else { %>
                                     <tr>
                                         <td colspan="5" class="empty-state">
-                                            <i class="fas fa-clipboard-check"></i>
                                             <h4>No completed appointments</h4>
                                             <p>There are no completed appointments at this time.</p>
                                         </td>
@@ -256,16 +252,15 @@
                                             <td><%= appointment.getPatientName() %></td>
                                             <td><%= appointment.getAppointmentDate() %></td>
                                             <td><%= appointment.getAppointmentTime() %></td>
-                                            <td class="status-cell"><span class="status-badge rejected">REJECTED</span></td>
+                                            <td class="status-cell"><span class="status-badge rejected">Rejected</span></td>
                                             <td class="action-cell">
-                                                <span class="rejected-text">Appointment Rejected</span>
+                                                <button class="action-btn view-details-btn" data-appointment-id="<%= appointment.getId() %>"><i class="fas fa-eye"></i> View Details</button>
                                             </td>
                                         </tr>
                                     <% } %>
                                 <% } else { %>
                                     <tr>
                                         <td colspan="5" class="empty-state">
-                                            <i class="fas fa-times-circle"></i>
                                             <h4>No rejected appointments</h4>
                                             <p>There are no rejected appointments at this time.</p>
                                         </td>
