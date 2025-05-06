@@ -247,33 +247,32 @@
                     // Create a modal for rescheduling
                     const modal = document.createElement('div');
                     modal.className = 'modal';
-                    modal.innerHTML = `
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h3>Reschedule Appointment</h3>
-                                <span class="close">&times;</span>
-                            </div>
-                            <div class="modal-body">
-                                <p>Reschedule appointment for <strong>${patientName}</strong></p>
-                                <div class="form-group">
-                                    <label for="reschedule-date">New Date</label>
-                                    <input type="date" id="reschedule-date">
-                                </div>
-                                <div class="form-group">
-                                    <label for="reschedule-time">New Time</label>
-                                    <input type="time" id="reschedule-time">
-                                </div>
-                                <div class="form-group">
-                                    <label for="reschedule-reason">Reason for Rescheduling</label>
-                                    <textarea id="reschedule-reason" rows="3"></textarea>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button class="btn btn-outline modal-cancel">Cancel</button>
-                                <button class="btn btn-primary modal-save">Save Changes</button>
-                            </div>
-                        </div>
-                    `;
+                    modal.innerHTML =
+                        '<div class="modal-content">' +
+                            '<div class="modal-header">' +
+                                '<h3>Reschedule Appointment</h3>' +
+                                '<span class="close">&times;</span>' +
+                            '</div>' +
+                            '<div class="modal-body">' +
+                                '<p>Reschedule appointment for <strong>' + patientName + '</strong></p>' +
+                                '<div class="form-group">' +
+                                    '<label for="reschedule-date">New Date</label>' +
+                                    '<input type="date" id="reschedule-date">' +
+                                '</div>' +
+                                '<div class="form-group">' +
+                                    '<label for="reschedule-time">New Time</label>' +
+                                    '<input type="time" id="reschedule-time">' +
+                                '</div>' +
+                                '<div class="form-group">' +
+                                    '<label for="reschedule-reason">Reason for Rescheduling</label>' +
+                                    '<textarea id="reschedule-reason" rows="3"></textarea>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="modal-footer">' +
+                                '<button class="btn btn-outline modal-cancel">Cancel</button>' +
+                                '<button class="btn btn-primary modal-save">Save Changes</button>' +
+                            '</div>' +
+                        '</div>';
 
                     document.body.appendChild(modal);
 
@@ -283,61 +282,60 @@
 
                     // Add modal styles if not already in CSS
                     const style = document.createElement('style');
-                    style.textContent = `
-                        .modal {
-                            display: block;
-                            position: fixed;
-                            z-index: 1000;
-                            left: 0;
-                            top: 0;
-                            width: 100%;
-                            height: 100%;
-                            background-color: rgba(0,0,0,0.5);
-                        }
-                        .modal-content {
-                            background-color: #fff;
-                            margin: 10% auto;
-                            padding: 20px;
-                            border-radius: 8px;
-                            width: 500px;
-                            max-width: 90%;
-                        }
-                        .modal-header {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            margin-bottom: 15px;
-                            padding-bottom: 10px;
-                            border-bottom: 1px solid #e0e0e0;
-                        }
-                        .modal-footer {
-                            display: flex;
-                            justify-content: flex-end;
-                            gap: 10px;
-                            margin-top: 20px;
-                            padding-top: 15px;
-                            border-top: 1px solid #e0e0e0;
-                        }
-                        .close {
-                            font-size: 24px;
-                            font-weight: bold;
-                            cursor: pointer;
-                        }
-                        .form-group {
-                            margin-bottom: 15px;
-                        }
-                        .form-group label {
-                            display: block;
-                            margin-bottom: 5px;
-                            font-weight: 500;
-                        }
-                        .form-group input, .form-group textarea {
-                            width: 100%;
-                            padding: 8px;
-                            border: 1px solid #ddd;
-                            border-radius: 4px;
-                        }
-                    `;
+                    style.textContent =
+                        '.modal {' +
+                            'display: block;' +
+                            'position: fixed;' +
+                            'z-index: 1000;' +
+                            'left: 0;' +
+                            'top: 0;' +
+                            'width: 100%;' +
+                            'height: 100%;' +
+                            'background-color: rgba(0,0,0,0.5);' +
+                        '}' +
+                        '.modal-content {' +
+                            'background-color: #fff;' +
+                            'margin: 10% auto;' +
+                            'padding: 20px;' +
+                            'border-radius: 8px;' +
+                            'width: 500px;' +
+                            'max-width: 90%;' +
+                        '}' +
+                        '.modal-header {' +
+                            'display: flex;' +
+                            'justify-content: space-between;' +
+                            'align-items: center;' +
+                            'margin-bottom: 15px;' +
+                            'padding-bottom: 10px;' +
+                            'border-bottom: 1px solid #e0e0e0;' +
+                        '}' +
+                        '.modal-footer {' +
+                            'display: flex;' +
+                            'justify-content: flex-end;' +
+                            'gap: 10px;' +
+                            'margin-top: 20px;' +
+                            'padding-top: 15px;' +
+                            'border-top: 1px solid #e0e0e0;' +
+                        '}' +
+                        '.close {' +
+                            'font-size: 24px;' +
+                            'font-weight: bold;' +
+                            'cursor: pointer;' +
+                        '}' +
+                        '.form-group {' +
+                            'margin-bottom: 15px;' +
+                        '}' +
+                        '.form-group label {' +
+                            'display: block;' +
+                            'margin-bottom: 5px;' +
+                            'font-weight: 500;' +
+                        '}' +
+                        '.form-group input, .form-group textarea {' +
+                            'width: 100%;' +
+                            'padding: 8px;' +
+                            'border: 1px solid #ddd;' +
+                            'border-radius: 4px;' +
+                        '}';
                     document.head.appendChild(style);
 
                     // Close modal functionality
@@ -388,7 +386,7 @@
                     const appointmentId = this.closest('tr').querySelector('td:first-child').textContent;
                     const patientName = this.closest('tr').querySelector('.patient-name').textContent;
 
-                    if (confirm(`Are you sure you want to approve the appointment for ${patientName}?`)) {
+                    if (confirm('Are you sure you want to approve the appointment for ' + patientName + '?')) {
                         // Here you would send the approval to the server
                         console.log('Approving appointment', appointmentId);
 
@@ -399,10 +397,9 @@
 
                         // Replace approve/reject buttons with reschedule button
                         const actionCell = btn.closest('td');
-                        actionCell.innerHTML = `
-                            <a href="#" class="action-btn view">View</a>
-                            <a href="#" class="action-btn reschedule">Reschedule</a>
-                        `;
+                        actionCell.innerHTML =
+                            '<a href="#" class="action-btn view">View</a>' +
+                            '<a href="#" class="action-btn reschedule">Reschedule</a>';
 
                         // Show success message
                         alert('Appointment approved successfully!');
@@ -429,25 +426,24 @@
                     // Create a modal for rejection reason
                     const modal = document.createElement('div');
                     modal.className = 'modal';
-                    modal.innerHTML = `
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h3>Reject Appointment</h3>
-                                <span class="close">&times;</span>
-                            </div>
-                            <div class="modal-body">
-                                <p>Reject appointment for <strong>${patientName}</strong></p>
-                                <div class="form-group">
-                                    <label for="reject-reason">Reason for Rejection</label>
-                                    <textarea id="reject-reason" rows="3" placeholder="Please provide a reason for rejecting this appointment"></textarea>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button class="btn btn-outline modal-cancel">Cancel</button>
-                                <button class="btn btn-danger modal-reject">Reject Appointment</button>
-                            </div>
-                        </div>
-                    `;
+                    modal.innerHTML =
+                        '<div class="modal-content">' +
+                            '<div class="modal-header">' +
+                                '<h3>Reject Appointment</h3>' +
+                                '<span class="close">&times;</span>' +
+                            '</div>' +
+                            '<div class="modal-body">' +
+                                '<p>Reject appointment for <strong>' + patientName + '</strong></p>' +
+                                '<div class="form-group">' +
+                                    '<label for="reject-reason">Reason for Rejection</label>' +
+                                    '<textarea id="reject-reason" rows="3" placeholder="Please provide a reason for rejecting this appointment"></textarea>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="modal-footer">' +
+                                '<button class="btn btn-outline modal-cancel">Cancel</button>' +
+                                '<button class="btn btn-danger modal-reject">Reject Appointment</button>' +
+                            '</div>' +
+                        '</div>';
 
                     document.body.appendChild(modal);
 
@@ -481,9 +477,8 @@
 
                         // Update the action buttons
                         const actionCell = btn.closest('td');
-                        actionCell.innerHTML = `
-                            <a href="#" class="action-btn view">View</a>
-                        `;
+                        actionCell.innerHTML =
+                            '<a href="#" class="action-btn view">View</a>';
 
                         // Close the modal
                         closeModal();

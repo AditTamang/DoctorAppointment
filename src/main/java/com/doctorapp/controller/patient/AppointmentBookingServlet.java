@@ -122,9 +122,178 @@ public class AppointmentBookingServlet extends HttpServlet {
             case "/appointment/confirm":
                 confirmBooking(request, response);
                 break;
+            case "/appointment/book":
+                processBooking(request, response);
+                break;
             default:
                 response.sendRedirect(request.getContextPath() + "/doctors");
                 break;
+        }
+    }
+
+    /**
+     * Process appointment booking from the new form
+     */
+    private void processBooking(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+
+        if (user == null || !"PATIENT".equals(user.getRole())) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        // Get form data
+        String doctorIdParam = request.getParameter("doctorId");
+        String appointmentDate = request.getParameter("appointmentDate");
+        String appointmentTime = request.getParameter("appointmentTime");
+        String symptoms = request.getParameter("symptoms");
+
+        // Validate input
+        boolean hasError = false;
+
+        if (doctorIdParam == null || doctorIdParam.isEmpty()) {
+            request.setAttribute("errorMessage", "Invalid doctor information");
+            hasError = true;
+        }
+
+        if (appointmentDate == null || appointmentDate.isEmpty()) {
+            request.setAttribute("dateError", "Please select an appointment date");
+            hasError = true;
+        } else {
+            try {
+                LocalDate date = LocalDate.parse(appointmentDate);
+                LocalDate today = LocalDate.now();
+
+                if (date.isBefore(today)) {
+                    request.setAttribute("dateError", "Appointment date cannot be in the past");
+                    hasError = true;
+                }
+            } catch (DateTimeParseException e) {
+                request.setAttribute("dateError", "Invalid date format");
+                hasError = true;
+            }
+        }
+
+        if (appointmentTime == null || appointmentTime.isEmpty()) {
+            request.setAttribute("timeError", "Please select an appointment time");
+            hasError = true;
+        }
+
+        if (symptoms == null || symptoms.trim().isEmpty()) {
+            request.setAttribute("symptomsError", "Please provide symptoms or reason for visit");
+            hasError = true;
+        }
+
+        if (hasError) {
+            // Get doctor details again
+            int doctorId = Integer.parseInt(doctorIdParam);
+            Doctor doctor = doctorService.getDoctorById(doctorId);
+
+            // Get available time slots for the doctor
+            List<String> availableTimeSlots = appointmentService.getAvailableTimeSlots(doctorId);
+
+            // Set attributes for the booking form
+            request.setAttribute("doctor", doctor);
+            request.setAttribute("availableTimeSlots", availableTimeSlots);
+            request.setAttribute("appointmentDate", appointmentDate);
+            request.setAttribute("appointmentTime", appointmentTime);
+            request.setAttribute("symptoms", symptoms);
+
+            // Forward back to booking form
+            request.getRequestDispatcher("/patient/book-appointment-new.jsp").forward(request, response);
+            return;
+        }
+
+        // Parse IDs
+        int doctorId = Integer.parseInt(doctorIdParam);
+        int patientId = patientService.getPatientIdByUserId(user.getId());
+
+        // Create appointment object
+        Appointment appointment = new Appointment();
+        appointment.setDoctorId(doctorId);
+        appointment.setPatientId(patientId);
+
+        // Convert String date to java.util.Date
+        try {
+            java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date parsedDate = dateFormat.parse(appointmentDate);
+            appointment.setAppointmentDate(parsedDate);
+        } catch (Exception e) {
+            System.err.println("Error parsing date: " + e.getMessage());
+            // Use current date as fallback
+            appointment.setAppointmentDate(new java.util.Date());
+        }
+
+        appointment.setAppointmentTime(appointmentTime);
+        appointment.setSymptoms(symptoms);
+        appointment.setStatus("PENDING");
+
+        // Check if the time slot is already booked
+        boolean isTimeSlotAvailable = appointmentService.isTimeSlotAvailable(doctorId, appointmentDate, appointmentTime);
+
+        if (!isTimeSlotAvailable) {
+            // Time slot is already booked
+            request.setAttribute("timeError", "This time slot is no longer available. Please select another time.");
+
+            // Get doctor details again
+            Doctor doctor = doctorService.getDoctorById(doctorId);
+
+            // Get available time slots for the doctor (refresh the list)
+            List<String> availableTimeSlots = appointmentService.getAvailableTimeSlots(doctorId);
+
+            // Set attributes for the booking form
+            request.setAttribute("doctor", doctor);
+            request.setAttribute("availableTimeSlots", availableTimeSlots);
+            request.setAttribute("appointmentDate", appointmentDate);
+            request.setAttribute("symptoms", symptoms);
+
+            // Forward back to booking form
+            request.getRequestDispatcher("/patient/book-appointment-new.jsp").forward(request, response);
+            return;
+        }
+
+        // Book appointment
+        boolean booked = appointmentService.bookAppointment(appointment);
+
+        if (booked) {
+            // Update doctor's patient count
+            doctorService.incrementPatientCount(doctorId);
+
+            // Get doctor details for confirmation page
+            Doctor doctor = doctorService.getDoctorById(doctorId);
+
+            // Set doctor name in appointment for display
+            appointment.setDoctorName(doctor.getName());
+
+            // Set patient name in appointment for display
+            String patientName = user.getFirstName() + " " + user.getLastName();
+            appointment.setPatientName(patientName);
+
+            // Redirect to success page
+            request.setAttribute("successMessage", "Appointment booked successfully");
+            request.setAttribute("appointment", appointment);
+            request.setAttribute("doctor", doctor);
+            request.getRequestDispatcher("/patient/appointmentConfirmation.jsp").forward(request, response);
+        } else {
+            // Redirect back to booking form with error
+            request.setAttribute("errorMessage", "Failed to book appointment. Please try again.");
+
+            // Get doctor details again
+            Doctor doctor = doctorService.getDoctorById(doctorId);
+
+            // Get available time slots for the doctor
+            List<String> availableTimeSlots = appointmentService.getAvailableTimeSlots(doctorId);
+
+            // Set attributes for the booking form
+            request.setAttribute("doctor", doctor);
+            request.setAttribute("availableTimeSlots", availableTimeSlots);
+            request.setAttribute("appointmentDate", appointmentDate);
+            request.setAttribute("appointmentTime", appointmentTime);
+            request.setAttribute("symptoms", symptoms);
+
+            // Forward back to booking form
+            request.getRequestDispatcher("/patient/book-appointment-new.jsp").forward(request, response);
         }
     }
 
@@ -192,7 +361,7 @@ public class AppointmentBookingServlet extends HttpServlet {
         request.setAttribute("availableTimeSlots", availableTimeSlots);
 
         // Forward to booking form
-        request.getRequestDispatcher("/patient/bookAppointment.jsp").forward(request, response);
+        request.getRequestDispatcher("/patient/book-appointment-new.jsp").forward(request, response);
     }
 
     /**

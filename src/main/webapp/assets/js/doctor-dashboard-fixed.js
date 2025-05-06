@@ -6,10 +6,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize the dashboard
     initDashboard();
-
+    
     // Set up event listeners
     setupEventListeners();
-
+    
     // Load initial data
     loadDashboardData();
 });
@@ -20,10 +20,10 @@ document.addEventListener('DOMContentLoaded', function() {
 function initDashboard() {
     // Set current date in the header
     updateCurrentDate();
-
+    
     // Initialize sidebar toggle
     initSidebarToggle();
-
+    
     // Initialize section navigation
     initSectionNavigation();
 }
@@ -46,13 +46,13 @@ function updateCurrentDate() {
 function initSidebarToggle() {
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebar = document.getElementById('sidebar');
-
+    
     if (sidebarToggle && sidebar) {
         sidebarToggle.addEventListener('click', function() {
             sidebar.classList.toggle('collapsed');
         });
     }
-
+    
     // Handle responsive behavior
     handleResponsiveSidebar();
     window.addEventListener('resize', handleResponsiveSidebar);
@@ -63,7 +63,7 @@ function initSidebarToggle() {
  */
 function handleResponsiveSidebar() {
     const sidebar = document.getElementById('sidebar');
-
+    
     if (sidebar) {
         if (window.innerWidth < 992) {
             sidebar.classList.add('collapsed');
@@ -79,34 +79,34 @@ function handleResponsiveSidebar() {
 function initSectionNavigation() {
     const navLinks = document.querySelectorAll('.sidebar-nav a');
     const sections = document.querySelectorAll('.dashboard-section');
-
+    
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
-
+            
             // Get the target section ID from the href attribute
             const targetId = this.getAttribute('href');
-
+            
             // Hide all sections
             sections.forEach(section => {
                 section.classList.remove('active');
             });
-
+            
             // Show the target section
             const targetSection = document.querySelector(targetId);
             if (targetSection) {
                 targetSection.classList.add('active');
-
+                
                 // Load section content if needed
                 loadSectionContent(targetId);
             }
-
+            
             // Update active navigation link
             navLinks.forEach(navLink => {
                 navLink.parentElement.classList.remove('active');
             });
             this.parentElement.classList.add('active');
-
+            
             // Close sidebar on mobile
             if (window.innerWidth < 768) {
                 const sidebar = document.getElementById('sidebar');
@@ -116,7 +116,7 @@ function initSectionNavigation() {
             }
         });
     });
-
+    
     // Check if there's a hash in the URL and navigate to that section
     if (window.location.hash) {
         const targetLink = document.querySelector('.sidebar-nav a[href="' + window.location.hash + '"]');
@@ -133,7 +133,7 @@ function initSectionNavigation() {
 function loadSectionContent(sectionId) {
     // Remove the # from the section ID
     const section = sectionId.substring(1);
-
+    
     switch (section) {
         case 'profile-section':
             loadProfileSection();
@@ -167,16 +167,16 @@ function setupEventListeners() {
             updateDoctorStatus(this.checked);
         });
     }
-
+    
     // Appointment action buttons
     setupAppointmentActions();
-
+    
     // Notification dropdown
     setupNotificationDropdown();
-
+    
     // Account dropdown
     setupAccountDropdown();
-
+    
     // Search functionality
     setupSearch();
 }
@@ -192,7 +192,7 @@ function setupAppointmentActions() {
             viewAppointmentDetails(appointmentId);
         });
     });
-
+    
     // Reschedule appointment
     document.querySelectorAll('.btn-reschedule').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -200,7 +200,7 @@ function setupAppointmentActions() {
             rescheduleAppointment(appointmentId);
         });
     });
-
+    
     // Cancel appointment
     document.querySelectorAll('.btn-cancel').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -216,13 +216,13 @@ function setupAppointmentActions() {
 function setupNotificationDropdown() {
     const notificationBtn = document.querySelector('.notification-btn');
     const notificationDropdown = document.querySelector('.notification-dropdown');
-
+    
     if (notificationBtn && notificationDropdown) {
         notificationBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             notificationDropdown.style.display = notificationDropdown.style.display === 'block' ? 'none' : 'block';
         });
-
+        
         document.addEventListener('click', function(e) {
             if (!notificationBtn.contains(e.target) && !notificationDropdown.contains(e.target)) {
                 notificationDropdown.style.display = 'none';
@@ -237,13 +237,13 @@ function setupNotificationDropdown() {
 function setupAccountDropdown() {
     const accountBtn = document.querySelector('.account-btn');
     const accountDropdown = document.querySelector('.account-dropdown-menu');
-
+    
     if (accountBtn && accountDropdown) {
         accountBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             accountDropdown.style.display = accountDropdown.style.display === 'block' ? 'none' : 'block';
         });
-
+        
         document.addEventListener('click', function(e) {
             if (!accountBtn.contains(e.target) && !accountDropdown.contains(e.target)) {
                 accountDropdown.style.display = 'none';
@@ -258,12 +258,12 @@ function setupAccountDropdown() {
 function setupSearch() {
     const searchInput = document.querySelector('.search-input');
     const searchBtn = document.querySelector('.search-btn');
-
+    
     if (searchInput && searchBtn) {
         searchBtn.addEventListener('click', function() {
             performSearch(searchInput.value);
         });
-
+        
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 performSearch(this.value);
@@ -288,7 +288,7 @@ function loadDashboardData() {
 function updateDoctorStatus(isActive) {
     const statusText = document.getElementById('status-text');
     const statusIndicator = document.querySelector('.status-indicator');
-
+    
     if (statusText && statusIndicator) {
         if (isActive) {
             statusText.textContent = 'Active';
@@ -299,7 +299,7 @@ function updateDoctorStatus(isActive) {
             statusIndicator.classList.remove('active');
             statusIndicator.classList.add('inactive');
         }
-
+        
         // Send status update to server
         fetch(window.location.origin + '/doctor/update-status', {
             method: 'POST',
@@ -324,7 +324,7 @@ function updateDoctorStatus(isActive) {
  */
 function viewAppointmentDetails(appointmentId) {
     console.log('Viewing appointment details for ID:', appointmentId);
-
+    
     // Fetch appointment details from server
     fetch(window.location.origin + '/doctor/appointment?id=' + appointmentId)
     .then(response => response.json())
@@ -334,7 +334,7 @@ function viewAppointmentDetails(appointmentId) {
         if (modal) {
             // Populate modal content with appointment details
             // This would be implemented based on the actual data structure
-
+            
             // Show the modal
             const bootstrapModal = new bootstrap.Modal(modal);
             bootstrapModal.show();
@@ -360,7 +360,7 @@ function rescheduleAppointment(appointmentId) {
  */
 function cancelAppointment(appointmentId) {
     console.log('Cancelling appointment with ID:', appointmentId);
-
+    
     if (confirm('Are you sure you want to cancel this appointment?')) {
         // Send cancellation request to server
         fetch(window.location.origin + '/doctor/cancel-appointment', {
@@ -388,11 +388,11 @@ function cancelAppointment(appointmentId) {
  */
 function performSearch(query) {
     console.log('Searching for:', query);
-
+    
     if (query.trim() === '') {
         return;
     }
-
+    
     // Send search request to server
     fetch(window.location.origin + '/doctor/search?q=' + encodeURIComponent(query))
     .then(response => response.json())
@@ -411,7 +411,7 @@ function performSearch(query) {
  */
 function loadProfileSection() {
     const profileSection = document.getElementById('profile-section');
-
+    
     if (profileSection && profileSection.children.length === 0) {
         // Only load if the section is empty
         fetch(window.location.origin + '/doctor/profile')
@@ -432,7 +432,7 @@ function loadProfileSection() {
  */
 function loadAppointmentsSection() {
     const appointmentsSection = document.getElementById('appointments-section');
-
+    
     if (appointmentsSection && appointmentsSection.children.length === 0) {
         // Only load if the section is empty
         fetch(window.location.origin + '/doctor/appointments')
@@ -461,7 +461,7 @@ function initAppointmentsTabs() {
  */
 function loadPatientsSection() {
     const patientsSection = document.getElementById('patients-section');
-
+    
     if (patientsSection && patientsSection.children.length === 0) {
         // Only load if the section is empty
         fetch(window.location.origin + '/doctor/patients')
@@ -482,7 +482,7 @@ function loadPatientsSection() {
  */
 function loadAvailabilitySection() {
     const availabilitySection = document.getElementById('availability-section');
-
+    
     if (availabilitySection && availabilitySection.children.length === 0) {
         // Only load if the section is empty
         fetch(window.location.origin + '/doctor/availability')
@@ -512,7 +512,7 @@ function initAvailabilityCalendar() {
  */
 function loadPackagesSection() {
     const packagesSection = document.getElementById('packages-section');
-
+    
     if (packagesSection && packagesSection.children.length === 0) {
         // Only load if the section is empty
         fetch(window.location.origin + '/doctor/packages')
@@ -533,7 +533,7 @@ function loadPackagesSection() {
  */
 function loadSettingsSection() {
     const settingsSection = document.getElementById('settings-section');
-
+    
     if (settingsSection && settingsSection.children.length === 0) {
         // Only load if the section is empty
         fetch(window.location.origin + '/doctor/settings')

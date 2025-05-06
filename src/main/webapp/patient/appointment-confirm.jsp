@@ -40,7 +40,45 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-booking.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-confirmation.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-confirm-fix.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-sidebar-fix.css">
+    <style>
+        /* Fix for unavailable time slots */
+        .time-slot.unavailable label {
+            background-color: #ffebee;
+            color: #d32f2f;
+            text-decoration: line-through;
+            cursor: not-allowed;
+            border: 1px solid #ffcdd2;
+            position: relative;
+        }
+
+        .time-slot.unavailable input[type="radio"]:disabled + label {
+            background-color: #ffebee;
+            color: #d32f2f;
+            border-color: #ffcdd2;
+            box-shadow: none;
+            text-decoration: line-through;
+            cursor: not-allowed;
+        }
+
+        .time-unavailable-message {
+            color: #d32f2f;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            font-style: italic;
+            background-color: #ffebee;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border-left: 3px solid #d32f2f;
+            display: none;
+            align-items: center;
+        }
+
+        .time-unavailable-message:before {
+            content: "⚠";
+            margin-right: 8px;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
@@ -239,6 +277,30 @@
                 const timeInput = document.querySelector(`input[name="appointmentTime"][value="${selectedTime}"]`);
                 if (timeInput) {
                     timeInput.checked = true;
+                }
+            }
+
+            // Handle unavailable time slots
+            const unavailableSlots = document.querySelectorAll('.time-slot.unavailable');
+            if (unavailableSlots.length > 0) {
+                const unavailableMessage = document.querySelector('.time-unavailable-message');
+                if (unavailableMessage) {
+                    unavailableMessage.style.display = 'flex';
+                }
+
+                // Disable radio buttons for unavailable slots
+                unavailableSlots.forEach(slot => {
+                    const radio = slot.querySelector('input[type="radio"]');
+                    if (radio) {
+                        radio.disabled = true;
+                        radio.required = false;
+                    }
+                });
+            } else {
+                // Hide the unavailable message if no slots are unavailable
+                const unavailableMessage = document.querySelector('.time-unavailable-message');
+                if (unavailableMessage) {
+                    unavailableMessage.style.display = 'none';
                 }
             }
         });

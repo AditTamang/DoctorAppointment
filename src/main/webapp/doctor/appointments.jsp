@@ -222,13 +222,13 @@
                     const appointmentId = this.getAttribute('data-id');
                     const patientName = this.closest('tr').querySelector('.patient-name').textContent;
 
-                    if (confirm(`Are you sure you want to approve the appointment for ${patientName}?`)) {
+                    if (confirm('Are you sure you want to approve the appointment for ' + patientName + '?')) {
                         // Here you would send the approval to the server
                         // For example:
                         // fetch('/doctor/appointment/update', {
                         //     method: 'POST',
                         //     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        //     body: `id=${appointmentId}&status=APPROVED`
+                        //     body: 'id=' + appointmentId + '&status=APPROVED'
                         // })
 
                         // Update the UI to reflect the change
@@ -253,7 +253,7 @@
                     const appointmentId = this.getAttribute('data-id');
                     const patientName = this.closest('tr').querySelector('.patient-name').textContent;
 
-                    const reason = prompt(`Please provide a reason for rejecting ${patientName}'s appointment:`, '');
+                    const reason = prompt('Please provide a reason for rejecting ' + patientName + '\'s appointment:', '');
 
                     if (reason !== null) {
                         // Here you would send the rejection to the server
@@ -261,7 +261,7 @@
                         // fetch('/doctor/appointment/update', {
                         //     method: 'POST',
                         //     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        //     body: `id=${appointmentId}&status=REJECTED&notes=${encodeURIComponent(reason)}`
+                        //     body: 'id=' + appointmentId + '&status=REJECTED&notes=' + encodeURIComponent(reason)
                         // })
 
                         // Update the UI to reflect the change
@@ -275,7 +275,7 @@
 
                         // Update notes
                         const notesCell = this.closest('tr').querySelector('.notes-badge');
-                        notesCell.textContent = `Rejected: ${reason}`;
+                        notesCell.textContent = 'Rejected: ' + reason;
 
                         alert('Appointment rejected successfully!');
                     }

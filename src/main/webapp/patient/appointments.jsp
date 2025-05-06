@@ -31,7 +31,26 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-pages.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-confirmation.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-confirm-fix.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-sidebar-fix.css">
+    <style>
+        /* Fix for doctor initials */
+        .doctor-small-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+
+        .doctor-small-avatar .initials {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
@@ -161,10 +180,10 @@
                                 <div class="appointment-card-body">
                                     <div class="appointment-doctor">
                                         <div class="doctor-small-avatar">
-                                            <div class="initials"><%= appointment.getDoctorName().charAt(0) %></div>
+                                            <div class="initials"><%= appointment.getDoctorName() != null ? appointment.getDoctorName().charAt(0) : 'D' %></div>
                                         </div>
                                         <div class="appointment-doctor-info">
-                                            <div class="appointment-doctor-name"><%= appointment.getDoctorName() %></div>
+                                            <div class="appointment-doctor-name"><%= appointment.getDoctorName() != null ? appointment.getDoctorName() : "Doctor" %></div>
                                             <div class="appointment-doctor-specialty">
                                                 <%= appointment.getDoctorSpecialization() != null ? appointment.getDoctorSpecialization() : "Specialist" %>
                                             </div>

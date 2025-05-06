@@ -1,0 +1,270 @@
+/* New Appointment Confirmation Styles */
+.appointment-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.confirmation-header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    position: relative;
+}
+
+.confirmation-header .check-icon {
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    color: #4CAF50;
+    font-size: 18px;
+}
+
+.confirmation-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.appointment-details {
+    padding: 15px 20px;
+}
+
+.detail-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-row:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.detail-label {
+    width: 120px;
+    font-weight: 600;
+    color: #555;
+    font-size: 14px;
+}
+
+.detail-value {
+    flex: 1;
+    color: #333;
+    font-size: 14px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-confirmed, .status-approved {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-cancelled, .status-rejected {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.doctor-info {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #eee;
+}
+
+.doctor-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 15px;
+    background-color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.doctor-avatar .initials {
+    font-size: 20px;
+    font-weight: 600;
+    color: #4CAF50;
+}
+
+.doctor-details {
+    flex: 1;
+}
+
+.doctor-name {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.doctor-specialty {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.doctor-contact {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+    font-size: 14px;
+    color: #666;
+}
+
+.doctor-contact i {
+    margin-right: 5px;
+    color: #4CAF50;
+}
+
+.important-instructions {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 15px 20px;
+    margin: 15px 20px;
+    border-radius: 4px;
+}
+
+.important-instructions h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #856404;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.important-instructions ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.important-instructions li {
+    margin-bottom: 8px;
+    color: #856404;
+    font-size: 14px;
+}
+
+.important-instructions li:last-child {
+    margin-bottom: 0;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.btn i {
+    margin-right: 8px;
+}
+
+.btn-primary {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #388E3C;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.support-footer {
+    text-align: center;
+    padding: 15px;
+    border-top: 1px solid #eee;
+    color: #666;
+    font-size: 12px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .detail-label {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    .doctor-info {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .doctor-avatar {
+        margin: 0 auto 15px;
+    }
+
+    .doctor-details {
+        text-align: center;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .btn:last-child {
+        margin-bottom: 0;
+    }
+}

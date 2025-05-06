@@ -1,0 +1,172 @@
+/* Admin Dashboard Styles */
+:root {
+    --primary-color: #4e73df;
+    --secondary-color: #6c757d;
+    --success-color: #2ecc71;
+    --info-color: #3498db;
+    --warning-color: #f39c12;
+    --danger-color: #e74c3c;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --border-color: #e3e6f0;
+    --text-color: #5a5c69;
+    --sidebar-width: 250px;
+}
+
+body {
+    background-color: #f8f9fc;
+    color: var(--text-color);
+}
+
+/* Main Layout */
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Header Styles */
+.dashboard-header {
+    background-color: var(--dark-color);
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.add-new-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.add-new-button:hover {
+    background-color: #3756a4;
+}
+
+/* Search Bar */
+.search-bar {
+    display: flex;
+    margin: 20px 0;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: none;
+    font-size: 14px;
+}
+
+.search-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+/* Doctors Table */
+.doctors-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.doctors-table th, .doctors-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.doctors-table th {
+    background-color: var(--light-color);
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.doctors-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.view-btn {
+    background-color: var(--info-color);
+}
+
+.edit-btn {
+    background-color: var(--success-color);
+}
+
+.delete-btn {
+    background-color: var(--danger-color);
+}
+
+.action-btn:hover {
+    opacity: 0.8;
+}
+
+/* Footer */
+.dashboard-footer {
+    background-color: white;
+    padding: 15px;
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+    font-size: 12px;
+    color: var(--secondary-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+    
+    .search-bar {
+        flex-direction: column;
+    }
+    
+    .search-input, .search-button {
+        width: 100%;
+    }
+    
+    .doctors-table {
+        display: block;
+        overflow-x: auto;
+    }
+}
