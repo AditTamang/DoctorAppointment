@@ -72,7 +72,7 @@
                                  <label for="search">Search Doctor</label>
                                  <div class="input-icon-wrapper">
                                      <i class="fas fa-search"></i>
-                                     <input type="text" id="search" name="search" placeholder="Search by name or specialty" class="form-control">
+                                     <input type="text" id="search" name="search" placeholder="Search by name or specialty" class="form-control" value="${search != null ? search : ''}">
                                  </div>
                              </div>
 
@@ -97,10 +97,10 @@
                                  <div class="input-icon-wrapper">
                                      <i class="fas fa-briefcase"></i>
                                      <select id="experience" name="experience" class="form-control">
-                                         <option value="">Any Experience</option>
-                                         <option value="0-5">0-5 Years</option>
-                                         <option value="5-10">5-10 Years</option>
-                                         <option value="10+">10+ Years</option>
+                                         <option value="" ${experience == null || experience.isEmpty() ? 'selected' : ''}>Any Experience</option>
+                                         <option value="0-5" ${experience != null && experience.equals("0-5") ? 'selected' : ''}>0-5 Years</option>
+                                         <option value="5-10" ${experience != null && experience.equals("5-10") ? 'selected' : ''}>5-10 Years</option>
+                                         <option value="10+" ${experience != null && experience.equals("10+") ? 'selected' : ''}>10+ Years</option>
                                      </select>
                                  </div>
                              </div>
@@ -388,12 +388,33 @@
                  });
              }
 
-             // Redirect to the appropriate URL
-             if (specialty === '') {
-                 window.location.href = 'doctors';
-             } else {
-                 window.location.href = 'doctors?specialization=' + specialty;
+             // Get current search and experience values
+             const searchValue = document.getElementById('search').value;
+             const experienceValue = document.getElementById('experience').value;
+
+             // Build the URL with all filter parameters
+             let url = 'doctors';
+             let params = [];
+
+             if (specialty !== '') {
+                 params.push('specialization=' + encodeURIComponent(specialty));
              }
+
+             if (searchValue && searchValue.trim() !== '') {
+                 params.push('search=' + encodeURIComponent(searchValue));
+             }
+
+             if (experienceValue && experienceValue !== '') {
+                 params.push('experience=' + encodeURIComponent(experienceValue));
+             }
+
+             // Add parameters to URL if any exist
+             if (params.length > 0) {
+                 url += '?' + params.join('&');
+             }
+
+             // Redirect to the appropriate URL
+             window.location.href = url;
          }
 
          // Add event listener to the pagination links to prevent default behavior

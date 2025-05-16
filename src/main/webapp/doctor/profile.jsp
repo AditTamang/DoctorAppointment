@@ -487,56 +487,8 @@
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="user-profile">
-                <div class="profile-image">
-                    <% if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) { %>
-                        <div class="profile-initials">AT</div>
-                    <% } else { %>
-                        <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
-                    <% } %>
-                </div>
-                <h3 class="user-name"><%= user.getFirstName() + " " + user.getLastName() %></h3>
-                <p class="user-email"><%= user.getEmail() %></p>
-                <p class="user-phone"><%= user.getPhone() %></p>
-            </div>
-
-            <div class="sidebar-menu">
-                <ul>
-                    <li>
-                        <a href="index.jsp">
-                            <i class="fas fa-tachometer-alt"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="appointments.jsp">
-                            <i class="fas fa-calendar-check"></i>
-                            <span>Appointments</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="patients.jsp">
-                            <i class="fas fa-users"></i>
-                            <span>My Patients</span>
-                        </a>
-                    </li>
-                    <li class="active">
-                        <a href="profile.jsp">
-                            <i class="fas fa-user-md"></i>
-                            <span>My Profile</span>
-                        </a>
-                    </li>
-                    <li class="logout">
-                        <a href="../logout">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Logout</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+        <!-- Include the standardized sidebar -->
+        <jsp:include page="doctor-sidebar.jsp" />
 
         <!-- Main Content -->
         <div class="dashboard-main">

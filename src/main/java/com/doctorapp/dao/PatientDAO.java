@@ -291,12 +291,13 @@ public class PatientDAO {
     // Get recent patients by doctor
     public List<Patient> getRecentPatientsByDoctor(int doctorId, int limit) {
         List<Patient> patients = new ArrayList<>();
-        String query = "SELECT DISTINCT p.*, u.email, MAX(a.appointment_date) as last_visit " +
+        String query = "SELECT DISTINCT p.*, u.first_name, u.last_name, u.email, u.date_of_birth, u.gender, u.phone, u.address, " +
+                      "MAX(a.appointment_date) as last_visit " +
                       "FROM patients p " +
                       "JOIN appointments a ON p.id = a.patient_id " +
                       "JOIN users u ON p.user_id = u.id " +
                       "WHERE a.doctor_id = ? " +
-                      "GROUP BY p.id " +
+                      "GROUP BY p.id, u.first_name, u.last_name, u.email, u.date_of_birth, u.gender, u.phone, u.address " +
                       "ORDER BY last_visit DESC " +
                       "LIMIT ?";
 
@@ -311,12 +312,16 @@ public class PatientDAO {
                     Patient patient = new Patient();
                     patient.setId(rs.getInt("id"));
                     patient.setUserId(rs.getInt("user_id"));
+
+                    // Get user information from the users table
                     patient.setFirstName(rs.getString("first_name"));
                     patient.setLastName(rs.getString("last_name"));
                     patient.setDateOfBirth(rs.getString("date_of_birth"));
                     patient.setGender(rs.getString("gender"));
                     patient.setPhone(rs.getString("phone"));
                     patient.setAddress(rs.getString("address"));
+
+                    // Get patient-specific information
                     patient.setBloodGroup(rs.getString("blood_group"));
                     patient.setAllergies(rs.getString("allergies"));
                     patient.setEmail(rs.getString("email"));

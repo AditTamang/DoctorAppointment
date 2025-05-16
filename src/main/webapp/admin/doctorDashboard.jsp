@@ -20,85 +20,8 @@
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <div class="dashboard-sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-logo">
-                    <img src="../images/logo.png" alt="HealthCare Logo">
-                    <h2>Health<span>Care</span></h2>
-                </div>
-                <div class="sidebar-close" id="sidebarClose">
-                    <i class="fas fa-times"></i>
-                </div>
-            </div>
-
-            <div class="sidebar-menu">
-                <ul>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/dashboard">
-                            <i class="fas fa-tachometer-alt"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="active">
-                        <a href="${pageContext.request.contextPath}/admin/doctorDashboard">
-                            <i class="fas fa-user-md"></i>
-                            <span>Doctors</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/admin/doctor-requests">
-                            <i class="fas fa-user-plus"></i>
-                            <span>Doctor Requests</span>
-                            <%
-                            // Get the count of pending doctor requests
-                            com.doctorapp.service.DoctorRegistrationService doctorRegistrationService = new com.doctorapp.service.DoctorRegistrationService();
-                            int pendingRequestsCount = doctorRegistrationService.getPendingRequests().size();
-                            if (pendingRequestsCount > 0) {
-                            %>
-                            <span class="badge badge-primary"><%= pendingRequestsCount %></span>
-                            <% } %>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/admin/patients">
-                            <i class="fas fa-users"></i>
-                            <span>Patients</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/admin/appointments">
-                            <i class="fas fa-calendar-check"></i>
-                            <span>Appointments</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/admin/specializations">
-                            <i class="fas fa-stethoscope"></i>
-                            <span>Specializations</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/admin/reports">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>Reports</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/admin/settings">
-                            <i class="fas fa-cog"></i>
-                            <span>Settings</span>
-                        </a>
-                    </li>
-                    <li class="logout">
-                        <a href="${pageContext.request.contextPath}/logout">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Logout</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+        <!-- Include the standardized sidebar -->
+        <jsp:include page="admin-sidebar.jsp" />
 
         <!-- Main Content -->
         <div class="dashboard-main">

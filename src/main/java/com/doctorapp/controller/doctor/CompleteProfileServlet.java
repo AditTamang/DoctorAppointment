@@ -72,8 +72,8 @@ public class CompleteProfileServlet extends HttpServlet {
             // Get form data
             String specialization = request.getParameter("specialization");
             String qualification = request.getParameter("qualification");
-            int experience = Integer.parseInt(request.getParameter("experience"));
-            double consultationFee = Double.parseDouble(request.getParameter("consultationFee"));
+            String experience = request.getParameter("experience");
+            String consultationFee = request.getParameter("consultationFee");
             String bio = request.getParameter("bio");
             String profileImage = request.getParameter("profileImage");
 
@@ -94,6 +94,17 @@ public class CompleteProfileServlet extends HttpServlet {
             doctor.setBio(bio);
             doctor.setProfileImage(profileImage);
             doctor.setStatus("ACTIVE");
+
+            // Set additional required fields for new doctor
+            if (doctor.getId() == 0) {
+                // Use the existing user object from session
+                doctor.setName(user.getFirstName() + " " + user.getLastName());
+                doctor.setEmail(user.getEmail());
+                doctor.setPhone(user.getPhone() != null ? user.getPhone() : "");
+                doctor.setAddress(user.getAddress() != null ? user.getAddress() : "");
+                doctor.setAvailableDays("Monday-Friday");
+                doctor.setAvailableTime("09:00 AM - 05:00 PM");
+            }
 
             // Save doctor profile
             boolean success;

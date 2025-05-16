@@ -221,21 +221,87 @@ package com.doctorapp.service;
       * @return List of available time slots
       */
      public List<String> getAvailableTimeSlots(int doctorId) {
-         // Default time slots if not implemented in DAO
+         List<String> timeSlots = new java.util.ArrayList<>();
+
+         try {
+             // Get doctor information to check availability
+             com.doctorapp.dao.DoctorDAO doctorDAO = new com.doctorapp.dao.DoctorDAO();
+             com.doctorapp.model.Doctor doctor = doctorDAO.getDoctorById(doctorId);
+
+             if (doctor == null) {
+                 System.err.println("Doctor not found with ID: " + doctorId);
+                 return getDefaultTimeSlots(); // Return default slots if doctor not found
+             }
+
+             // Check if doctor is active
+             if (!"ACTIVE".equals(doctor.getStatus())) {
+                 System.out.println("Doctor is not active: " + doctorId);
+                 return new java.util.ArrayList<>(); // Return empty list if doctor is not active
+             }
+
+             // Get doctor's available time
+             String availableTime = doctor.getAvailableTime();
+             if (availableTime == null || availableTime.isEmpty()) {
+                 availableTime = "09:00 AM - 05:00 PM"; // Default
+             }
+
+             // Parse available time range
+             String[] timeRange = availableTime.split("-");
+             if (timeRange.length != 2) {
+                 System.err.println("Invalid time range format: " + availableTime);
+                 return getDefaultTimeSlots(); // Return default slots if format is invalid
+             }
+
+             String startTimeStr = timeRange[0].trim();
+             String endTimeStr = timeRange[1].trim();
+
+             // Parse start and end times
+             java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("hh:mm a");
+             java.util.Date startTime = timeFormat.parse(startTimeStr);
+             java.util.Date endTime = timeFormat.parse(endTimeStr);
+
+             // Generate time slots at 30-minute intervals
+             java.util.Calendar calendar = java.util.Calendar.getInstance();
+             calendar.setTime(startTime);
+
+             while (calendar.getTime().before(endTime)) {
+                 timeSlots.add(timeFormat.format(calendar.getTime()));
+
+                 // Add 30 minutes
+                 calendar.add(java.util.Calendar.MINUTE, 30);
+             }
+
+             return timeSlots;
+         } catch (Exception e) {
+             System.err.println("Error getting available time slots: " + e.getMessage());
+             e.printStackTrace();
+             return getDefaultTimeSlots(); // Return default slots in case of error
+         }
+     }
+
+     /**
+      * Get default time slots
+      * @return List of default time slots
+      */
+     private List<String> getDefaultTimeSlots() {
          List<String> timeSlots = new java.util.ArrayList<>();
          timeSlots.add("09:00 AM");
+         timeSlots.add("09:30 AM");
          timeSlots.add("10:00 AM");
+         timeSlots.add("10:30 AM");
          timeSlots.add("11:00 AM");
+         timeSlots.add("11:30 AM");
          timeSlots.add("12:00 PM");
+         timeSlots.add("12:30 PM");
          timeSlots.add("01:00 PM");
+         timeSlots.add("01:30 PM");
          timeSlots.add("02:00 PM");
+         timeSlots.add("02:30 PM");
          timeSlots.add("03:00 PM");
+         timeSlots.add("03:30 PM");
          timeSlots.add("04:00 PM");
+         timeSlots.add("04:30 PM");
          timeSlots.add("05:00 PM");
-
-         // TODO: Implement actual time slot availability check in DAO
-         // This would check the doctor's schedule and return only available slots
-
          return timeSlots;
      }
 
@@ -247,14 +313,80 @@ package com.doctorapp.service;
       * @return true if the time slot is available, false otherwise
       */
      public boolean isTimeSlotAvailable(int doctorId, String date, String time) {
-         // In a real implementation, this would check the database for existing appointments
-         // For now, we'll assume all time slots are available
-
          try {
-             // Convert date string to java.sql.Date for database comparison
+             // Get doctor information to check availability
+             com.doctorapp.dao.DoctorDAO doctorDAO = new com.doctorapp.dao.DoctorDAO();
+             com.doctorapp.model.Doctor doctor = doctorDAO.getDoctorById(doctorId);
+
+             if (doctor == null) {
+                 System.err.println("Doctor not found with ID: " + doctorId);
+                 return false;
+             }
+
+             // Check if doctor is active
+             if (!"ACTIVE".equals(doctor.getStatus())) {
+                 System.out.println("Doctor is not active: " + doctorId);
+                 return false;
+             }
+
+             // Convert date string to java.util.Date for comparison
              java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
              java.util.Date parsedDate = dateFormat.parse(date);
              java.sql.Date sqlDate = new java.sql.Date(parsedDate.getTime());
+
+             // Get day of week from the date
+             java.util.Calendar calendar = java.util.Calendar.getInstance();
+             calendar.setTime(parsedDate);
+             int dayOfWeek = calendar.get(java.util.Calendar.DAY_OF_WEEK);
+             String[] daysOfWeek = {"", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+             String dayName = daysOfWeek[dayOfWeek];
+
+             // Check if doctor is available on this day
+             String availableDays = doctor.getAvailableDays();
+             if (availableDays == null || availableDays.isEmpty()) {
+                 availableDays = "Monday,Tuesday,Wednesday,Thursday,Friday"; // Default
+             }
+
+             boolean isDayAvailable = false;
+             for (String day : availableDays.split(",")) {
+                 if (day.trim().equalsIgnoreCase(dayName)) {
+                     isDayAvailable = true;
+                     break;
+                 }
+             }
+
+             if (!isDayAvailable) {
+                 System.out.println("Doctor is not available on " + dayName);
+                 return false;
+             }
+
+             // Check if time is within doctor's available hours
+             String availableTime = doctor.getAvailableTime();
+             if (availableTime == null || availableTime.isEmpty()) {
+                 availableTime = "09:00 AM - 05:00 PM"; // Default
+             }
+
+             // Parse available time range
+             String[] timeRange = availableTime.split("-");
+             if (timeRange.length != 2) {
+                 System.err.println("Invalid time range format: " + availableTime);
+                 return true; // Default to available if format is invalid
+             }
+
+             String startTimeStr = timeRange[0].trim();
+             String endTimeStr = timeRange[1].trim();
+
+             // Parse appointment time
+             java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("hh:mm a");
+             java.util.Date appointmentTime = timeFormat.parse(time);
+             java.util.Date doctorStartTime = timeFormat.parse(startTimeStr);
+             java.util.Date doctorEndTime = timeFormat.parse(endTimeStr);
+
+             // Check if appointment time is within doctor's available hours
+             if (appointmentTime.before(doctorStartTime) || appointmentTime.after(doctorEndTime)) {
+                 System.out.println("Appointment time is outside doctor's available hours");
+                 return false;
+             }
 
              // Check if there's an existing appointment for this doctor at this date and time
              List<Appointment> doctorAppointments = appointmentDAO.getAppointmentsByDoctorId(doctorId);
@@ -282,8 +414,9 @@ package com.doctorapp.service;
              return true;
          } catch (Exception e) {
              System.err.println("Error checking time slot availability: " + e.getMessage());
-             // In case of error, assume the slot is available to avoid blocking appointments
-             return true;
+             e.printStackTrace();
+             // In case of error, assume the slot is not available to be safe
+             return false;
          }
      }
  }

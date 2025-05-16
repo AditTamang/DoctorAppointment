@@ -37,42 +37,8 @@
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h2>HealthPro Portal</h2>
-            </div>
-
-            <div class="sidebar-menu">
-                <ul>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/doctor/dashboard">
-                            Dashboard
-                        </a>
-                    </li>
-                    <li class="active">
-                        <a href="${pageContext.request.contextPath}/doctor/appointments">
-                            Appointment Management
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/doctor/patients">
-                            Patient Details
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/doctor/profile">
-                            My Profile
-                        </a>
-                    </li>
-                    <li class="logout">
-                        <a href="${pageContext.request.contextPath}/logout">
-                            Logout
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+        <!-- Include the standardized sidebar -->
+        <jsp:include page="doctor-sidebar.jsp" />
 
         <!-- Main Content -->
         <div class="main-content">

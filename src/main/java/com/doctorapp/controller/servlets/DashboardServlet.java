@@ -205,8 +205,8 @@ package com.doctorapp.controller.servlets;
                  System.err.println("Error loading upcoming appointments: " + e.getMessage());
              }
 
-             // Forward to new doctor dashboard
-             request.getRequestDispatcher("/doctor/new-dashboard.jsp").forward(request, response);
+             // Forward to doctor dashboard
+             request.getRequestDispatcher("/doctor/dashboard.jsp").forward(request, response);
          } catch (Exception e) {
              System.err.println("Error in loadDoctorDashboard: " + e.getMessage());
              e.printStackTrace();

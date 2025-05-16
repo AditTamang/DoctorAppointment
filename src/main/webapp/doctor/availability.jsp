@@ -13,8 +13,16 @@
         return;
     }
 
-    // Get doctor information
-    String doctorName = "Dr. Harlan Drake";
+    // Get doctor information from request attribute
+    Doctor doctor = (Doctor) request.getAttribute("doctor");
+
+    // Set default doctor name
+    String doctorName = "Dr. " + user.getFirstName() + " " + user.getLastName();
+
+    // If doctor object is available, use its name
+    if (doctor != null && doctor.getName() != null && !doctor.getName().isEmpty()) {
+        doctorName = doctor.getName();
+    }
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -198,73 +206,17 @@
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="HealthPro Logo">
-                <h2>HealthPro Portal</h2>
-            </div>
-
-            <div class="profile-overview">
-                <h3><i class="fas fa-user-md"></i> <span>Profile Overview</span></h3>
-            </div>
-
-            <div class="sidebar-menu">
-                <ul>
-                    <li>
-                        <a href="index.jsp">
-                            <i class="fas fa-user"></i>
-                            <span>Profile</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="appointments.jsp">
-                            <i class="fas fa-calendar-check"></i>
-                            <span>Appointment Management</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="patients.jsp">
-                            <i class="fas fa-user-injured"></i>
-                            <span>Patient Details</span>
-                        </a>
-                    </li>
-                    <li class="active">
-                        <a href="availability.jsp">
-                            <i class="fas fa-clock"></i>
-                            <span>Set Availability</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="health-packages.jsp">
-                            <i class="fas fa-box-open"></i>
-                            <span>Health Packages</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="preferences.jsp">
-                            <i class="fas fa-cog"></i>
-                            <span>UI Preferences</span>
-                        </a>
-                    </li>
-                    <li class="logout">
-                        <a href="../logout">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Logout</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+        <!-- Include the standardized sidebar -->
+        <jsp:include page="doctor-sidebar.jsp" />
 
         <!-- Main Content -->
         <div class="main-content">
             <!-- Top Header -->
             <div class="top-header">
                 <div class="top-header-left">
-                    <a href="index.jsp">Profile</a>
-                    <a href="appointments.jsp">Appointment Management</a>
-                    <a href="patients.jsp">Patient Details</a>
+                    <a href="${pageContext.request.contextPath}/doctor/dashboard">Dashboard</a>
+                    <a href="${pageContext.request.contextPath}/doctor/appointments">Appointment Management</a>
+                    <a href="${pageContext.request.contextPath}/doctor/patients">Patient Details</a>
                 </div>
 
                 <div class="top-header-right">
@@ -272,7 +224,7 @@
                         <i class="fas fa-search"></i>
                     </div>
                     <div class="user-profile-icon">
-                        <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
+                        <img src="${pageContext.request.contextPath}/assets/images/default-doctor.png" alt="Doctor">
                     </div>
                 </div>
             </div>
@@ -283,89 +235,138 @@
                     <h2>Set Availability</h2>
                 </div>
 
-                <form id="availability-form">
+                <form id="availability-form" action="${pageContext.request.contextPath}/doctor/update-availability" method="post" enctype="application/x-www-form-urlencoded">
                     <div class="availability-content">
                         <div class="availability-section">
                             <h3>Weekly Schedule</h3>
 
+                            <%
+                            // Parse available days from doctor object
+                            String availableDays = (doctor != null && doctor.getAvailableDays() != null) ? doctor.getAvailableDays() : "Monday,Tuesday,Wednesday,Thursday,Friday";
+                            String[] days = availableDays.split(",");
+
+                            // Create a set for easy checking
+                            java.util.Set<String> availableDaysSet = new java.util.HashSet<>();
+                            for (String day : days) {
+                                availableDaysSet.add(day.trim());
+                            }
+
+                            // Parse available time from doctor object
+                            String availableTime = (doctor != null && doctor.getAvailableTime() != null) ? doctor.getAvailableTime() : "09:00 AM - 05:00 PM";
+                            String startTime = "09:00";
+                            String endTime = "17:00";
+
+                            if (availableTime.contains("-")) {
+                                String[] times = availableTime.split("-");
+                                if (times.length == 2) {
+                                    String startTimeStr = times[0].trim();
+                                    String endTimeStr = times[1].trim();
+
+                                    // Convert from AM/PM format to 24-hour format if needed
+                                    if (startTimeStr.contains("AM") || startTimeStr.contains("PM")) {
+                                        try {
+                                            java.text.SimpleDateFormat inputFormat = new java.text.SimpleDateFormat("hh:mm a");
+                                            java.text.SimpleDateFormat outputFormat = new java.text.SimpleDateFormat("HH:mm");
+
+                                            java.util.Date date = inputFormat.parse(startTimeStr);
+                                            startTime = outputFormat.format(date);
+
+                                            date = inputFormat.parse(endTimeStr);
+                                            endTime = outputFormat.format(date);
+                                        } catch (Exception e) {
+                                            // Use default values if parsing fails
+                                            e.printStackTrace();
+                                        }
+                                    } else {
+                                        startTime = startTimeStr;
+                                        endTime = endTimeStr;
+                                    }
+                                }
+                            }
+                            %>
+
                             <div class="day-item">
-                                <input type="checkbox" id="monday" class="day-checkbox" checked>
+                                <input type="checkbox" id="monday" name="days" value="Monday" class="day-checkbox" <%= availableDaysSet.contains("Monday") ? "checked" : "" %>>
                                 <label for="monday" class="day-label">Monday</label>
                                 <div class="time-inputs">
-                                    <input type="time" value="09:00" class="start-time">
+                                    <input type="time" name="monday-start" value="<%= startTime %>" class="start-time" <%= !availableDaysSet.contains("Monday") ? "disabled" : "" %>>
                                     <span class="time-separator">to</span>
-                                    <input type="time" value="17:00" class="end-time">
+                                    <input type="time" name="monday-end" value="<%= endTime %>" class="end-time" <%= !availableDaysSet.contains("Monday") ? "disabled" : "" %>>
                                 </div>
                             </div>
 
                             <div class="day-item">
-                                <input type="checkbox" id="tuesday" class="day-checkbox" checked>
+                                <input type="checkbox" id="tuesday" name="days" value="Tuesday" class="day-checkbox" <%= availableDaysSet.contains("Tuesday") ? "checked" : "" %>>
                                 <label for="tuesday" class="day-label">Tuesday</label>
                                 <div class="time-inputs">
-                                    <input type="time" value="09:00" class="start-time">
+                                    <input type="time" name="tuesday-start" value="<%= startTime %>" class="start-time" <%= !availableDaysSet.contains("Tuesday") ? "disabled" : "" %>>
                                     <span class="time-separator">to</span>
-                                    <input type="time" value="17:00" class="end-time">
+                                    <input type="time" name="tuesday-end" value="<%= endTime %>" class="end-time" <%= !availableDaysSet.contains("Tuesday") ? "disabled" : "" %>>
                                 </div>
                             </div>
 
                             <div class="day-item">
-                                <input type="checkbox" id="wednesday" class="day-checkbox" checked>
+                                <input type="checkbox" id="wednesday" name="days" value="Wednesday" class="day-checkbox" <%= availableDaysSet.contains("Wednesday") ? "checked" : "" %>>
                                 <label for="wednesday" class="day-label">Wednesday</label>
                                 <div class="time-inputs">
-                                    <input type="time" value="09:00" class="start-time">
+                                    <input type="time" name="wednesday-start" value="<%= startTime %>" class="start-time" <%= !availableDaysSet.contains("Wednesday") ? "disabled" : "" %>>
                                     <span class="time-separator">to</span>
-                                    <input type="time" value="17:00" class="end-time">
+                                    <input type="time" name="wednesday-end" value="<%= endTime %>" class="end-time" <%= !availableDaysSet.contains("Wednesday") ? "disabled" : "" %>>
                                 </div>
                             </div>
 
                             <div class="day-item">
-                                <input type="checkbox" id="thursday" class="day-checkbox" checked>
+                                <input type="checkbox" id="thursday" name="days" value="Thursday" class="day-checkbox" <%= availableDaysSet.contains("Thursday") ? "checked" : "" %>>
                                 <label for="thursday" class="day-label">Thursday</label>
                                 <div class="time-inputs">
-                                    <input type="time" value="09:00" class="start-time">
+                                    <input type="time" name="thursday-start" value="<%= startTime %>" class="start-time" <%= !availableDaysSet.contains("Thursday") ? "disabled" : "" %>>
                                     <span class="time-separator">to</span>
-                                    <input type="time" value="17:00" class="end-time">
+                                    <input type="time" name="thursday-end" value="<%= endTime %>" class="end-time" <%= !availableDaysSet.contains("Thursday") ? "disabled" : "" %>>
                                 </div>
                             </div>
 
                             <div class="day-item">
-                                <input type="checkbox" id="friday" class="day-checkbox" checked>
+                                <input type="checkbox" id="friday" name="days" value="Friday" class="day-checkbox" <%= availableDaysSet.contains("Friday") ? "checked" : "" %>>
                                 <label for="friday" class="day-label">Friday</label>
                                 <div class="time-inputs">
-                                    <input type="time" value="09:00" class="start-time">
+                                    <input type="time" name="friday-start" value="<%= startTime %>" class="start-time" <%= !availableDaysSet.contains("Friday") ? "disabled" : "" %>>
                                     <span class="time-separator">to</span>
-                                    <input type="time" value="17:00" class="end-time">
+                                    <input type="time" name="friday-end" value="<%= endTime %>" class="end-time" <%= !availableDaysSet.contains("Friday") ? "disabled" : "" %>>
                                 </div>
                             </div>
 
                             <div class="day-item">
-                                <input type="checkbox" id="saturday" class="day-checkbox">
+                                <input type="checkbox" id="saturday" name="days" value="Saturday" class="day-checkbox" <%= availableDaysSet.contains("Saturday") ? "checked" : "" %>>
                                 <label for="saturday" class="day-label">Saturday</label>
                                 <div class="time-inputs">
-                                    <input type="time" value="10:00" class="start-time" disabled>
+                                    <input type="time" name="saturday-start" value="<%= startTime %>" class="start-time" <%= !availableDaysSet.contains("Saturday") ? "disabled" : "" %>>
                                     <span class="time-separator">to</span>
-                                    <input type="time" value="14:00" class="end-time" disabled>
+                                    <input type="time" name="saturday-end" value="<%= endTime %>" class="end-time" <%= !availableDaysSet.contains("Saturday") ? "disabled" : "" %>>
                                 </div>
                             </div>
 
                             <div class="day-item">
-                                <input type="checkbox" id="sunday" class="day-checkbox">
+                                <input type="checkbox" id="sunday" name="days" value="Sunday" class="day-checkbox" <%= availableDaysSet.contains("Sunday") ? "checked" : "" %>>
                                 <label for="sunday" class="day-label">Sunday</label>
                                 <div class="time-inputs">
-                                    <input type="time" value="10:00" class="start-time" disabled>
+                                    <input type="time" name="sunday-start" value="<%= startTime %>" class="start-time" <%= !availableDaysSet.contains("Sunday") ? "disabled" : "" %>>
                                     <span class="time-separator">to</span>
-                                    <input type="time" value="14:00" class="end-time" disabled>
+                                    <input type="time" name="sunday-end" value="<%= endTime %>" class="end-time" <%= !availableDaysSet.contains("Sunday") ? "disabled" : "" %>>
                                 </div>
                             </div>
 
                             <div class="break-time">
                                 <h4>Break Time</h4>
                                 <div class="time-inputs">
-                                    <input type="time" value="12:00" id="break-start">
+                                    <input type="time" value="12:00" id="break-start" name="break-start">
                                     <span class="time-separator">to</span>
-                                    <input type="time" value="13:00" id="break-end">
+                                    <input type="time" value="13:00" id="break-end" name="break-end">
                                 </div>
                             </div>
+
+                            <!-- Hidden fields to store the final values -->
+                            <input type="hidden" id="availableDays" name="availableDays" value="<%= availableDays %>">
+                            <input type="hidden" id="availableTime" name="availableTime" value="<%= availableTime %>">
                         </div>
 
                         <div class="availability-section">
@@ -373,7 +374,7 @@
 
                             <div class="slot-duration">
                                 <h4>Appointment Duration</h4>
-                                <select id="slot-duration">
+                                <select id="slot-duration" name="slotDuration">
                                     <option value="15">15 minutes</option>
                                     <option value="30" selected>30 minutes</option>
                                     <option value="45">45 minutes</option>
@@ -392,14 +393,7 @@
                                 </div>
 
                                 <div class="vacation-list">
-                                    <div class="vacation-item">
-                                        <span class="vacation-item-dates">Dec 24, 2023 - Jan 2, 2024</span>
-                                        <span class="vacation-item-remove"><i class="fas fa-times"></i></span>
-                                    </div>
-                                    <div class="vacation-item">
-                                        <span class="vacation-item-dates">Nov 23, 2023 - Nov 26, 2023</span>
-                                        <span class="vacation-item-remove"><i class="fas fa-times"></i></span>
-                                    </div>
+                                    <!-- Vacation items will be added dynamically -->
                                 </div>
                             </div>
                         </div>
@@ -409,7 +403,7 @@
                                 <i class="fas fa-times"></i> Cancel
                             </button>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Upload Changes
+                                <i class="fas fa-save"></i> Save Changes
                             </button>
                         </div>
                     </div>
@@ -428,6 +422,7 @@
                     timeInputs.forEach(input => {
                         input.disabled = !this.checked;
                     });
+                    updateAvailableDays();
                 });
             });
 
@@ -489,9 +484,44 @@
             if (cancelBtn) {
                 cancelBtn.addEventListener('click', function() {
                     if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
-                        window.location.href = 'index.jsp';
+                        window.location.href = '${pageContext.request.contextPath}/doctor/dashboard';
                     }
                 });
+            }
+
+            // Function to update available days hidden field
+            function updateAvailableDays() {
+                const checkedDays = Array.from(document.querySelectorAll('.day-checkbox:checked'))
+                    .map(checkbox => checkbox.value);
+
+                document.getElementById('availableDays').value = checkedDays.join(',');
+            }
+
+            // Function to update available time hidden field
+            function updateAvailableTime() {
+                // Get the first checked day's time range
+                const firstCheckedDay = document.querySelector('.day-checkbox:checked');
+                if (firstCheckedDay) {
+                    const dayItem = firstCheckedDay.closest('.day-item');
+                    const startTime = dayItem.querySelector('.start-time').value;
+                    const endTime = dayItem.querySelector('.end-time').value;
+
+                    // Convert to 12-hour format with AM/PM
+                    const startDate = new Date();
+                    const [startHours, startMinutes] = startTime.split(':');
+                    startDate.setHours(parseInt(startHours, 10));
+                    startDate.setMinutes(parseInt(startMinutes, 10));
+
+                    const endDate = new Date();
+                    const [endHours, endMinutes] = endTime.split(':');
+                    endDate.setHours(parseInt(endHours, 10));
+                    endDate.setMinutes(parseInt(endMinutes, 10));
+
+                    const startFormatted = startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    const endFormatted = endDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+                    document.getElementById('availableTime').value = startFormatted + ' - ' + endFormatted;
+                }
             }
 
             // Form submission
@@ -500,11 +530,52 @@
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
 
-                    // In a real application, you would collect all the form data and send it to the server
-                    alert('Availability settings saved successfully!');
-                    window.location.href = 'index.jsp';
+                    // Update hidden fields before submission
+                    updateAvailableDays();
+                    updateAvailableTime();
+
+                    // Create URL-encoded form data
+                    const formData = new URLSearchParams(new FormData(form));
+
+                    // Submit the form using fetch API
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success message
+                            alert(data.message || 'Availability settings saved successfully!');
+
+                            // Redirect to dashboard
+                            window.location.href = '${pageContext.request.contextPath}/doctor/dashboard';
+                        } else {
+                            // Show error message
+                            alert(data.message || 'Failed to save availability settings. Please try again.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while saving availability settings. Please try again.');
+                    });
                 });
             }
+
+            // Initialize available days on page load
+            updateAvailableDays();
+
+            // Add event listeners for time inputs
+            document.querySelectorAll('.time-inputs input').forEach(input => {
+                input.addEventListener('change', updateAvailableTime);
+            });
+
+            // Initialize available time on page load
+            updateAvailableTime();
         });
     </script>
 </body>

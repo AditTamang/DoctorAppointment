@@ -12,14 +12,14 @@
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
-    
+
     // Get appointment ID from request parameter
     String appointmentId = request.getParameter("id");
     if (appointmentId == null || appointmentId.isEmpty()) {
         response.sendRedirect(request.getContextPath() + "/doctor/index.jsp");
         return;
     }
-    
+
     // In a real application, you would fetch the appointment details from the database
     // For now, we'll use dummy data
     String patientName = "John Doe";
@@ -47,7 +47,7 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
-        
+
         .appointment-details-header {
             display: flex;
             justify-content: space-between;
@@ -56,54 +56,54 @@
             padding-bottom: 10px;
             border-bottom: 1px solid #e0e0e0;
         }
-        
+
         .appointment-details-header h2 {
             font-size: 20px;
             font-weight: 600;
         }
-        
+
         .appointment-details-content {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
         }
-        
+
         .detail-item {
             margin-bottom: 15px;
         }
-        
+
         .detail-item label {
             display: block;
             font-weight: 500;
             margin-bottom: 5px;
             color: #6c757d;
         }
-        
+
         .detail-item p {
             font-size: 16px;
             color: #333;
         }
-        
+
         .detail-item.full-width {
             grid-column: span 2;
         }
-        
+
         .appointment-actions {
             margin-top: 20px;
             display: flex;
             gap: 10px;
         }
-        
+
         .medical-notes {
             margin-top: 20px;
         }
-        
+
         .medical-notes h3 {
             font-size: 18px;
             font-weight: 600;
             margin-bottom: 10px;
         }
-        
+
         .medical-notes textarea {
             width: 100%;
             height: 150px;
@@ -112,12 +112,12 @@
             border-radius: 5px;
             resize: vertical;
         }
-        
+
         @media (max-width: 768px) {
             .appointment-details-content {
                 grid-template-columns: 1fr;
             }
-            
+
             .detail-item.full-width {
                 grid-column: span 1;
             }
@@ -126,65 +126,9 @@
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="HealthPro Logo">
-                <h2>HealthPro Portal</h2>
-            </div>
-            
-            <div class="profile-overview">
-                <h3><i class="fas fa-user-md"></i> <span>Profile Overview</span></h3>
-            </div>
-            
-            <div class="sidebar-menu">
-                <ul>
-                    <li>
-                        <a href="index.jsp">
-                            <i class="fas fa-user"></i>
-                            <span>Profile</span>
-                        </a>
-                    </li>
-                    <li class="active">
-                        <a href="appointments.jsp">
-                            <i class="fas fa-calendar-check"></i>
-                            <span>Appointment Management</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="patients.jsp">
-                            <i class="fas fa-user-injured"></i>
-                            <span>Patient Details</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="availability.jsp">
-                            <i class="fas fa-clock"></i>
-                            <span>Set Availability</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="health-packages.jsp">
-                            <i class="fas fa-box-open"></i>
-                            <span>Health Packages</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="preferences.jsp">
-                            <i class="fas fa-cog"></i>
-                            <span>UI Preferences</span>
-                        </a>
-                    </li>
-                    <li class="logout">
-                        <a href="../logout">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Logout</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        
+        <!-- Include the standardized sidebar -->
+        <jsp:include page="doctor-sidebar.jsp" />
+
         <!-- Main Content -->
         <div class="main-content">
             <!-- Top Header -->
@@ -194,7 +138,7 @@
                     <a href="appointments.jsp" class="active">Appointment Management</a>
                     <a href="patients.jsp">Patient Details</a>
                 </div>
-                
+
                 <div class="top-header-right">
                     <div class="search-icon">
                         <i class="fas fa-search"></i>
@@ -204,7 +148,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Appointment Details -->
             <div class="appointment-details-container">
                 <div class="appointment-details-header">
@@ -213,54 +157,54 @@
                         <i class="fas fa-arrow-left"></i> Back to Appointments
                     </a>
                 </div>
-                
+
                 <div class="appointment-details-content">
                     <div class="detail-item">
                         <label>Appointment ID</label>
                         <p><%= appointmentId %></p>
                     </div>
-                    
+
                     <div class="detail-item">
                         <label>Patient Name</label>
                         <p><%= patientName %></p>
                     </div>
-                    
+
                     <div class="detail-item">
                         <label>Date</label>
                         <p><%= appointmentDate %></p>
                     </div>
-                    
+
                     <div class="detail-item">
                         <label>Time</label>
                         <p><%= appointmentTime %></p>
                     </div>
-                    
+
                     <div class="detail-item">
                         <label>Status</label>
                         <p><span class="status-badge active"><%= status %></span></p>
                     </div>
-                    
+
                     <div class="detail-item">
                         <label>Doctor</label>
                         <p>Dr. <%= user.getFirstName() + " " + user.getLastName() %></p>
                     </div>
-                    
+
                     <div class="detail-item full-width">
                         <label>Symptoms</label>
                         <p><%= symptoms %></p>
                     </div>
-                    
+
                     <div class="detail-item full-width">
                         <label>Notes</label>
                         <p><%= notes %></p>
                     </div>
                 </div>
-                
+
                 <div class="medical-notes">
                     <h3>Medical Notes</h3>
                     <textarea placeholder="Add medical notes here..."></textarea>
                 </div>
-                
+
                 <div class="appointment-actions">
                     <button class="btn btn-primary">
                         <i class="fas fa-save"></i> Save Notes
@@ -275,7 +219,7 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Save notes button functionality
@@ -287,12 +231,12 @@
                         alert('Please add some notes before saving.');
                         return;
                     }
-                    
+
                     // In a real application, you would send the notes to the server
                     alert('Notes saved successfully!');
                 });
             }
-            
+
             // Print details button functionality
             const printBtn = document.querySelector('.btn-outline');
             if (printBtn) {
@@ -300,7 +244,7 @@
                     window.print();
                 });
             }
-            
+
             // Cancel appointment button functionality
             const cancelBtn = document.querySelector('.btn-danger');
             if (cancelBtn) {

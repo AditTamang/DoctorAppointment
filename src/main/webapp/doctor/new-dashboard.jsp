@@ -62,73 +62,8 @@
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="HealthPro Logo">
-                <h2>HealthPro Portal</h2>
-                <button id="sidebar-toggle" class="sidebar-toggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-
-            <div class="profile-overview">
-                <h3><i class="fas fa-user-md"></i> <span>Profile Overview</span></h3>
-            </div>
-
-            <div class="sidebar-menu">
-                <ul>
-                    <li class="active">
-                        <a href="${pageContext.request.contextPath}/doctor/dashboard">
-                            <i class="fas fa-home"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/doctor/profile">
-                            <i class="fas fa-user"></i>
-                            <span>Profile</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/doctor/appointments">
-                            <i class="fas fa-calendar-check"></i>
-                            <span>Appointment Management</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/doctor/patients">
-                            <i class="fas fa-user-injured"></i>
-                            <span>Patient Details</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/doctor/availability">
-                            <i class="fas fa-clock"></i>
-                            <span>Set Availability</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/doctor/health-packages">
-                            <i class="fas fa-box-open"></i>
-                            <span>Health Packages</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/doctor/preferences">
-                            <i class="fas fa-cog"></i>
-                            <span>UI Preferences</span>
-                        </a>
-                    </li>
-                    <li class="logout">
-                        <a href="${pageContext.request.contextPath}/logout">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Logout</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+        <!-- Include the standardized sidebar -->
+        <jsp:include page="doctor-sidebar.jsp" />
 
         <!-- Main Content -->
         <div class="main-content">
@@ -188,9 +123,9 @@
                             </div>
 
                             <div class="profile-actions">
-                                <button class="btn btn-primary">Edit Profile</button>
-                                <button class="btn btn-outline">Set Active ${(doctor != null && doctor.status == 'ACTIVE') ? 'Off' : 'On'}</button>
-                                <button class="btn btn-danger">Delete Profile</button>
+                                <a href="${pageContext.request.contextPath}/doctor/profile" class="btn btn-primary">Edit Profile</a>
+                                <button id="toggle-status-btn" class="btn btn-outline">Set Active ${(doctor != null && doctor.status == 'ACTIVE') ? 'Off' : 'On'}</button>
+                                <button class="btn btn-danger" disabled>Delete Profile</button>
                             </div>
                         </div>
                     </div>
@@ -457,6 +392,155 @@
     <script>
         // Set context path for JavaScript
         const contextPath = '${pageContext.request.contextPath}';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle status button functionality
+            const toggleStatusBtn = document.getElementById('toggle-status-btn');
+            if (toggleStatusBtn) {
+                toggleStatusBtn.addEventListener('click', function() {
+                    // Confirm before changing status
+                    const currentStatus = '${doctor.status}';
+                    const newStatus = currentStatus == 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+                    const confirmMessage = currentStatus == 'ACTIVE'
+                        ? 'Are you sure you want to set your status to inactive? You will not receive new appointments.'
+                        : 'Are you sure you want to set your status to active? You will start receiving new appointments.';
+
+                    if (confirm(confirmMessage)) {
+                        // Send request to toggle status
+                        fetch(contextPath + '/doctor/toggle-status', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Update button text
+                                toggleStatusBtn.textContent = 'Set Active ' + (data.status == 'ACTIVE' ? 'Off' : 'On');
+
+                                // Show success message
+                                alert(data.message || 'Status updated successfully!');
+
+                                // Reload the page to reflect changes
+                                window.location.reload();
+                            } else {
+                                // Show error message
+                                alert(data.message || 'Failed to update status. Please try again.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while updating status. Please try again.');
+                        });
+                    }
+                });
+            }
+
+            // Make appointment view buttons functional
+            const viewButtons = document.querySelectorAll('.action-btn.view');
+            viewButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const row = this.closest('tr');
+                    const appointmentId = row.cells[0].textContent;
+                    const patientName = row.cells[1].textContent;
+                    const appointmentDate = row.cells[2].textContent;
+                    const status = row.cells[3].querySelector('.status').textContent;
+                    const notes = row.cells[6].textContent;
+
+                    // Create modal with appointment details
+                    const modal = document.createElement('div');
+                    modal.className = 'modal';
+                    modal.innerHTML = `
+                        <div class="modal-content">
+                            <span class="close">&times;</span>
+                            <h2>Appointment Details</h2>
+                            <div class="appointment-details">
+                                <p><strong>Appointment ID:</strong> ${appointmentId}</p>
+                                <p><strong>Patient Name:</strong> ${patientName}</p>
+                                <p><strong>Date:</strong> ${appointmentDate}</p>
+                                <p><strong>Status:</strong> ${status}</p>
+                                <p><strong>Notes:</strong> ${notes}</p>
+                            </div>
+                            <div class="modal-actions">
+                                <button class="btn btn-primary">Update Status</button>
+                                <button class="btn btn-outline close-btn">Close</button>
+                            </div>
+                        </div>
+                    `;
+
+                    document.body.appendChild(modal);
+
+                    // Add modal styles if not already added
+                    if (!document.getElementById('modal-styles')) {
+                        const style = document.createElement('style');
+                        style.id = 'modal-styles';
+                        style.textContent = `
+                            .modal {
+                                display: block;
+                                position: fixed;
+                                z-index: 1000;
+                                left: 0;
+                                top: 0;
+                                width: 100%;
+                                height: 100%;
+                                background-color: rgba(0,0,0,0.4);
+                            }
+                            .modal-content {
+                                background-color: #fff;
+                                margin: 10% auto;
+                                padding: 20px;
+                                border-radius: 10px;
+                                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                                width: 60%;
+                                max-width: 600px;
+                            }
+                            .close {
+                                color: #aaa;
+                                float: right;
+                                font-size: 28px;
+                                font-weight: bold;
+                                cursor: pointer;
+                            }
+                            .close:hover {
+                                color: #000;
+                            }
+                            .appointment-details {
+                                margin: 20px 0;
+                            }
+                            .modal-actions {
+                                display: flex;
+                                justify-content: flex-end;
+                                gap: 10px;
+                                margin-top: 20px;
+                            }
+                        `;
+                        document.head.appendChild(style);
+                    }
+
+                    // Close modal functionality
+                    const closeBtn = modal.querySelector('.close');
+                    const closeBtnAction = modal.querySelector('.close-btn');
+
+                    closeBtn.addEventListener('click', function() {
+                        modal.remove();
+                    });
+
+                    closeBtnAction.addEventListener('click', function() {
+                        modal.remove();
+                    });
+
+                    // Close when clicking outside the modal
+                    window.addEventListener('click', function(event) {
+                        if (event.target === modal) {
+                            modal.remove();
+                        }
+                    });
+                });
+            });
+        });
     </script>
     <script src="${pageContext.request.contextPath}/assets/js/healthpro-dashboard.js"></script>
 </body>

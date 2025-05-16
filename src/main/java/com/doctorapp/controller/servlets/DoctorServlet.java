@@ -81,23 +81,71 @@ package com.doctorapp.controller.servlets;
      }
 
      private void listDoctors(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+         // Get filter parameters
          String specialization = request.getParameter("specialization");
+         String search = request.getParameter("search");
+         String experience = request.getParameter("experience");
+
          List<Doctor> doctors;
 
-         if (specialization != null && !specialization.isEmpty()) {
-             // Use approved doctors by specialization for public display
-             System.out.println("Fetching doctors with specialization: " + specialization);
-             doctors = doctorService.getApprovedDoctorsBySpecialization(specialization);
-         } else {
-             // Use approved doctors for public display
-             System.out.println("Fetching all approved doctors");
-             doctors = doctorService.getApprovedDoctors();
+         try {
+             // First get doctors based on specialization
+             if (specialization != null && !specialization.isEmpty()) {
+                 // Use approved doctors by specialization for public display
+                 System.out.println("Fetching doctors with specialization: " + specialization);
+                 doctors = doctorService.getApprovedDoctorsBySpecialization(specialization);
+             } else if (search != null && !search.isEmpty()) {
+                 // Search for doctors by name or specialization
+                 System.out.println("Searching for doctors with term: " + search);
+                 doctors = doctorService.searchApprovedDoctors(search);
+             } else {
+                 // Use approved doctors for public display
+                 System.out.println("Fetching all approved doctors");
+                 doctors = doctorService.getApprovedDoctors();
+             }
+
+             // Apply additional filters in memory
+             if (experience != null && !experience.isEmpty() && doctors != null) {
+                 // Filter by experience range
+                 System.out.println("Filtering by experience: " + experience);
+                 List<Doctor> filteredDoctors = new java.util.ArrayList<>();
+
+                 for (Doctor doctor : doctors) {
+                     String docExperience = doctor.getExperience();
+                     if (docExperience != null && !docExperience.isEmpty()) {
+                         try {
+                             // Extract numeric value from experience string
+                             int years = Integer.parseInt(docExperience.replaceAll("[^0-9]", ""));
+
+                             if (experience.equals("0-5") && years >= 0 && years <= 5) {
+                                 filteredDoctors.add(doctor);
+                             } else if (experience.equals("5-10") && years > 5 && years <= 10) {
+                                 filteredDoctors.add(doctor);
+                             } else if (experience.equals("10+") && years > 10) {
+                                 filteredDoctors.add(doctor);
+                             }
+                         } catch (NumberFormatException e) {
+                             // If we can't parse the experience, skip this doctor
+                             System.out.println("Could not parse experience: " + docExperience);
+                         }
+                     }
+                 }
+
+                 doctors = filteredDoctors;
+             }
+
+             System.out.println("Found " + (doctors != null ? doctors.size() : 0) + " doctors after filtering");
+         } catch (Exception e) {
+             System.err.println("Error filtering doctors: " + e.getMessage());
+             e.printStackTrace();
+             doctors = new java.util.ArrayList<>();
+             request.setAttribute("error", "An error occurred while filtering doctors. Please try again.");
          }
 
-         System.out.println("Found " + (doctors != null ? doctors.size() : 0) + " doctors");
-
-         // Set the specialization attribute for the JSP
+         // Set attributes for the JSP
          request.setAttribute("specialization", specialization);
+         request.setAttribute("search", search);
+         request.setAttribute("experience", experience);
          request.setAttribute("doctors", doctors);
          request.getRequestDispatcher("/doctors.jsp").forward(request, response);
      }

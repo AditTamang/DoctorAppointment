@@ -6,12 +6,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Doctor Appointment System</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Google Fonts - Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS (Bootstrap Replacement) -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin-custom.css">
     <style>
         * {
             margin: 0;
@@ -268,56 +268,8 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h3>Doctor App</h3>
-            <div class="profile-info">
-                <c:if test="${not empty user}">
-                    <div class="user-name">${user.firstName} ${user.lastName}</div>
-                    <div class="user-role">Administrator</div>
-                </c:if>
-            </div>
-        </div>
-        <ul class="sidebar-menu">
-            <li class="menu-item active">
-                <a href="${pageContext.request.contextPath}/admin/dashboard" class="menu-link">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="${pageContext.request.contextPath}/admin/doctors" class="menu-link">
-                    <i class="fas fa-user-md"></i>
-                    <span>Doctors</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="${pageContext.request.contextPath}/admin/doctor-requests" class="menu-link">
-                    <i class="fas fa-user-plus"></i>
-                    <span>Doctor Requests</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="${pageContext.request.contextPath}/admin/patients" class="menu-link">
-                    <i class="fas fa-users"></i>
-                    <span>Patients</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="${pageContext.request.contextPath}/admin/appointments" class="menu-link">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Appointments</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="${pageContext.request.contextPath}/logout" class="menu-link">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </li>
-        </ul>
-    </div>
+    <!-- Include the standardized sidebar -->
+    <jsp:include page="admin-sidebar.jsp" />
 
     <!-- Main Content -->
     <div class="main-content">
@@ -605,5 +557,8 @@
             }
         }
     </script>
+
+    <!-- Custom JavaScript (Bootstrap Replacement) -->
+    <script src="${pageContext.request.contextPath}/assets/js/admin-custom.js"></script>
 </body>
 </html>

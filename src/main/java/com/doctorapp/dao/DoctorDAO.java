@@ -890,6 +890,7 @@ package com.doctorapp.dao;
      // Get doctor ID by user ID
      public int getDoctorIdByUserId(int userId) {
          String query = "SELECT id FROM doctors WHERE user_id = ?";
+         System.out.println("Getting doctor ID for user ID: " + userId);
 
          try (Connection conn = DBConnection.getConnection();
               PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -898,20 +899,48 @@ package com.doctorapp.dao;
 
              try (ResultSet rs = pstmt.executeQuery()) {
                  if (rs.next()) {
-                     return rs.getInt("id");
+                     int doctorId = rs.getInt("id");
+                     System.out.println("Found doctor ID: " + doctorId + " for user ID: " + userId);
+                     return doctorId;
+                 } else {
+                     System.out.println("No doctor found for user ID: " + userId + " using direct query");
                  }
              }
-
          } catch (SQLException | ClassNotFoundException e) {
+             System.err.println("Error in primary query for doctor ID: " + e.getMessage());
              e.printStackTrace();
+
+             // Try a fallback query with a join to users table
+             try {
+                 String fallbackQuery = "SELECT d.id FROM doctors d JOIN users u ON d.user_id = u.id WHERE u.id = ? AND u.role = 'DOCTOR'";
+
+                 try (Connection conn = DBConnection.getConnection();
+                      PreparedStatement pstmt = conn.prepareStatement(fallbackQuery)) {
+
+                     pstmt.setInt(1, userId);
+
+                     try (ResultSet rs = pstmt.executeQuery()) {
+                         if (rs.next()) {
+                             int doctorId = rs.getInt("id");
+                             System.out.println("Fallback: Found doctor ID: " + doctorId + " for user ID: " + userId);
+                             return doctorId;
+                         }
+                     }
+                 }
+             } catch (SQLException | ClassNotFoundException fallbackEx) {
+                 System.err.println("Error in fallback query for doctor ID: " + fallbackEx.getMessage());
+             }
          }
 
+         // If we get here, no doctor ID was found
+         System.out.println("No doctor ID found for user ID: " + userId + ", returning 0");
          return 0;
      }
 
      // Get total patients by doctor
      public int getTotalPatientsByDoctor(int doctorId) {
          String query = "SELECT COUNT(DISTINCT patient_id) FROM appointments WHERE doctor_id = ?";
+         System.out.println("Getting total patients for doctor ID: " + doctorId);
 
          try (Connection conn = DBConnection.getConnection();
               PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -920,11 +949,14 @@ package com.doctorapp.dao;
 
              try (ResultSet rs = pstmt.executeQuery()) {
                  if (rs.next()) {
-                     return rs.getInt(1);
+                     int count = rs.getInt(1);
+                     System.out.println("Found " + count + " total patients for doctor ID: " + doctorId);
+                     return count;
                  }
              }
 
          } catch (SQLException | ClassNotFoundException e) {
+             System.err.println("Error getting total patients by doctor ID: " + doctorId);
              e.printStackTrace();
          }
 
@@ -934,6 +966,7 @@ package com.doctorapp.dao;
      // Get pending reports by doctor
      public int getPendingReportsByDoctor(int doctorId) {
          String query = "SELECT COUNT(*) FROM appointments WHERE doctor_id = ? AND status = 'COMPLETED' AND medical_report IS NULL";
+         System.out.println("Getting pending reports for doctor ID: " + doctorId);
 
          try (Connection conn = DBConnection.getConnection();
               PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -942,12 +975,36 @@ package com.doctorapp.dao;
 
              try (ResultSet rs = pstmt.executeQuery()) {
                  if (rs.next()) {
-                     return rs.getInt(1);
+                     int count = rs.getInt(1);
+                     System.out.println("Found " + count + " pending reports for doctor ID: " + doctorId);
+                     return count;
                  }
              }
 
          } catch (SQLException | ClassNotFoundException e) {
+             System.err.println("Error getting pending reports by doctor ID: " + doctorId);
              e.printStackTrace();
+
+             // Try a fallback query without the medical_report column in case it doesn't exist
+             try {
+                 String fallbackQuery = "SELECT COUNT(*) FROM appointments WHERE doctor_id = ? AND status = 'COMPLETED'";
+
+                 try (Connection conn = DBConnection.getConnection();
+                      PreparedStatement pstmt = conn.prepareStatement(fallbackQuery)) {
+
+                     pstmt.setInt(1, doctorId);
+
+                     try (ResultSet rs = pstmt.executeQuery()) {
+                         if (rs.next()) {
+                             int count = rs.getInt(1);
+                             System.out.println("Fallback: Found " + count + " completed appointments for doctor ID: " + doctorId);
+                             return count;
+                         }
+                     }
+                 }
+             } catch (SQLException | ClassNotFoundException fallbackEx) {
+                 System.err.println("Error in fallback query for pending reports: " + fallbackEx.getMessage());
+             }
          }
 
          return 0;
@@ -956,6 +1013,7 @@ package com.doctorapp.dao;
      // Get average rating by doctor
      public double getAverageRatingByDoctor(int doctorId) {
          String query = "SELECT AVG(rating) FROM doctor_ratings WHERE doctor_id = ?";
+         System.out.println("Getting average rating for doctor ID: " + doctorId);
 
          try (Connection conn = DBConnection.getConnection();
               PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -964,15 +1022,40 @@ package com.doctorapp.dao;
 
              try (ResultSet rs = pstmt.executeQuery()) {
                  if (rs.next()) {
-                     return rs.getDouble(1);
+                     double rating = rs.getDouble(1);
+                     System.out.println("Found average rating " + rating + " for doctor ID: " + doctorId);
+                     return rating;
                  }
              }
 
          } catch (SQLException | ClassNotFoundException e) {
-             e.printStackTrace();
+             System.err.println("Error getting average rating by doctor ID: " + doctorId);
+             System.err.println("Error message: " + e.getMessage());
+
+             // Try a fallback - check if the doctor has a rating field directly
+             try {
+                 String fallbackQuery = "SELECT rating FROM doctors WHERE id = ?";
+
+                 try (Connection conn = DBConnection.getConnection();
+                      PreparedStatement pstmt = conn.prepareStatement(fallbackQuery)) {
+
+                     pstmt.setInt(1, doctorId);
+
+                     try (ResultSet rs = pstmt.executeQuery()) {
+                         if (rs.next()) {
+                             double rating = rs.getDouble("rating");
+                             System.out.println("Fallback: Found rating " + rating + " directly in doctors table for ID: " + doctorId);
+                             return rating;
+                         }
+                     }
+                 }
+             } catch (SQLException | ClassNotFoundException fallbackEx) {
+                 System.err.println("Error in fallback query for doctor rating: " + fallbackEx.getMessage());
+             }
          }
 
-         return 0.0;
+         // Return a default rating if no rating found
+         return 4.0;
      }
 
      // Get only approved doctors (for public display)

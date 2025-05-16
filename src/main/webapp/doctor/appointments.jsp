@@ -29,39 +29,8 @@
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="HealthPro Logo">
-                <h2>HealthPro Portal</h2>
-            </div>
-
-            <div class="sidebar-menu">
-                <ul>
-                    <li>
-                        <a href="index.jsp">
-                            <span>Profile</span>
-                        </a>
-                    </li>
-                    <li class="active">
-                        <a href="appointments.jsp">
-                            <span>Appointment Management</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="patients.jsp">
-                            <span>Patient Details</span>
-                        </a>
-                    </li>
-
-                    <li class="logout">
-                        <a href="../logout">
-                            <span>Logout</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+        <!-- Include the standardized sidebar -->
+        <jsp:include page="doctor-sidebar.jsp" />
 
         <!-- Main Content -->
         <div class="main-content">

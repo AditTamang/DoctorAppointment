@@ -32,47 +32,8 @@
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="HealthPro Logo">
-                <h2>HealthPro Portal</h2>
-            </div>
-
-            <div class="profile-overview">
-                <h3><i class="fas fa-user-md"></i> <span>Profile Overview</span></h3>
-            </div>
-
-            <div class="sidebar-menu">
-                <ul>
-                    <li class="active">
-                        <a href="index.jsp">
-                            <i class="fas fa-user"></i>
-                            <span>Profile</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="appointments.jsp">
-                            <i class="fas fa-calendar-check"></i>
-                            <span>Appointment Management</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="patients.jsp">
-                            <i class="fas fa-user-injured"></i>
-                            <span>Patient Details</span>
-                        </a>
-                    </li>
-
-                    <li class="logout">
-                        <a href="../logout">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Logout</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+        <!-- Include the standardized sidebar -->
+        <jsp:include page="doctor-sidebar.jsp" />
 
         <!-- Main Content -->
         <div class="main-content">

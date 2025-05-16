@@ -146,6 +146,9 @@
     </style>
 </head>
 <body>
+    <!-- Include the standardized sidebar -->
+    <jsp:include page="admin-sidebar.jsp" />
+
     <!-- Header -->
     <div class="dashboard-header">
         <h1 class="dashboard-title">Add New Doctor</h1>
