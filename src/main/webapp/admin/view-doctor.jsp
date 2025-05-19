@@ -14,24 +14,30 @@
         .doctor-profile {
             background-color: #fff;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             padding: 30px;
             margin-top: 20px;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .profile-header {
             display: flex;
             align-items: center;
             margin-bottom: 30px;
+            flex-wrap: wrap;
         }
 
         .profile-image {
-            width: 120px;
-            height: 120px;
+            width: 150px;
+            height: 150px;
             border-radius: 50%;
             overflow: hidden;
             margin-right: 30px;
-            border: 3px solid #4e73df;
+            border: 4px solid #4e73df;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
         }
 
         .profile-image img {
@@ -40,21 +46,33 @@
             object-fit: cover;
         }
 
+        .profile-info {
+            flex: 1;
+            min-width: 250px;
+        }
+
         .profile-info h2 {
             margin: 0 0 5px 0;
             color: #333;
-            font-size: 24px;
+            font-size: 28px;
+            font-weight: 600;
         }
 
         .profile-info p {
-            margin: 0 0 10px 0;
+            margin: 0 0 12px 0;
             color: #666;
             font-size: 16px;
         }
 
         .profile-info .specialization {
             color: #4e73df;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 18px;
+            display: inline-block;
+            padding: 5px 12px;
+            background-color: rgba(78, 115, 223, 0.1);
+            border-radius: 20px;
+            margin-bottom: 15px;
         }
 
         .profile-details {
@@ -63,12 +81,17 @@
 
         .detail-section {
             margin-bottom: 30px;
+            background-color: #f8f9fc;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #4e73df;
         }
 
         .detail-section h3 {
-            margin: 0 0 15px 0;
+            margin: 0 0 20px 0;
             color: #333;
-            font-size: 18px;
+            font-size: 20px;
+            font-weight: 600;
             border-bottom: 1px solid #eee;
             padding-bottom: 10px;
         }
@@ -76,34 +99,40 @@
         .detail-row {
             display: flex;
             margin-bottom: 15px;
+            flex-wrap: wrap;
         }
 
         .detail-label {
-            width: 150px;
-            font-weight: 500;
+            width: 180px;
+            font-weight: 600;
             color: #555;
+            font-size: 14px;
         }
 
         .detail-value {
             flex: 1;
             color: #333;
+            font-size: 15px;
+            min-width: 250px;
         }
 
         .action-buttons {
             display: flex;
             gap: 15px;
             margin-top: 30px;
+            flex-wrap: wrap;
         }
 
         .btn {
-            padding: 10px 20px;
-            border-radius: 4px;
-            font-weight: 500;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
             transition: all 0.3s ease;
+            font-size: 14px;
         }
 
         .btn-primary {
@@ -115,6 +144,7 @@
         .btn-primary:hover {
             background-color: #3756a4;
             transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .btn-danger {
@@ -126,6 +156,7 @@
         .btn-danger:hover {
             background-color: #c23321;
             transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .back-btn {
@@ -137,10 +168,58 @@
             font-weight: 500;
             margin-bottom: 20px;
             transition: all 0.3s ease;
+            font-size: 14px;
         }
 
         .back-btn:hover {
             color: #3756a4;
+            transform: translateX(-3px);
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .profile-image {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+
+            .detail-row {
+                flex-direction: column;
+            }
+
+            .detail-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+
+            .action-buttons {
+                justify-content: center;
+            }
         }
     </style>
 </head>

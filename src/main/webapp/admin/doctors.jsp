@@ -8,29 +8,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Doctors | Admin Dashboard</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/admin-dashboard.css">
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts - Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-dashboard.css">
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fc;
+        /* Main Content Styles */
+        .main-content {
+            padding: 20px;
+            margin-left: 250px;
+            transition: margin-left 0.3s;
         }
 
-        .dashboard-header {
-            background-color: #4a2c46;
-            color: white;
-            padding: 15px 20px;
+        /* Page Header Styles */
+        .page-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
         }
 
-        .dashboard-title {
+        .page-title {
             font-size: 1.5rem;
             font-weight: 600;
+            color: #333;
             margin: 0;
         }
 
@@ -45,15 +51,22 @@
             gap: 8px;
             cursor: pointer;
             font-weight: 500;
-            transition: all 0.3s ease;
+            text-decoration: none;
+            transition: background-color 0.3s;
         }
 
+        .add-new-btn:hover {
+            background-color: #375abd;
+        }
+
+        /* Search Container Styles */
         .search-container {
+            margin-bottom: 20px;
             display: flex;
-            margin: 20px;
             border: 1px solid #ddd;
             border-radius: 4px;
             overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .search-container input {
@@ -61,6 +74,7 @@
             padding: 10px 15px;
             border: none;
             font-size: 14px;
+            outline: none;
         }
 
         .search-container button {
@@ -69,18 +83,24 @@
             border: none;
             padding: 10px 20px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
 
+        .search-container button:hover {
+            background-color: #375abd;
+        }
+
+        /* Doctors Count Styles */
         .doctors-count {
-            margin: 20px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: #333;
+            margin-bottom: 15px;
         }
 
+        /* Doctors Table Styles */
         .doctors-table {
-            width: calc(100% - 40px);
-            margin: 0 20px 20px;
+            width: 100%;
             border-collapse: collapse;
             background-color: white;
             border-radius: 8px;
@@ -100,6 +120,11 @@
             color: #333;
         }
 
+        .doctors-table tr:hover {
+            background-color: #f8f9fc;
+        }
+
+        /* Action Buttons Styles */
         .action-buttons {
             display: flex;
             gap: 8px;
@@ -113,35 +138,46 @@
             align-items: center;
             justify-content: center;
             color: white;
-            transition: all 0.3s ease;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .action-btn:hover {
+            opacity: 0.8;
         }
 
         .view-btn {
-            background-color: #3498db;
+            background-color: #36b9cc;
         }
 
         .edit-btn {
-            background-color: #2ecc71;
+            background-color: #1cc88a;
         }
 
         .delete-btn {
-            background-color: #e74c3c;
+            background-color: #e74a3b;
         }
 
-        .dashboard-footer {
-            background-color: white;
-            padding: 10px 20px;
-            text-align: left;
-            border-top: 1px solid #e3e6f0;
-            font-size: 12px;
-            color: #6c757d;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
 
-        .dashboard-main {
-            padding-bottom: 50px; /* To account for fixed footer */
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .doctors-table {
+                font-size: 14px;
+            }
+
+            .doctors-table th, .doctors-table td {
+                padding: 10px;
+            }
         }
     </style>
 </head>
@@ -149,21 +185,21 @@
     <!-- Include the standardized sidebar -->
     <jsp:include page="admin-sidebar.jsp" />
 
-    <!-- Header -->
-    <div class="dashboard-header">
-        <h1 class="dashboard-title">Add New Doctor</h1>
-        <a href="add-doctor.jsp" class="add-new-btn">
-            <i class="fas fa-plus"></i> Add New
-        </a>
-    </div>
-
     <!-- Main Content -->
-    <div class="dashboard-main">
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Manage Doctors</h1>
+            <a href="add-doctor.jsp" class="add-new-btn">
+                <i class="fas fa-plus"></i> Add New Doctor
+            </a>
+        </div>
+
         <!-- Search Bar -->
         <div class="search-container">
-            <form action="${pageContext.request.contextPath}/admin/doctors" method="get">
-                <input type="text" name="search" placeholder="Search doctor name or ID">
-                <button type="submit">Search</button>
+            <form action="${pageContext.request.contextPath}/admin/doctors" method="get" style="display: flex; width: 100%;">
+                <input type="text" name="search" placeholder="Search doctor name, email or specialization">
+                <button type="submit"><i class="fas fa-search"></i> Search</button>
             </form>
         </div>
 
@@ -177,8 +213,8 @@
                 <tr>
                     <th>Doctor Name</th>
                     <th>Email</th>
-                    <th>Specialties</th>
-                    <th>Events</th>
+                    <th>Specialization</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -188,18 +224,18 @@
                     for (Doctor doctor : doctors) {
                 %>
                 <tr>
-                    <td>Dr. <%= doctor.getName() %></td>
+                    <td><%= doctor.getName() %></td>
                     <td><%= doctor.getEmail() %></td>
                     <td><%= doctor.getSpecialization() %></td>
                     <td>
                         <div class="action-buttons">
-                            <a href="${pageContext.request.contextPath}/admin/doctor/view?id=<%= doctor.getId() %>" class="action-btn view-btn">
+                            <a href="${pageContext.request.contextPath}/admin/doctor/view?id=<%= doctor.getId() %>" class="action-btn view-btn" title="View Doctor">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a href="${pageContext.request.contextPath}/admin/doctor/edit?id=<%= doctor.getId() %>" class="action-btn edit-btn">
+                            <a href="${pageContext.request.contextPath}/admin/doctor/edit?id=<%= doctor.getId() %>" class="action-btn edit-btn" title="Edit Doctor">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a href="#" onclick="confirmDelete(<%= doctor.getId() %>)" class="action-btn delete-btn">
+                            <a href="#" onclick="confirmDelete(<%= doctor.getId() %>)" class="action-btn delete-btn" title="Delete Doctor">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </div>
@@ -215,12 +251,6 @@
                 <% } %>
             </tbody>
         </table>
-    </div>
-
-    <!-- Footer -->
-    <div class="dashboard-footer">
-        <p>&copy; 2023 MedDoc. All Rights Reserved.</p>
-        <p>Version 1.0.0</p>
     </div>
 
     <script>

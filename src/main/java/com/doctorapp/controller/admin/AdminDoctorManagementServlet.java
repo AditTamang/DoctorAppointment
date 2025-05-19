@@ -33,7 +33,7 @@ public class AdminDoctorManagementServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getServletPath();
-        
+
         // Check if user is admin
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
@@ -46,7 +46,7 @@ public class AdminDoctorManagementServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/access-denied.jsp");
             return;
         }
-        
+
         switch (action) {
             case "/admin/doctors/view":
                 viewDoctor(request, response);
@@ -65,7 +65,7 @@ public class AdminDoctorManagementServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getServletPath();
-        
+
         // Check if user is admin
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
@@ -78,7 +78,7 @@ public class AdminDoctorManagementServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/access-denied.jsp");
             return;
         }
-        
+
         switch (action) {
             case "/admin/doctors/update":
                 updateDoctor(request, response);
@@ -95,13 +95,13 @@ public class AdminDoctorManagementServlet extends HttpServlet {
     private void viewDoctor(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int doctorId = Integer.parseInt(request.getParameter("id"));
         Doctor doctor = doctorService.getDoctorById(doctorId);
-        
+
         if (doctor == null) {
             request.setAttribute("errorMessage", "Doctor not found");
             request.getRequestDispatcher("/admin/doctorDashboard.jsp").forward(request, response);
             return;
         }
-        
+
         request.setAttribute("doctor", doctor);
         request.getRequestDispatcher("/admin/viewDoctor.jsp").forward(request, response);
     }
@@ -112,13 +112,13 @@ public class AdminDoctorManagementServlet extends HttpServlet {
     private void showEditForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int doctorId = Integer.parseInt(request.getParameter("id"));
         Doctor doctor = doctorService.getDoctorById(doctorId);
-        
+
         if (doctor == null) {
             request.setAttribute("errorMessage", "Doctor not found");
             request.getRequestDispatcher("/admin/doctorDashboard.jsp").forward(request, response);
             return;
         }
-        
+
         request.setAttribute("doctor", doctor);
         request.getRequestDispatcher("/admin/editDoctor.jsp").forward(request, response);
     }
@@ -129,13 +129,13 @@ public class AdminDoctorManagementServlet extends HttpServlet {
     private void updateDoctor(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int doctorId = Integer.parseInt(request.getParameter("id"));
         Doctor doctor = doctorService.getDoctorById(doctorId);
-        
+
         if (doctor == null) {
             request.setAttribute("errorMessage", "Doctor not found");
             request.getRequestDispatcher("/admin/doctorDashboard.jsp").forward(request, response);
             return;
         }
-        
+
         // Get form data
         String specialization = request.getParameter("specialization");
         String qualification = request.getParameter("qualification");
@@ -144,7 +144,22 @@ public class AdminDoctorManagementServlet extends HttpServlet {
         String availableDays = request.getParameter("availableDays");
         String availableTime = request.getParameter("availableTime");
         String bio = request.getParameter("bio");
-        
+        String status = request.getParameter("status");
+
+        // Log the data being updated
+        System.out.println("Updating doctor ID: " + doctorId);
+        System.out.println("Specialization: " + specialization);
+        System.out.println("Qualification: " + qualification);
+        System.out.println("Experience: " + experience);
+        System.out.println("Consultation Fee: " + consultationFee);
+        System.out.println("Available Days: " + availableDays);
+        System.out.println("Available Time: " + availableTime);
+        System.out.println("Bio: " + bio);
+
+        // Log the original doctor data for comparison
+        System.out.println("Original doctor available days: " + doctor.getAvailableDays());
+        System.out.println("Original doctor available time: " + doctor.getAvailableTime());
+
         // Update doctor information
         doctor.setSpecialization(specialization);
         doctor.setQualification(qualification);
@@ -153,15 +168,20 @@ public class AdminDoctorManagementServlet extends HttpServlet {
         doctor.setAvailableDays(availableDays);
         doctor.setAvailableTime(availableTime);
         doctor.setBio(bio);
-        
+
+        // Set status if provided
+        if (status != null && !status.isEmpty()) {
+            doctor.setStatus(status);
+        }
+
         boolean updated = doctorService.updateDoctor(doctor);
-        
+
         if (updated) {
             request.setAttribute("successMessage", "Doctor information updated successfully");
         } else {
             request.setAttribute("errorMessage", "Failed to update doctor information");
         }
-        
+
         // Refresh doctor data
         doctor = doctorService.getDoctorById(doctorId);
         request.setAttribute("doctor", doctor);
@@ -173,15 +193,15 @@ public class AdminDoctorManagementServlet extends HttpServlet {
      */
     private void deleteDoctor(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int doctorId = Integer.parseInt(request.getParameter("id"));
-        
+
         boolean deleted = doctorService.deleteDoctor(doctorId);
-        
+
         if (deleted) {
             request.setAttribute("successMessage", "Doctor deleted successfully");
         } else {
             request.setAttribute("errorMessage", "Failed to delete doctor");
         }
-        
+
         // Redirect to doctor list
         response.sendRedirect(request.getContextPath() + "/admin/doctorDashboard");
     }

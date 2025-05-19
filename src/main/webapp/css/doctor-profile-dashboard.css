@@ -56,6 +56,7 @@ body {
     overflow-y: auto;
     z-index: 100;
     padding: 20px 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
 }
 
 .sidebar-header {
@@ -165,6 +166,8 @@ body {
     text-decoration: none;
     transition: all 0.3s ease;
     border-radius: 8px;
+    font-weight: 500;
+    margin-right: 5px;
 }
 
 .sidebar-menu a i {
@@ -182,6 +185,8 @@ body {
 .sidebar-menu li.active a {
     background-color: var(--primary-light);
     color: var(--primary-color);
+    font-weight: 600;
+    border-left: 3px solid var(--primary-color);
 }
 
 .sidebar-menu a span {

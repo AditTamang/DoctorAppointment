@@ -14,9 +14,12 @@
         .form-container {
             background-color: #fff;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             padding: 30px;
             margin-top: 20px;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .form-group {
@@ -26,32 +29,37 @@
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 500;
+            font-weight: 600;
             color: #333;
+            font-size: 14px;
         }
 
         .form-control {
             width: 100%;
-            padding: 10px 15px;
+            padding: 12px 15px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 14px;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
         }
 
         .form-control:focus {
             border-color: #4e73df;
             outline: none;
+            box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.1);
         }
 
         .form-row {
             display: flex;
             gap: 20px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
         .form-col {
             flex: 1;
+            min-width: 250px;
         }
 
         .btn-primary {
@@ -59,15 +67,18 @@
             color: white;
             border: none;
             padding: 12px 25px;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
             transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .btn-primary:hover {
             background-color: #3756a4;
             transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .btn-secondary {
@@ -75,15 +86,18 @@
             color: white;
             border: none;
             padding: 12px 25px;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
             transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .btn-secondary:hover {
             background-color: #5a6268;
             transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
         }
 
         .form-actions {
@@ -91,12 +105,14 @@
             justify-content: flex-end;
             gap: 15px;
             margin-top: 30px;
+            flex-wrap: wrap;
         }
 
         .alert {
             padding: 15px;
             margin-bottom: 20px;
-            border-radius: 4px;
+            border-radius: 6px;
+            font-weight: 500;
         }
 
         .alert-success {
@@ -120,10 +136,43 @@
             font-weight: 500;
             margin-bottom: 20px;
             transition: all 0.3s ease;
+            font-size: 14px;
         }
 
         .back-btn:hover {
             color: #3756a4;
+            transform: translateX(-3px);
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #4e73df;
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .form-col {
+                width: 100%;
+            }
+
+            .form-actions {
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -267,7 +316,7 @@
                 if (doctor != null) {
                 %>
                 <div class="form-container">
-                    <form action="${pageContext.request.contextPath}/admin/doctor/edit" method="post">
+                    <form action="${pageContext.request.contextPath}/admin/doctors/update" method="post">
                         <input type="hidden" name="id" value="<%= doctor.getId() %>">
 
                         <div class="form-row">

@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import com.doctorapp.model.Doctor;
 import com.doctorapp.util.DBConnection;
 
 /**
@@ -24,6 +25,29 @@ public class DoctorAvailabilityDAO {
         System.out.println("Updating availability for doctor ID: " + doctorId);
         System.out.println("Available days: " + availableDays);
         System.out.println("Available time: " + availableTime);
+
+        // Validate input parameters
+        if (doctorId <= 0) {
+            System.err.println("Invalid doctor ID: " + doctorId);
+            return false;
+        }
+
+        if (availableDays == null || availableDays.trim().isEmpty()) {
+            System.err.println("Available days cannot be empty");
+            return false;
+        }
+
+        if (availableTime == null || availableTime.trim().isEmpty()) {
+            System.err.println("Available time cannot be empty");
+            return false;
+        }
+
+        // First, check if the doctor exists
+        boolean doctorExists = checkDoctorExists(doctorId);
+        if (!doctorExists) {
+            System.err.println("Doctor with ID " + doctorId + " does not exist");
+            return false;
+        }
 
         // First, check if the columns exist and what naming convention is used
         String columnNamingQuery = "SHOW COLUMNS FROM doctors";
@@ -44,8 +68,11 @@ public class DoctorAvailabilityDAO {
                 }
             }
 
+            System.out.println("Column check - hasCamelCase: " + hasCamelCase + ", hasSnakeCase: " + hasSnakeCase);
+
         } catch (SQLException | ClassNotFoundException e) {
             System.err.println("Error checking column names: " + e.getMessage());
+            e.printStackTrace();
         }
 
         // If columns don't exist, add them
@@ -53,38 +80,63 @@ public class DoctorAvailabilityDAO {
             try (Connection conn = DBConnection.getConnection();
                  Statement stmt = conn.createStatement()) {
 
-                // Try to add columns with camelCase naming
+                // Try to add columns with snake_case naming (more standard)
                 try {
-                    stmt.executeUpdate("ALTER TABLE doctors ADD COLUMN availableDays VARCHAR(255)");
-                    stmt.executeUpdate("ALTER TABLE doctors ADD COLUMN availableTime VARCHAR(255)");
-                    hasCamelCase = true;
-                    System.out.println("Added camelCase columns to doctors table");
+                    stmt.executeUpdate("ALTER TABLE doctors ADD COLUMN available_days VARCHAR(255)");
+                    stmt.executeUpdate("ALTER TABLE doctors ADD COLUMN available_time VARCHAR(255)");
+                    hasSnakeCase = true;
+                    System.out.println("Added snake_case columns to doctors table");
                 } catch (SQLException e) {
-                    System.err.println("Error adding camelCase columns: " + e.getMessage());
+                    System.err.println("Error adding snake_case columns: " + e.getMessage());
+                    e.printStackTrace();
 
-                    // Try with snake_case
+                    // Try with camelCase
                     try {
-                        stmt.executeUpdate("ALTER TABLE doctors ADD COLUMN available_days VARCHAR(255)");
-                        stmt.executeUpdate("ALTER TABLE doctors ADD COLUMN available_time VARCHAR(255)");
-                        hasSnakeCase = true;
-                        System.out.println("Added snake_case columns to doctors table");
+                        stmt.executeUpdate("ALTER TABLE doctors ADD COLUMN availableDays VARCHAR(255)");
+                        stmt.executeUpdate("ALTER TABLE doctors ADD COLUMN availableTime VARCHAR(255)");
+                        hasCamelCase = true;
+                        System.out.println("Added camelCase columns to doctors table");
                     } catch (SQLException innerE) {
-                        System.err.println("Error adding snake_case columns: " + innerE.getMessage());
+                        System.err.println("Error adding camelCase columns: " + innerE.getMessage());
+                        innerE.printStackTrace();
                     }
                 }
 
             } catch (SQLException | ClassNotFoundException e) {
                 System.err.println("Error altering doctors table: " + e.getMessage());
+                e.printStackTrace();
             }
         }
 
         // Now update the columns based on what naming convention is used
         boolean updateSuccess = false;
 
-        if (hasCamelCase) {
-            String query = "UPDATE doctors SET availableDays = ?, availableTime = ? WHERE id = ?";
+        // Try to update both column types regardless of what we detected
+        // This ensures we update the right columns even if our detection was wrong
+
+        // Try snake_case first (more common in SQL)
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement("UPDATE doctors SET available_days = ?, available_time = ? WHERE id = ?")) {
+
+            pstmt.setString(1, availableDays);
+            pstmt.setString(2, availableTime);
+            pstmt.setInt(3, doctorId);
+
+            int rowsAffected = pstmt.executeUpdate();
+            System.out.println("Rows affected (snake_case): " + rowsAffected);
+            if (rowsAffected > 0) {
+                updateSuccess = true;
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Error updating with snake_case: " + e.getMessage());
+            // Continue to try camelCase
+        }
+
+        // Try camelCase if snake_case failed
+        if (!updateSuccess) {
             try (Connection conn = DBConnection.getConnection();
-                 PreparedStatement pstmt = conn.prepareStatement(query)) {
+                 PreparedStatement pstmt = conn.prepareStatement("UPDATE doctors SET availableDays = ?, availableTime = ? WHERE id = ?")) {
 
                 pstmt.setString(1, availableDays);
                 pstmt.setString(2, availableTime);
@@ -92,57 +144,176 @@ public class DoctorAvailabilityDAO {
 
                 int rowsAffected = pstmt.executeUpdate();
                 System.out.println("Rows affected (camelCase): " + rowsAffected);
-                updateSuccess = rowsAffected > 0;
+                if (rowsAffected > 0) {
+                    updateSuccess = true;
+                }
 
             } catch (SQLException | ClassNotFoundException e) {
                 System.err.println("Error updating with camelCase: " + e.getMessage());
+                // Continue to try individual field updates
             }
         }
 
-        if (!updateSuccess && hasSnakeCase) {
-            String query = "UPDATE doctors SET available_days = ?, available_time = ? WHERE id = ?";
-            try (Connection conn = DBConnection.getConnection();
-                 PreparedStatement pstmt = conn.prepareStatement(query)) {
-
-                pstmt.setString(1, availableDays);
-                pstmt.setString(2, availableTime);
-                pstmt.setInt(3, doctorId);
-
-                int rowsAffected = pstmt.executeUpdate();
-                System.out.println("Rows affected (snake_case): " + rowsAffected);
-                updateSuccess = rowsAffected > 0;
-
-            } catch (SQLException | ClassNotFoundException e) {
-                System.err.println("Error updating with snake_case: " + e.getMessage());
-            }
+        // If both approaches failed, try updating individual fields
+        if (!updateSuccess) {
+            updateSuccess = updateIndividualFields(doctorId, availableDays, availableTime);
         }
 
-        // If all else fails, try a direct SQL approach
+        // If all else fails, try a direct SQL approach as a last resort
         if (!updateSuccess) {
             try (Connection conn = DBConnection.getConnection();
                  Statement stmt = conn.createStatement()) {
 
-                String directQuery;
-                if (hasCamelCase) {
-                    directQuery = "UPDATE doctors SET availableDays = '" + availableDays +
-                                 "', availableTime = '" + availableTime +
-                                 "' WHERE id = " + doctorId;
-                } else {
-                    directQuery = "UPDATE doctors SET available_days = '" + availableDays +
+                // Try both naming conventions
+                try {
+                    String snakeCaseQuery = "UPDATE doctors SET available_days = '" + availableDays +
                                  "', available_time = '" + availableTime +
                                  "' WHERE id = " + doctorId;
+                    int rowsAffected = stmt.executeUpdate(snakeCaseQuery);
+                    System.out.println("Rows affected (direct SQL snake_case): " + rowsAffected);
+                    if (rowsAffected > 0) {
+                        updateSuccess = true;
+                    }
+                } catch (SQLException e) {
+                    System.err.println("Error with direct SQL snake_case update: " + e.getMessage());
                 }
 
-                int rowsAffected = stmt.executeUpdate(directQuery);
-                System.out.println("Rows affected (direct SQL): " + rowsAffected);
-                updateSuccess = rowsAffected > 0;
+                if (!updateSuccess) {
+                    try {
+                        String camelCaseQuery = "UPDATE doctors SET availableDays = '" + availableDays +
+                                     "', availableTime = '" + availableTime +
+                                     "' WHERE id = " + doctorId;
+                        int rowsAffected = stmt.executeUpdate(camelCaseQuery);
+                        System.out.println("Rows affected (direct SQL camelCase): " + rowsAffected);
+                        if (rowsAffected > 0) {
+                            updateSuccess = true;
+                        }
+                    } catch (SQLException e) {
+                        System.err.println("Error with direct SQL camelCase update: " + e.getMessage());
+                    }
+                }
 
             } catch (SQLException | ClassNotFoundException e) {
                 System.err.println("Error with direct SQL update: " + e.getMessage());
+                e.printStackTrace();
             }
         }
 
+        // Update the Doctor object in the session if the update was successful
+        if (updateSuccess) {
+            System.out.println("Successfully updated doctor availability");
+            // Also update the doctor in DoctorDAO to ensure consistency
+            try {
+                DoctorDAO doctorDAO = new DoctorDAO();
+                Doctor doctor = doctorDAO.getDoctorById(doctorId);
+                if (doctor != null) {
+                    doctor.setAvailableDays(availableDays);
+                    doctor.setAvailableTime(availableTime);
+                    doctorDAO.updateDoctor(doctor);
+                }
+            } catch (Exception e) {
+                System.err.println("Error updating doctor in DoctorDAO: " + e.getMessage());
+                // Don't fail the operation if this fails
+            }
+        } else {
+            System.err.println("Failed to update doctor availability");
+        }
+
         return updateSuccess;
+    }
+
+    /**
+     * Check if a doctor exists in the database
+     * @param doctorId The doctor ID
+     * @return true if the doctor exists, false otherwise
+     */
+    private boolean checkDoctorExists(int doctorId) {
+        String query = "SELECT COUNT(*) FROM doctors WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, doctorId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    return count > 0;
+                }
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Error checking if doctor exists: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /**
+     * Update individual fields for doctor availability
+     * @param doctorId The doctor ID
+     * @param availableDays The available days
+     * @param availableTime The available time
+     * @return true if at least one field was updated successfully
+     */
+    private boolean updateIndividualFields(int doctorId, String availableDays, String availableTime) {
+        boolean success = false;
+
+        try (Connection conn = DBConnection.getConnection()) {
+            // Try to update available_days (snake_case)
+            try {
+                PreparedStatement pstmt = conn.prepareStatement("UPDATE doctors SET available_days = ? WHERE id = ?");
+                pstmt.setString(1, availableDays);
+                pstmt.setInt(2, doctorId);
+                int rowsAffected = pstmt.executeUpdate();
+                System.out.println("Updated available_days: " + rowsAffected + " rows affected");
+                if (rowsAffected > 0) success = true;
+            } catch (SQLException e) {
+                System.err.println("Error updating available_days: " + e.getMessage());
+            }
+
+            // Try to update availableDays (camelCase)
+            try {
+                PreparedStatement pstmt = conn.prepareStatement("UPDATE doctors SET availableDays = ? WHERE id = ?");
+                pstmt.setString(1, availableDays);
+                pstmt.setInt(2, doctorId);
+                int rowsAffected = pstmt.executeUpdate();
+                System.out.println("Updated availableDays: " + rowsAffected + " rows affected");
+                if (rowsAffected > 0) success = true;
+            } catch (SQLException e) {
+                System.err.println("Error updating availableDays: " + e.getMessage());
+            }
+
+            // Try to update available_time (snake_case)
+            try {
+                PreparedStatement pstmt = conn.prepareStatement("UPDATE doctors SET available_time = ? WHERE id = ?");
+                pstmt.setString(1, availableTime);
+                pstmt.setInt(2, doctorId);
+                int rowsAffected = pstmt.executeUpdate();
+                System.out.println("Updated available_time: " + rowsAffected + " rows affected");
+                if (rowsAffected > 0) success = true;
+            } catch (SQLException e) {
+                System.err.println("Error updating available_time: " + e.getMessage());
+            }
+
+            // Try to update availableTime (camelCase)
+            try {
+                PreparedStatement pstmt = conn.prepareStatement("UPDATE doctors SET availableTime = ? WHERE id = ?");
+                pstmt.setString(1, availableTime);
+                pstmt.setInt(2, doctorId);
+                int rowsAffected = pstmt.executeUpdate();
+                System.out.println("Updated availableTime: " + rowsAffected + " rows affected");
+                if (rowsAffected > 0) success = true;
+            } catch (SQLException e) {
+                System.err.println("Error updating availableTime: " + e.getMessage());
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Error in updateIndividualFields: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return success;
     }
 
     /**

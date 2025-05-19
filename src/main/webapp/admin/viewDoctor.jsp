@@ -9,7 +9,7 @@
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
-    
+
     // Get doctor data from request attribute
     Doctor doctor = (Doctor) request.getAttribute("doctor");
     if (doctor == null) {
@@ -27,6 +27,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/adminDashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-doctor.css">
     <style>
         .doctor-profile {
             background-color: #fff;
@@ -35,7 +36,7 @@
             overflow: hidden;
             margin-bottom: 30px;
         }
-        
+
         .profile-header {
             background: linear-gradient(135deg, #4e54c8, #8f94fb);
             color: white;
@@ -44,7 +45,7 @@
             display: flex;
             align-items: center;
         }
-        
+
         .profile-avatar {
             width: 120px;
             height: 120px;
@@ -54,24 +55,24 @@
             margin-right: 30px;
             background-color: #fff;
         }
-        
+
         .profile-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        
+
         .profile-info h2 {
             margin: 0 0 5px 0;
             font-size: 24px;
         }
-        
+
         .profile-info p {
             margin: 0 0 10px 0;
             opacity: 0.9;
             font-size: 16px;
         }
-        
+
         .profile-actions {
             position: absolute;
             top: 20px;
@@ -79,7 +80,7 @@
             display: flex;
             gap: 10px;
         }
-        
+
         .btn {
             padding: 8px 15px;
             border-radius: 5px;
@@ -92,43 +93,43 @@
             transition: all 0.3s ease;
             text-decoration: none;
         }
-        
+
         .btn-primary {
             background-color: #4CAF50;
             color: white;
         }
-        
+
         .btn-primary:hover {
             background-color: #388E3C;
         }
-        
+
         .btn-danger {
             background-color: #f44336;
             color: white;
         }
-        
+
         .btn-danger:hover {
             background-color: #d32f2f;
         }
-        
+
         .btn-secondary {
             background-color: #f8f9fa;
             color: #333;
             border: 1px solid #ddd;
         }
-        
+
         .btn-secondary:hover {
             background-color: #e9ecef;
         }
-        
+
         .profile-body {
             padding: 30px;
         }
-        
+
         .profile-section {
             margin-bottom: 30px;
         }
-        
+
         .profile-section h3 {
             color: #333;
             border-bottom: 1px solid #eee;
@@ -136,37 +137,37 @@
             margin-bottom: 20px;
             font-size: 18px;
         }
-        
+
         .profile-details {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
         }
-        
+
         .detail-item {
             margin-bottom: 15px;
         }
-        
+
         .detail-item label {
             display: block;
             color: #666;
             margin-bottom: 5px;
             font-size: 14px;
         }
-        
+
         .detail-item p {
             color: #333;
             font-weight: 500;
             margin: 0;
         }
-        
+
         .availability-days {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-top: 10px;
         }
-        
+
         .day-badge {
             background-color: #e6f7ff;
             color: #0099ff;
@@ -174,34 +175,84 @@
             border-radius: 20px;
             font-size: 14px;
         }
-        
+
         .stats-section {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             margin-top: 30px;
         }
-        
+
         .stat-card {
             background-color: #f8f9fa;
             border-radius: 8px;
             padding: 20px;
             text-align: center;
         }
-        
+
         .stat-card h4 {
             color: #666;
             margin-bottom: 10px;
             font-size: 16px;
         }
-        
+
+        /* Availability Form Styles */
+        .availability-form {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fc;
+            border-radius: 8px;
+            border-left: 4px solid #4e73df;
+        }
+
+        .availability-form h4 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .update-availability-form .form-group {
+            margin-bottom: 15px;
+        }
+
+        .update-availability-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .update-availability-form .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .update-availability-form .form-text {
+            color: #666;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .update-availability-btn {
+            margin-top: 10px;
+        }
+
+        #availability-message {
+            margin-top: 15px;
+        }
+
         .stat-card p {
             color: #333;
             font-size: 24px;
             font-weight: 600;
             margin: 0;
         }
-        
+
         .alert {
             padding: 15px;
             border-radius: 5px;
@@ -209,50 +260,50 @@
             display: flex;
             align-items: center;
         }
-        
+
         .alert i {
             margin-right: 10px;
             font-size: 18px;
         }
-        
+
         .alert-success {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
-        
+
         .alert-danger {
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
-        
+
         .bio-section {
             line-height: 1.6;
             color: #555;
         }
-        
+
         @media (max-width: 768px) {
             .profile-header {
                 flex-direction: column;
                 text-align: center;
             }
-            
+
             .profile-avatar {
                 margin-right: 0;
                 margin-bottom: 20px;
             }
-            
+
             .profile-actions {
                 position: static;
                 justify-content: center;
                 margin-top: 20px;
             }
-            
+
             .profile-details {
                 grid-template-columns: 1fr;
             }
-            
+
             .stats-section {
                 grid-template-columns: 1fr;
             }
@@ -330,7 +381,7 @@
                 <div class="menu-toggle" id="menuToggle">
                     <i class="fas fa-bars"></i>
                 </div>
-                
+
                 <div class="nav-right">
                     <div class="nav-user">
                         <div class="user-image">
@@ -361,7 +412,7 @@
                         <i class="fas fa-check-circle"></i> ${successMessage}
                     </div>
                 </c:if>
-                
+
                 <c:if test="${not empty errorMessage}">
                     <div class="alert alert-danger">
                         <i class="fas fa-exclamation-circle"></i> ${errorMessage}
@@ -453,13 +504,13 @@
                             <div class="detail-item">
                                 <label>Available Days</label>
                                 <div class="availability-days">
-                                    <% 
+                                    <%
                                     if (doctor.getAvailableDays() != null && !doctor.getAvailableDays().isEmpty()) {
                                         String[] days = doctor.getAvailableDays().split(",");
                                         for (String day : days) {
                                     %>
                                         <span class="day-badge"><%= day.trim() %></span>
-                                    <% 
+                                    <%
                                         }
                                     } else {
                                     %>
@@ -471,16 +522,18 @@
                                 <label>Available Hours</label>
                                 <p><%= doctor.getAvailableTime() != null ? doctor.getAvailableTime() : "Not provided" %></p>
                             </div>
+
+                            <!-- Update Availability section removed as per requirements -->
                         </div>
 
                         <div class="profile-section bio-section">
                             <h3>Biography</h3>
                             <p>
-                                <%= doctor.getBio() != null && !doctor.getBio().isEmpty() ? doctor.getBio() : 
-                                   "Dr. " + doctor.getName() + " is a highly skilled " + doctor.getSpecialization() + 
-                                   " with " + (doctor.getExperience() != null ? doctor.getExperience() : "many") + 
-                                   " years of experience. " + (doctor.getQualification() != null ? doctor.getQualification() : "") + 
-                                   ". Specializing in comprehensive care, Dr. " + doctor.getName() + 
+                                <%= doctor.getBio() != null && !doctor.getBio().isEmpty() ? doctor.getBio() :
+                                   "Dr. " + doctor.getName() + " is a highly skilled " + doctor.getSpecialization() +
+                                   " with " + (doctor.getExperience() != null ? doctor.getExperience() : "many") +
+                                   " years of experience. " + (doctor.getQualification() != null ? doctor.getQualification() : "") +
+                                   ". Specializing in comprehensive care, Dr. " + doctor.getName() +
                                    " is dedicated to providing personalized treatment plans for each patient." %>
                             </p>
                         </div>
@@ -512,17 +565,17 @@
         document.getElementById('menuToggle').addEventListener('click', function() {
             document.querySelector('.sidebar').classList.toggle('active');
         });
-        
+
         // Delete confirmation modal
         function confirmDelete(doctorId) {
             document.getElementById('deleteModal').style.display = 'block';
             document.getElementById('confirmDeleteBtn').href = '${pageContext.request.contextPath}/admin/doctors/delete?id=' + doctorId;
         }
-        
+
         function closeModal() {
             document.getElementById('deleteModal').style.display = 'none';
         }
-        
+
         // Close modal when clicking outside
         window.onclick = function(event) {
             var modal = document.getElementById('deleteModal');
@@ -530,8 +583,10 @@
                 modal.style.display = 'none';
             }
         }
+
+        // Availability form submission code removed as per requirements
     </script>
-    
+
     <style>
         /* Modal Styles */
         .modal {
@@ -546,7 +601,7 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .modal-content {
             background-color: #fff;
             border-radius: 8px;
@@ -554,7 +609,7 @@
             max-width: 90%;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
-        
+
         .modal-header {
             padding: 15px 20px;
             border-bottom: 1px solid #eee;
@@ -562,28 +617,28 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .modal-header h2 {
             margin: 0;
             font-size: 18px;
             color: #333;
         }
-        
+
         .close {
             font-size: 24px;
             font-weight: bold;
             color: #777;
             cursor: pointer;
         }
-        
+
         .close:hover {
             color: #333;
         }
-        
+
         .modal-body {
             padding: 20px;
         }
-        
+
         .modal-footer {
             padding: 15px 20px;
             border-top: 1px solid #eee;

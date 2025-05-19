@@ -34,6 +34,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-profile-dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-buttons.css">
     <style>
         .availability-container {
             background-color: #fff;
@@ -55,6 +56,7 @@
         .availability-header h2 {
             font-size: 20px;
             font-weight: 600;
+            color: var(--primary-color);
         }
 
         .availability-content {
@@ -67,41 +69,66 @@
             background-color: #f8f9fa;
             border-radius: 10px;
             padding: 20px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .availability-section:hover {
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
         }
 
         .availability-section h3 {
             font-size: 18px;
             font-weight: 600;
             margin-bottom: 15px;
-            color: #333;
+            color: var(--primary-dark);
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 8px;
         }
 
         .day-item {
             display: flex;
             align-items: center;
             margin-bottom: 15px;
+            padding: 8px;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+        }
+
+        .day-item:hover {
+            background-color: var(--gray-100);
         }
 
         .day-checkbox {
             margin-right: 10px;
+            cursor: pointer;
         }
 
         .day-label {
             font-weight: 500;
             width: 100px;
+            color: var(--text-dark);
         }
 
         .time-inputs {
             display: flex;
             align-items: center;
             flex: 1;
+            gap: 10px;
         }
 
         .time-inputs input {
             width: 100px;
-            padding: 8px;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            padding: 8px 10px;
+            transition: border-color 0.3s ease;
+        }
+
+        .time-inputs input:focus {
+            border-color: var(--primary-color);
+            outline: none;
         }
 
         .time-separator {

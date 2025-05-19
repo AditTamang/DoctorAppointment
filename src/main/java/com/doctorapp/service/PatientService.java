@@ -100,7 +100,7 @@ public class PatientService {
         try {
             return patientDAO.updatePatient(patient);
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error updating patient", e);
+            LOGGER.log(Level.SEVERE, "Error updating patient with ID: " + patient.getId(), e);
             return false;
         }
     }
@@ -129,6 +129,20 @@ public class PatientService {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error getting total patients count", e);
             return 0;
+        }
+    }
+
+    /**
+     * Search for patients by name or email
+     * @param searchTerm The search term
+     * @return List of patients matching the search term
+     */
+    public List<Patient> searchPatients(String searchTerm) {
+        try {
+            return patientDAO.searchPatients(searchTerm);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error searching for patients with term: " + searchTerm, e);
+            return Collections.emptyList();
         }
     }
 

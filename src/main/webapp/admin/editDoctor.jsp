@@ -9,7 +9,7 @@
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
-    
+
     // Get doctor data from request attribute
     Doctor doctor = (Doctor) request.getAttribute("doctor");
     if (doctor == null) {
@@ -27,6 +27,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/adminDashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-doctor.css">
     <style>
         .doctor-profile {
             background-color: #fff;
@@ -35,7 +36,7 @@
             overflow: hidden;
             margin-bottom: 30px;
         }
-        
+
         .profile-header {
             background: linear-gradient(135deg, #4e54c8, #8f94fb);
             color: white;
@@ -44,7 +45,7 @@
             display: flex;
             align-items: center;
         }
-        
+
         .profile-avatar {
             width: 120px;
             height: 120px;
@@ -54,32 +55,32 @@
             margin-right: 30px;
             background-color: #fff;
         }
-        
+
         .profile-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        
+
         .profile-info h2 {
             margin: 0 0 5px 0;
             font-size: 24px;
         }
-        
+
         .profile-info p {
             margin: 0 0 10px 0;
             opacity: 0.9;
             font-size: 16px;
         }
-        
+
         .profile-body {
             padding: 30px;
         }
-        
+
         .profile-section {
             margin-bottom: 30px;
         }
-        
+
         .profile-section h3 {
             color: #333;
             border-bottom: 1px solid #eee;
@@ -87,24 +88,24 @@
             margin-bottom: 20px;
             font-size: 18px;
         }
-        
+
         .form-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
         }
-        
+
         .form-group {
             margin-bottom: 20px;
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: 8px;
             color: #555;
             font-weight: 500;
         }
-        
+
         .form-control {
             width: 100%;
             padding: 10px 15px;
@@ -113,35 +114,35 @@
             font-size: 15px;
             transition: border-color 0.3s;
         }
-        
+
         .form-control:focus {
             border-color: #4e54c8;
             outline: none;
             box-shadow: 0 0 5px rgba(78, 84, 200, 0.2);
         }
-        
+
         .form-group-full {
             grid-column: span 2;
         }
-        
+
         textarea.form-control {
             min-height: 120px;
             resize: vertical;
         }
-        
+
         .form-error {
             color: #dc3545;
             font-size: 13px;
             margin-top: 5px;
         }
-        
+
         .form-actions {
             display: flex;
             justify-content: flex-end;
             gap: 15px;
             margin-top: 30px;
         }
-        
+
         .btn {
             padding: 10px 20px;
             border-radius: 5px;
@@ -154,67 +155,67 @@
             transition: all 0.3s ease;
             text-decoration: none;
         }
-        
+
         .btn-primary {
             background-color: #4e54c8;
             color: white;
         }
-        
+
         .btn-primary:hover {
             background-color: #3a3f9a;
         }
-        
+
         .btn-secondary {
             background-color: #f8f9fa;
             color: #333;
             border: 1px solid #ddd;
         }
-        
+
         .btn-secondary:hover {
             background-color: #e9ecef;
         }
-        
+
         .checkbox-group {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-top: 10px;
         }
-        
+
         .checkbox-item {
             display: flex;
             align-items: center;
             gap: 5px;
         }
-        
+
         .checkbox-item input[type="checkbox"] {
             width: 16px;
             height: 16px;
         }
-        
+
         @media (max-width: 768px) {
             .profile-header {
                 flex-direction: column;
                 text-align: center;
             }
-            
+
             .profile-avatar {
                 margin-right: 0;
                 margin-bottom: 20px;
             }
-            
+
             .form-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .form-group-full {
                 grid-column: span 1;
             }
-            
+
             .form-actions {
                 flex-direction: column;
             }
-            
+
             .btn {
                 width: 100%;
                 justify-content: center;
@@ -293,7 +294,7 @@
                 <div class="menu-toggle" id="menuToggle">
                     <i class="fas fa-bars"></i>
                 </div>
-                
+
                 <div class="nav-right">
                     <div class="nav-user">
                         <div class="user-image">
@@ -334,7 +335,7 @@
                     <div class="profile-body">
                         <form action="${pageContext.request.contextPath}/admin/doctors/update" method="post">
                             <input type="hidden" name="id" value="<%= doctor.getId() %>">
-                            
+
                             <div class="profile-section">
                                 <h3>Professional Information</h3>
                                 <div class="form-grid">
@@ -375,10 +376,10 @@
                                     <div class="form-group">
                                         <label>Available Days</label>
                                         <div class="checkbox-group">
-                                            <% 
+                                            <%
                                             String[] availableDays = doctor.getAvailableDays() != null ? doctor.getAvailableDays().split(",") : new String[0];
                                             String[] allDays = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-                                            
+
                                             for (String day : allDays) {
                                                 boolean isChecked = false;
                                                 for (String availableDay : availableDays) {
@@ -389,10 +390,12 @@
                                                 }
                                             %>
                                             <div class="checkbox-item">
-                                                <input type="checkbox" id="day_<%= day %>" name="availableDays" value="<%= day %>" <%= isChecked ? "checked" : "" %>>
+                                                <input type="checkbox" id="day_<%= day %>" name="day_<%= day %>" value="<%= day %>" <%= isChecked ? "checked" : "" %>>
                                                 <label for="day_<%= day %>"><%= day %></label>
                                             </div>
                                             <% } %>
+                                            <!-- Hidden input to store the comma-separated list of days -->
+                                            <input type="hidden" id="availableDays" name="availableDays" value="<%= doctor.getAvailableDays() != null ? doctor.getAvailableDays() : "" %>">
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -429,29 +432,33 @@
         document.getElementById('menuToggle').addEventListener('click', function() {
             document.querySelector('.sidebar').classList.toggle('active');
         });
-        
+
         // Handle checkbox group for available days
-        document.querySelectorAll('input[name="availableDays"]').forEach(function(checkbox) {
-            checkbox.addEventListener('change', function() {
-                const checkedDays = Array.from(document.querySelectorAll('input[name="availableDays"]:checked'))
-                    .map(cb => cb.value);
-                
-                // Create a hidden input to store the comma-separated list of days
-                let hiddenInput = document.getElementById('availableDaysHidden');
-                if (!hiddenInput) {
-                    hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.name = 'availableDaysHidden';
-                    hiddenInput.id = 'availableDaysHidden';
-                    this.parentNode.parentNode.appendChild(hiddenInput);
+        function updateAvailableDays() {
+            const dayCheckboxes = document.querySelectorAll('input[id^="day_"]');
+            const checkedDays = [];
+
+            dayCheckboxes.forEach(function(checkbox) {
+                if (checkbox.checked) {
+                    checkedDays.push(checkbox.value);
                 }
-                
-                hiddenInput.value = checkedDays.join(',');
             });
+
+            // Update the hidden input with the comma-separated list of days
+            const hiddenInput = document.getElementById('availableDays');
+            hiddenInput.value = checkedDays.join(',');
+            console.log('Updated available days:', hiddenInput.value);
+        }
+
+        // Add event listeners to all day checkboxes
+        document.querySelectorAll('input[id^="day_"]').forEach(function(checkbox) {
+            checkbox.addEventListener('change', updateAvailableDays);
         });
-        
-        // Trigger change event on page load to initialize the hidden input
-        document.querySelectorAll('input[name="availableDays"]:checked')[0]?.dispatchEvent(new Event('change'));
+
+        // Initialize the hidden input on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateAvailableDays();
+        });
     </script>
 </body>
 </html>

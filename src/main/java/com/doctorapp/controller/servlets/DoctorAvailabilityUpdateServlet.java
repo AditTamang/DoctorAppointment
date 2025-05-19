@@ -105,6 +105,15 @@ public class DoctorAvailabilityUpdateServlet extends HttpServlet {
             boolean updated = availabilityDAO.updateDoctorAvailability(doctorId, availableDays, availableTime);
 
             if (updated) {
+                // Update the doctor in session
+                com.doctorapp.model.Doctor updatedDoctor = doctorDAO.getDoctorById(doctorId);
+                if (updatedDoctor != null) {
+                    session.setAttribute("doctor", updatedDoctor);
+                    System.out.println("Updated doctor in session: " + updatedDoctor.getId());
+                    System.out.println("Available days: " + updatedDoctor.getAvailableDays());
+                    System.out.println("Available time: " + updatedDoctor.getAvailableTime());
+                }
+
                 JsonResponse.send(response, true, "Availability updated successfully");
             } else {
                 JsonResponse.send(response, false, "Failed to update availability");

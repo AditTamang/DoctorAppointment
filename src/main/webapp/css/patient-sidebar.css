@@ -1,6 +1,6 @@
 /* Patient Sidebar Styles */
 .sidebar {
-    width: 220px;
+    width: 250px;
     height: 100vh;
     background-color: #fff;
     border-right: 1px solid #e0e0e0;
@@ -9,31 +9,52 @@
     left: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding-top: 30px;
+    padding-top: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
     z-index: 1000;
+    overflow-y: auto;
 }
 
-.profile-circle {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    background-color: #4CAF50;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.user-profile {
+    padding: 20px;
+    text-align: center;
+    width: 100%;
+    border-bottom: 1px solid #e0e0e0;
     margin-bottom: 15px;
 }
 
+.profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 15px;
+    border: 3px solid #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 .profile-initials {
-    font-size: 40px;
+    width: 100%;
+    height: 100%;
+    font-size: 36px;
     font-weight: 600;
     color: white;
     text-transform: uppercase;
+    background-color: #4CAF50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.patient-name {
+.user-name {
     font-size: 18px;
     font-weight: 600;
     color: #333;
@@ -41,11 +62,12 @@
     text-align: center;
 }
 
-.patient-role {
+.user-email, .user-phone {
     font-size: 14px;
     color: #666;
-    margin-bottom: 30px;
+    margin-bottom: 5px;
     text-align: center;
+    word-break: break-word;
 }
 
 .sidebar-menu {
@@ -53,6 +75,7 @@
     padding: 0;
     margin: 0;
     width: 100%;
+    padding-bottom: 20px;
 }
 
 .sidebar-menu li {
@@ -67,6 +90,7 @@
     color: #333;
     text-decoration: none;
     transition: all 0.3s ease;
+    font-size: 15px;
 }
 
 .sidebar-menu li a:hover {
@@ -78,6 +102,12 @@
     color: #4CAF50;
     font-weight: 500;
     border-left: 3px solid #4CAF50;
+}
+
+.sidebar-menu li.logout a {
+    color: #F44336;
+    font-weight: 500;
+    margin-top: 10px;
 }
 
 .sidebar-menu li a i {
@@ -93,35 +123,36 @@
         width: 80px;
         padding-top: 20px;
     }
-    
-    .profile-circle {
+
+    .profile-image {
         width: 60px;
         height: 60px;
     }
-    
+
     .profile-initials {
         font-size: 24px;
     }
-    
-    .patient-name, 
-    .patient-role {
+
+    .user-name,
+    .user-email,
+    .user-phone {
         display: none;
     }
-    
+
     .sidebar-menu li a span {
         display: none;
     }
-    
+
     .sidebar-menu li a {
         justify-content: center;
         padding: 15px 0;
     }
-    
+
     .sidebar-menu li a i {
         margin-right: 0;
         font-size: 18px;
     }
-    
+
     .sidebar-menu li.active a {
         border-left: none;
         border-left: 3px solid #4CAF50;
@@ -138,28 +169,28 @@
         justify-content: space-between;
         align-items: center;
     }
-    
-    .profile-circle {
+
+    .profile-image {
         width: 50px;
         height: 50px;
         margin-bottom: 0;
         margin-right: 15px;
     }
-    
+
     .profile-initials {
         font-size: 20px;
     }
-    
-    .patient-name {
+
+    .user-name {
         display: block;
         margin-bottom: 0;
         margin-right: auto;
     }
-    
-    .patient-role {
+
+    .user-email, .user-phone {
         display: none;
     }
-    
+
     .sidebar-menu {
         position: absolute;
         top: 80px;
@@ -170,27 +201,30 @@
         display: none;
         z-index: 1000;
     }
-    
+
     .sidebar-menu.active {
         display: block;
     }
-    
+
     .sidebar-menu li a {
         padding: 12px 20px;
     }
-    
+
     .sidebar-menu li a span {
         display: inline;
     }
-    
+
     .sidebar-menu li a i {
         margin-right: 10px;
     }
-    
+
+    /* Mobile menu toggle button */
     .menu-toggle {
         display: block;
+        cursor: pointer;
         font-size: 24px;
         color: #333;
-        cursor: pointer;
     }
 }
+
+

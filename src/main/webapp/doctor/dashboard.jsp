@@ -53,6 +53,7 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/doctor-profile-dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-buttons.css">
 </head>
 <body>
     <div class="dashboard-container">
@@ -245,17 +246,7 @@
                             </tr>
                             <% } } else { %>
                             <tr>
-                                <td>Peter Church</td>
-                                <td>42</td>
-                                <td>Male</td>
-                                <td>2023-10-05</td>
-                                <td>+1 234 567 890</td>
-                                <td>
-                                    <div class="table-actions">
-                                        <a href="#" class="action-btn view"><i class="fas fa-eye"></i></a>
-                                        <a href="#" class="action-btn edit"><i class="fas fa-edit"></i></a>
-                                    </div>
-                                </td>
+                                <td colspan="6">No recent patients</td>
                             </tr>
                             <% } %>
                         </tbody>

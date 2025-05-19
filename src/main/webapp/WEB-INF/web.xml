@@ -127,4 +127,22 @@
         <url-pattern>/appointment/*</url-pattern>
     </servlet-mapping>
 
+    <!-- Doctor Profile Servlet Multipart Configuration -->
+    <servlet>
+        <servlet-name>DoctorProfileServlet</servlet-name>
+        <servlet-class>com.doctorapp.controller.doctor.DoctorProfileServlet</servlet-class>
+        <multipart-config>
+            <location>/tmp</location>
+            <max-file-size>5242880</max-file-size>
+            <max-request-size>10485760</max-request-size>
+            <file-size-threshold>1048576</file-size-threshold>
+        </multipart-config>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DoctorProfileServlet</servlet-name>
+        <url-pattern>/doctor/profile</url-pattern>
+        <url-pattern>/doctor/profile/update</url-pattern>
+        <url-pattern>/doctor/edit-profile</url-pattern>
+    </servlet-mapping>
+
 </web-app>

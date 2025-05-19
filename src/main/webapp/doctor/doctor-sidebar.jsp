@@ -74,12 +74,7 @@
                     <span>Set Availability</span>
                 </a>
             </li>
-            <li class="<%= activePage.equals("health-packages") ? "active" : "" %>">
-                <a href="${pageContext.request.contextPath}/doctor/health-packages">
-                    <i class="fas fa-box-open"></i>
-                    <span>Health Packages</span>
-                </a>
-            </li>
+
             <li class="logout">
                 <a href="${pageContext.request.contextPath}/logout">
                     <i class="fas fa-sign-out-alt"></i>

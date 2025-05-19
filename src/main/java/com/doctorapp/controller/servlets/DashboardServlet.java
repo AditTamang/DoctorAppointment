@@ -141,16 +141,37 @@ package com.doctorapp.controller.servlets;
                  return;
              }
 
-             int doctorId = doctorDAO.getDoctorIdByUserId(user.getId());
+             // First check if doctor is in session
+             com.doctorapp.model.Doctor doctor = (com.doctorapp.model.Doctor) session.getAttribute("doctor");
+             int doctorId;
 
-             if (doctorId == 0) {
-                 // Doctor profile not found, redirect to complete profile
-                 response.sendRedirect(request.getContextPath() + "/complete-profile.jsp");
-                 return;
+             if (doctor == null) {
+                 // Doctor not in session, get from database
+                 System.out.println("Doctor not found in session, retrieving from database");
+                 doctorId = doctorDAO.getDoctorIdByUserId(user.getId());
+
+                 if (doctorId == 0) {
+                     // Doctor profile not found, redirect to complete profile
+                     response.sendRedirect(request.getContextPath() + "/doctor/complete-profile");
+                     return;
+                 }
+
+                 // Get doctor details from database
+                 doctor = doctorDAO.getDoctorById(doctorId);
+
+                 // Store in session for future use
+                 if (doctor != null) {
+                     session.setAttribute("doctor", doctor);
+                     System.out.println("Stored doctor in session: " + doctor.getId());
+                     System.out.println("Available days: " + doctor.getAvailableDays());
+                     System.out.println("Available time: " + doctor.getAvailableTime());
+                 }
+             } else {
+                 System.out.println("Using doctor from session: " + doctor.getId());
+                 System.out.println("Available days: " + doctor.getAvailableDays());
+                 System.out.println("Available time: " + doctor.getAvailableTime());
+                 doctorId = doctor.getId();
              }
-
-             // Get doctor details first
-             com.doctorapp.model.Doctor doctor = doctorDAO.getDoctorById(doctorId);
              request.setAttribute("doctor", doctor);
 
              // Set default values for all attributes to prevent null pointer exceptions

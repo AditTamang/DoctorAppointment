@@ -191,7 +191,7 @@ public class AppointmentBookingServlet extends HttpServlet {
             Doctor doctor = doctorService.getDoctorById(doctorId);
 
             // Get available time slots for the doctor
-            List<String> availableTimeSlots = appointmentService.getAvailableTimeSlots(doctorId);
+            List<String> availableTimeSlots = appointmentService.getAvailableTimeSlots(doctorId, appointmentDate);
 
             // Set attributes for the booking form
             request.setAttribute("doctor", doctor);
@@ -208,6 +208,9 @@ public class AppointmentBookingServlet extends HttpServlet {
         // Parse IDs
         int doctorId = Integer.parseInt(doctorIdParam);
         int patientId = patientService.getPatientIdByUserId(user.getId());
+
+        // Log the patient ID for debugging
+        System.out.println("Patient ID: " + patientId + " for user ID: " + user.getId());
 
         // Create appointment object
         Appointment appointment = new Appointment();
@@ -240,7 +243,7 @@ public class AppointmentBookingServlet extends HttpServlet {
             Doctor doctor = doctorService.getDoctorById(doctorId);
 
             // Get available time slots for the doctor (refresh the list)
-            List<String> availableTimeSlots = appointmentService.getAvailableTimeSlots(doctorId);
+            List<String> availableTimeSlots = appointmentService.getAvailableTimeSlots(doctorId, appointmentDate);
 
             // Set attributes for the booking form
             request.setAttribute("doctor", doctor);
@@ -313,9 +316,18 @@ public class AppointmentBookingServlet extends HttpServlet {
 
         // Get doctor ID from request
         String doctorIdParam = request.getParameter("doctorId");
+        String dateParam = request.getParameter("date");
+
         if (doctorIdParam == null || doctorIdParam.isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/doctors");
             return;
+        }
+
+        // If date is provided, use it for filtering time slots
+        String selectedDate = dateParam;
+        if (selectedDate == null || selectedDate.isEmpty()) {
+            // Default to today's date
+            selectedDate = java.time.LocalDate.now().toString();
         }
 
         int doctorId;
@@ -352,8 +364,11 @@ public class AppointmentBookingServlet extends HttpServlet {
             patientId = patientService.getPatientIdByUserId(user.getId());
         }
 
-        // Get available time slots for the doctor
-        List<String> availableTimeSlots = appointmentService.getAvailableTimeSlots(doctorId);
+        // Get available time slots for the doctor based on the selected date
+        List<String> availableTimeSlots = appointmentService.getAvailableTimeSlots(doctorId, selectedDate);
+
+        // Set the selected date as an attribute
+        request.setAttribute("selectedDate", selectedDate);
 
         // Set attributes for the booking form
         request.setAttribute("doctor", doctor);
@@ -426,7 +441,7 @@ public class AppointmentBookingServlet extends HttpServlet {
             Doctor doctor = doctorService.getDoctorById(doctorId);
 
             // Get available time slots for the doctor
-            List<String> availableTimeSlots = appointmentService.getAvailableTimeSlots(doctorId);
+            List<String> availableTimeSlots = appointmentService.getAvailableTimeSlots(doctorId, appointmentDate);
 
             // Set attributes for the booking form
             request.setAttribute("doctor", doctor);
@@ -510,6 +525,9 @@ public class AppointmentBookingServlet extends HttpServlet {
             String patientName = user.getFirstName() + " " + user.getLastName();
             appointment.setPatientName(patientName);
 
+            // Log the patient name for debugging
+            System.out.println("Setting patient name in appointment: " + patientName);
+
             // Redirect to success page
             request.setAttribute("successMessage", "Appointment booked successfully");
             request.setAttribute("appointment", appointment);
@@ -523,7 +541,7 @@ public class AppointmentBookingServlet extends HttpServlet {
             Doctor doctor = doctorService.getDoctorById(doctorId);
 
             // Get available time slots for the doctor
-            List<String> availableTimeSlots = appointmentService.getAvailableTimeSlots(doctorId);
+            List<String> availableTimeSlots = appointmentService.getAvailableTimeSlots(doctorId, appointmentDate);
 
             // Set attributes for the booking form
             request.setAttribute("doctor", doctor);

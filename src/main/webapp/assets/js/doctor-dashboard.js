@@ -335,9 +335,9 @@ function viewAppointmentDetails(appointmentId) {
             // Populate modal content with appointment details
             // This would be implemented based on the actual data structure
 
-            // Show the modal
-            const bootstrapModal = new bootstrap.Modal(modal);
-            bootstrapModal.show();
+            // Show the modal using our custom modal implementation
+            const customModalInstance = new customModal.Modal(modal);
+            customModalInstance.show();
         }
     })
     .catch(error => {

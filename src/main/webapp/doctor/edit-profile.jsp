@@ -36,7 +36,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-profile-dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctorDashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-buttons.css">
     <style>
         .profile-edit-container {
             background-color: #fff;
@@ -168,9 +169,9 @@
             <!-- Top Header -->
             <div class="top-header">
                 <div class="top-header-left">
-                    <a href="index.jsp" class="active">Profile</a>
-                    <a href="appointments.jsp">Appointment Management</a>
-                    <a href="patients.jsp">Patient Details</a>
+                    <a href="${pageContext.request.contextPath}/doctor/profile" class="active">Profile</a>
+                    <a href="${pageContext.request.contextPath}/doctor/appointments">Appointment Management</a>
+                    <a href="${pageContext.request.contextPath}/doctor/patients">Patient Details</a>
                 </div>
 
                 <div class="top-header-right">
@@ -187,12 +188,12 @@
             <div class="profile-edit-container">
                 <div class="profile-edit-header">
                     <h2>Edit Profile</h2>
-                    <a href="index.jsp" class="btn btn-outline">
+                    <a href="${pageContext.request.contextPath}/doctor/profile" class="btn btn-outline">
                         <i class="fas fa-arrow-left"></i> Back to Profile
                     </a>
                 </div>
 
-                <form id="edit-profile-form" action="${pageContext.request.contextPath}/doctor/profile/update" method="post" enctype="multipart/form-data">
+                <form id="edit-profile-form" action="${pageContext.request.contextPath}/doctor/profile/update" method="post" enctype="multipart/form-data" onsubmit="return validateForm();">
                     <input type="hidden" name="doctorId" value="<%= doctor.getId() %>">
                     <!-- Add success/error message display -->
                     <% if (request.getAttribute("successMessage") != null) { %>
@@ -296,7 +297,7 @@
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i> Save Changes
                         </button>
-                        <a href="index.jsp" class="btn btn-outline" id="cancel-btn">
+                        <a href="${pageContext.request.contextPath}/doctor/profile" class="btn btn-outline" id="cancel-btn">
                             <i class="fas fa-times"></i> Cancel
                         </a>
                     </div>
@@ -320,6 +321,7 @@
             const removeBtn = document.getElementById('remove-btn');
             const profileImage = document.getElementById('profile-image');
             const profilePreview = document.getElementById('profile-preview');
+            let imageRemoved = false;
 
             if (uploadBtn) {
                 uploadBtn.addEventListener('click', function() {
@@ -330,13 +332,37 @@
             if (profileImage) {
                 profileImage.addEventListener('change', function() {
                     if (this.files && this.files[0]) {
-                        const reader = new FileReader();
+                        // Check file size first
+                        const fileSize = this.files[0].size / 1024 / 1024; // in MB
+                        if (fileSize > 5) {
+                            alert('File size exceeds 5MB. Please choose a smaller image.');
+                            this.value = '';
+                            return false;
+                        }
 
+                        // Check file type
+                        const fileType = this.files[0].type;
+                        if (!fileType.match('image.*')) {
+                            alert('Please select an image file.');
+                            this.value = '';
+                            return false;
+                        }
+
+                        // If all checks pass, show preview
+                        const reader = new FileReader();
                         reader.onload = function(e) {
                             profilePreview.src = e.target.result;
+                            imageRemoved = false;
                         };
-
                         reader.readAsDataURL(this.files[0]);
+
+                        console.log('File selected:', this.files[0].name, 'Size:', fileSize.toFixed(2) + 'MB', 'Type:', fileType);
+
+                        // Remove any hidden field indicating image removal
+                        let removeImageField = document.getElementById('remove-image');
+                        if (removeImageField) {
+                            removeImageField.value = 'false';
+                        }
                     }
                 });
             }
@@ -345,36 +371,68 @@
                 removeBtn.addEventListener('click', function() {
                     profilePreview.src = '${pageContext.request.contextPath}/assets/images/doctors/default.jpg';
                     profileImage.value = '';
+                    imageRemoved = true;
+
+                    // Add a hidden field to indicate image removal
+                    let removeImageField = document.getElementById('remove-image');
+                    if (!removeImageField) {
+                        removeImageField = document.createElement('input');
+                        removeImageField.type = 'hidden';
+                        removeImageField.id = 'remove-image';
+                        removeImageField.name = 'removeImage';
+                        document.getElementById('edit-profile-form').appendChild(removeImageField);
+                    }
+                    removeImageField.value = 'true';
                 });
             }
 
-            // Form validation
-            const form = document.getElementById('edit-profile-form');
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    // Get form values
-                    const firstName = document.getElementById('first-name').value;
-                    const lastName = document.getElementById('last-name').value;
-                    const specialization = document.getElementById('specialization').value;
-                    const email = document.getElementById('email').value;
-                    const phone = document.getElementById('phone').value;
+            // Form validation function
+            window.validateForm = function() {
+                // Get form values
+                const firstName = document.getElementById('first-name').value;
+                const lastName = document.getElementById('last-name').value;
+                const specialization = document.getElementById('specialization').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+                const profileImageInput = document.getElementById('profile-image');
 
-                    // Validate form
-                    if (!firstName || !lastName || !specialization || !email || !phone) {
-                        alert('Please fill in all required fields.');
-                        e.preventDefault();
-                        return;
+                // Validate form
+                if (!firstName || !lastName || !specialization || !email || !phone) {
+                    alert('Please fill in all required fields.');
+                    return false;
+                }
+
+                // Validate email
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    alert('Please enter a valid email address.');
+                    return false;
+                }
+
+                // Validate file upload if a file is selected
+                if (profileImageInput && profileImageInput.files && profileImageInput.files.length > 0) {
+                    const file = profileImageInput.files[0];
+
+                    // Check file size
+                    const fileSize = file.size / 1024 / 1024; // in MB
+                    if (fileSize > 5) {
+                        alert('File size exceeds 5MB. Please choose a smaller image.');
+                        return false;
                     }
 
-                    // Validate email
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailRegex.test(email)) {
-                        alert('Please enter a valid email address.');
-                        e.preventDefault();
-                        return;
+                    // Check file type
+                    const fileType = file.type;
+                    if (!fileType.match('image.*')) {
+                        alert('Please select an image file.');
+                        return false;
                     }
-                });
-            }
+
+                    console.log('File validation passed:', file.name, 'Size:', fileSize.toFixed(2) + 'MB');
+                }
+
+                console.log('Form validation passed, submitting...');
+                return true;
+            };
         });
     </script>
 </body>

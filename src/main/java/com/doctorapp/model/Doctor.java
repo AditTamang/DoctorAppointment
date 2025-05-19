@@ -3,7 +3,7 @@ package com.doctorapp.model;
 public class Doctor {
     private int id;
     private int userId;
-    private int departmentId;
+    // Department ID removed
     private String name;
     private String firstName;
     private String lastName;
@@ -205,13 +205,7 @@ public class Doctor {
         this.successRate = successRate;
     }
 
-    public int getDepartmentId() {
-        return departmentId;
-    }
-
-    public void setDepartmentId(int departmentId) {
-        this.departmentId = departmentId;
-    }
+    // Department ID getters and setters removed
 
     public String getStatus() {
         return status;

@@ -16,11 +16,11 @@
             box-sizing: border-box;
             font-family: Arial, sans-serif;
         }
-        
+
         body {
             background-color: #f8f9fa;
         }
-        
+
         /* Admin sidebar */
         .admin-sidebar {
             width: 200px;
@@ -32,34 +32,34 @@
             height: 100%;
             overflow-y: auto;
         }
-        
+
         .admin-header {
             padding: 15px;
             border-bottom: 1px solid #495057;
         }
-        
+
         .admin-header h2 {
             font-size: 18px;
             margin-bottom: 5px;
         }
-        
+
         .admin-header p {
             font-size: 14px;
             color: #adb5bd;
         }
-        
+
         .admin-menu {
             padding: 15px 0;
         }
-        
+
         .admin-menu ul {
             list-style: none;
         }
-        
+
         .admin-menu li {
             margin-bottom: 5px;
         }
-        
+
         .admin-menu a {
             display: block;
             padding: 10px 15px;
@@ -67,50 +67,50 @@
             text-decoration: none;
             transition: background-color 0.3s;
         }
-        
+
         .admin-menu a:hover, .admin-menu a.active {
             background-color: #495057;
         }
-        
+
         .admin-menu a i {
             margin-right: 10px;
             width: 20px;
             text-align: center;
         }
-        
+
         /* Main content */
         .main-content {
             margin-left: 200px;
             padding: 20px;
         }
-        
+
         .back-link {
             display: inline-block;
             margin-bottom: 20px;
             color: #007bff;
             text-decoration: none;
         }
-        
+
         .back-link:hover {
             text-decoration: underline;
         }
-        
+
         .page-header {
             margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .page-header h1 {
             font-size: 24px;
         }
-        
+
         .action-buttons {
             display: flex;
             gap: 10px;
         }
-        
+
         .btn {
             padding: 8px 15px;
             border-radius: 4px;
@@ -121,43 +121,43 @@
             align-items: center;
             text-decoration: none;
         }
-        
+
         .btn i {
             margin-right: 5px;
         }
-        
+
         .btn-primary {
             background-color: #007bff;
             color: #fff;
         }
-        
+
         .btn-danger {
             background-color: #dc3545;
             color: #fff;
         }
-        
+
         .department-details {
             background-color: #fff;
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        
+
         .detail-item {
             margin-bottom: 15px;
         }
-        
+
         .detail-item label {
             font-weight: bold;
             display: block;
             margin-bottom: 5px;
         }
-        
+
         .detail-item p {
             margin: 0;
             padding: 8px 0;
         }
-        
+
         .status-badge {
             display: inline-block;
             padding: 5px 10px;
@@ -165,23 +165,23 @@
             font-size: 12px;
             font-weight: bold;
         }
-        
+
         .status-active {
             background-color: #28a745;
             color: #fff;
         }
-        
+
         .status-inactive {
             background-color: #dc3545;
             color: #fff;
         }
-        
+
         .date-display {
             text-align: right;
             margin-bottom: 20px;
             color: #6c757d;
         }
-        
+
         /* Footer */
         .footer {
             margin-top: 30px;
@@ -195,37 +195,19 @@
     </style>
 </head>
 <body>
-    <!-- Admin Sidebar -->
-    <div class="admin-sidebar">
-        <div class="admin-header">
-            <h2>Administrator</h2>
-            <p>admin@medoc.com</p>
-        </div>
-        <div class="admin-menu">
-            <ul>
-                <li><a href="${pageContext.request.contextPath}/admin/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="${pageContext.request.contextPath}/admin/doctors"><i class="fas fa-user-md"></i> Doctors</a></li>
-                <li><a href="${pageContext.request.contextPath}/admin/patients"><i class="fas fa-users"></i> Patients</a></li>
-                <li><a href="${pageContext.request.contextPath}/admin/appointments"><i class="fas fa-calendar-check"></i> Appointments</a></li>
-                <li><a href="${pageContext.request.contextPath}/admin/departments" class="active"><i class="fas fa-hospital"></i> Departments</a></li>
-                <li><a href="${pageContext.request.contextPath}/admin/specializations"><i class="fas fa-stethoscope"></i> Specializations</a></li>
-                <li><a href="${pageContext.request.contextPath}/admin/reports"><i class="fas fa-chart-bar"></i> Reports</a></li>
-                <li><a href="${pageContext.request.contextPath}/admin/settings"><i class="fas fa-cog"></i> Settings</a></li>
-                <li><a href="${pageContext.request.contextPath}/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-            </ul>
-        </div>
-    </div>
+    <!-- Include the standardized sidebar -->
+    <jsp:include page="admin-sidebar.jsp" />
 
     <!-- Main Content -->
     <div class="main-content">
         <a href="${pageContext.request.contextPath}/admin/departments" class="back-link">
             <i class="fas fa-arrow-left"></i> Back to Departments
         </a>
-        
+
         <div class="date-display">
             Today's Date: <%= LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) %>
         </div>
-        
+
         <%
         Department department = (Department) request.getAttribute("department");
         if (department == null) {
@@ -238,7 +220,7 @@
             department.setUpdatedAt("2023-01-01 00:00:00");
         }
         %>
-        
+
         <div class="page-header">
             <h1>Department Details</h1>
             <div class="action-buttons">
@@ -250,18 +232,18 @@
                 </a>
             </div>
         </div>
-        
+
         <div class="department-details">
             <div class="detail-item">
                 <label>Department Name</label>
                 <p><%= department.getName() %></p>
             </div>
-            
+
             <div class="detail-item">
                 <label>Description</label>
                 <p><%= department.getDescription() %></p>
             </div>
-            
+
             <div class="detail-item">
                 <label>Status</label>
                 <p>
@@ -270,18 +252,18 @@
                     </span>
                 </p>
             </div>
-            
+
             <div class="detail-item">
                 <label>Created At</label>
                 <p><%= department.getCreatedAt() %></p>
             </div>
-            
+
             <div class="detail-item">
                 <label>Updated At</label>
                 <p><%= department.getUpdatedAt() %></p>
             </div>
         </div>
-        
+
         <div class="footer">
             <p>&copy; 2023 MedDoc. All Rights Reserved.</p>
             <p>Version 1.0.0</p>

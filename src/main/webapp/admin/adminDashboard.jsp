@@ -568,13 +568,13 @@
                                                 </td>
                                                 <td>
                                                     <div class="action-buttons">
-                                                        <a href="${pageContext.request.contextPath}/admin/patients/view?id=${appointment.patientId}" class="action-btn view-btn">
+                                                        <a href="${pageContext.request.contextPath}/admin/view-patient?id=${appointment.patientId}" class="action-btn view-btn" title="View Patient">
                                                             <i class="fas fa-eye"></i>
                                                         </a>
-                                                        <a href="${pageContext.request.contextPath}/admin/patients/edit?id=${appointment.patientId}" class="action-btn edit-btn">
+                                                        <a href="${pageContext.request.contextPath}/admin/edit-patient?id=${appointment.patientId}" class="action-btn edit-btn" title="Edit Patient">
                                                             <i class="fas fa-edit"></i>
                                                         </a>
-                                                        <a href="#" onclick="confirmDeletePatient(${appointment.patientId})" class="action-btn delete-btn">
+                                                        <a href="#" onclick="confirmDeletePatient(${appointment.patientId})" class="action-btn delete-btn" title="Delete Patient">
                                                             <i class="fas fa-trash"></i>
                                                         </a>
                                                     </div>
@@ -599,8 +599,6 @@
     <!-- Include JavaScript files -->
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
     <script>
         // Function to confirm doctor deletion
@@ -613,7 +611,7 @@
         // Function to confirm patient deletion
         function confirmDeletePatient(patientId) {
             if (confirm('Are you sure you want to delete this patient?')) {
-                window.location.href = '${pageContext.request.contextPath}/admin/patients/delete?id=' + patientId;
+                window.location.href = '${pageContext.request.contextPath}/admin/delete-patient?id=' + patientId;
             }
         }
 

@@ -115,6 +115,15 @@ public class CompleteProfileServlet extends HttpServlet {
             }
 
             if (success) {
+                // Update the doctor in session
+                Doctor updatedDoctor = doctorDAO.getDoctorByUserId(user.getId());
+                if (updatedDoctor != null) {
+                    session.setAttribute("doctor", updatedDoctor);
+                    System.out.println("Updated doctor in session: " + updatedDoctor.getId());
+                    System.out.println("Available days: " + updatedDoctor.getAvailableDays());
+                    System.out.println("Available time: " + updatedDoctor.getAvailableTime());
+                }
+
                 // Redirect to dashboard
                 response.sendRedirect(request.getContextPath() + "/doctor/dashboard");
             } else {

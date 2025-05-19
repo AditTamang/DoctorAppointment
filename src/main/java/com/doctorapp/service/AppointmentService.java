@@ -216,11 +216,22 @@ package com.doctorapp.service;
      }
 
      /**
-      * Get available time slots for a doctor
+      * Get appointments by patient and doctor ID
+      * @param patientId Patient ID
       * @param doctorId Doctor ID
+      * @return List of appointments for the patient with the specified doctor
+      */
+     public List<Appointment> getAppointmentsByPatientAndDoctorId(int patientId, int doctorId) {
+         return appointmentDAO.getAppointmentsByPatientAndDoctorId(patientId, doctorId);
+     }
+
+     /**
+      * Get available time slots for a doctor on a specific date
+      * @param doctorId Doctor ID
+      * @param date Appointment date (optional, can be null)
       * @return List of available time slots
       */
-     public List<String> getAvailableTimeSlots(int doctorId) {
+     public List<String> getAvailableTimeSlots(int doctorId, String date) {
          List<String> timeSlots = new java.util.ArrayList<>();
 
          try {
@@ -245,6 +256,8 @@ package com.doctorapp.service;
                  availableTime = "09:00 AM - 05:00 PM"; // Default
              }
 
+             System.out.println("Doctor available time: " + availableTime);
+
              // Parse available time range
              String[] timeRange = availableTime.split("-");
              if (timeRange.length != 2) {
@@ -260,18 +273,54 @@ package com.doctorapp.service;
              java.util.Date startTime = timeFormat.parse(startTimeStr);
              java.util.Date endTime = timeFormat.parse(endTimeStr);
 
-             // Generate time slots at 30-minute intervals
+             System.out.println("Start time: " + timeFormat.format(startTime));
+             System.out.println("End time: " + timeFormat.format(endTime));
+
+             // Generate time slots at 15-minute intervals to provide more options
              java.util.Calendar calendar = java.util.Calendar.getInstance();
              calendar.setTime(startTime);
 
-             while (calendar.getTime().before(endTime)) {
+             // Make sure we include the end time if it's exactly on a 15-minute interval
+             java.util.Calendar endCalendar = java.util.Calendar.getInstance();
+             endCalendar.setTime(endTime);
+
+             while (calendar.getTime().before(endTime) || calendar.getTime().equals(endTime)) {
                  timeSlots.add(timeFormat.format(calendar.getTime()));
 
-                 // Add 30 minutes
-                 calendar.add(java.util.Calendar.MINUTE, 30);
+                 // Add 15 minutes
+                 calendar.add(java.util.Calendar.MINUTE, 15);
+
+                 // Break if we've gone past the end time
+                 if (calendar.getTime().after(endTime)) {
+                     break;
+                 }
              }
 
-             return timeSlots;
+             System.out.println("Generated " + timeSlots.size() + " time slots");
+
+             // If date is provided, filter out already booked slots
+             if (date != null && !date.isEmpty()) {
+                 List<String> availableSlots = new java.util.ArrayList<>();
+
+                 for (String slot : timeSlots) {
+                     // Check if this time slot is available
+                     if (isTimeSlotAvailable(doctorId, date, slot)) {
+                         availableSlots.add(slot);
+                         System.out.println("Available time slot: " + slot);
+                     } else {
+                         System.out.println("Booked time slot: " + slot);
+                     }
+                 }
+
+                 System.out.println("After filtering, " + availableSlots.size() + " time slots are available");
+                 return availableSlots;
+             } else {
+                 // If no date provided, return all time slots
+                 for (String slot : timeSlots) {
+                     System.out.println("Time slot: " + slot);
+                 }
+                 return timeSlots;
+             }
          } catch (Exception e) {
              System.err.println("Error getting available time slots: " + e.getMessage());
              e.printStackTrace();
@@ -280,28 +329,81 @@ package com.doctorapp.service;
      }
 
      /**
+      * Get available time slots for a doctor (overloaded method for backward compatibility)
+      * @param doctorId Doctor ID
+      * @return List of available time slots
+      */
+     public List<String> getAvailableTimeSlots(int doctorId) {
+         return getAvailableTimeSlots(doctorId, null);
+     }
+
+     /**
       * Get default time slots
       * @return List of default time slots
       */
      private List<String> getDefaultTimeSlots() {
          List<String> timeSlots = new java.util.ArrayList<>();
-         timeSlots.add("09:00 AM");
-         timeSlots.add("09:30 AM");
-         timeSlots.add("10:00 AM");
-         timeSlots.add("10:30 AM");
-         timeSlots.add("11:00 AM");
-         timeSlots.add("11:30 AM");
-         timeSlots.add("12:00 PM");
-         timeSlots.add("12:30 PM");
-         timeSlots.add("01:00 PM");
-         timeSlots.add("01:30 PM");
-         timeSlots.add("02:00 PM");
-         timeSlots.add("02:30 PM");
-         timeSlots.add("03:00 PM");
-         timeSlots.add("03:30 PM");
-         timeSlots.add("04:00 PM");
-         timeSlots.add("04:30 PM");
-         timeSlots.add("05:00 PM");
+
+         try {
+             // Generate time slots from 9:00 AM to 5:00 PM at 15-minute intervals
+             java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("hh:mm a");
+             java.util.Date startTime = timeFormat.parse("09:00 AM");
+             java.util.Date endTime = timeFormat.parse("05:00 PM");
+
+             java.util.Calendar calendar = java.util.Calendar.getInstance();
+             calendar.setTime(startTime);
+
+             while (calendar.getTime().before(endTime) || calendar.getTime().equals(endTime)) {
+                 timeSlots.add(timeFormat.format(calendar.getTime()));
+
+                 // Add 15 minutes
+                 calendar.add(java.util.Calendar.MINUTE, 15);
+
+                 // Break if we've gone past the end time
+                 if (calendar.getTime().after(endTime)) {
+                     break;
+                 }
+             }
+         } catch (Exception e) {
+             // If there's an error, fall back to hardcoded slots
+             System.err.println("Error generating default time slots: " + e.getMessage());
+
+             // Add hardcoded slots as fallback
+             timeSlots.add("09:00 AM");
+             timeSlots.add("09:15 AM");
+             timeSlots.add("09:30 AM");
+             timeSlots.add("09:45 AM");
+             timeSlots.add("10:00 AM");
+             timeSlots.add("10:15 AM");
+             timeSlots.add("10:30 AM");
+             timeSlots.add("10:45 AM");
+             timeSlots.add("11:00 AM");
+             timeSlots.add("11:15 AM");
+             timeSlots.add("11:30 AM");
+             timeSlots.add("11:45 AM");
+             timeSlots.add("12:00 PM");
+             timeSlots.add("12:15 PM");
+             timeSlots.add("12:30 PM");
+             timeSlots.add("12:45 PM");
+             timeSlots.add("01:00 PM");
+             timeSlots.add("01:15 PM");
+             timeSlots.add("01:30 PM");
+             timeSlots.add("01:45 PM");
+             timeSlots.add("02:00 PM");
+             timeSlots.add("02:15 PM");
+             timeSlots.add("02:30 PM");
+             timeSlots.add("02:45 PM");
+             timeSlots.add("03:00 PM");
+             timeSlots.add("03:15 PM");
+             timeSlots.add("03:30 PM");
+             timeSlots.add("03:45 PM");
+             timeSlots.add("04:00 PM");
+             timeSlots.add("04:15 PM");
+             timeSlots.add("04:30 PM");
+             timeSlots.add("04:45 PM");
+             timeSlots.add("05:00 PM");
+         }
+
          return timeSlots;
      }
 

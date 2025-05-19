@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="com.doctorapp.model.User" %>
 <%@ page import="com.doctorapp.model.Patient" %>
 <%@ page import="com.doctorapp.model.Appointment" %>
@@ -13,21 +14,27 @@
         return;
     }
 
-    // Get appointment ID from request parameter
-    String appointmentId = request.getParameter("id");
-    if (appointmentId == null || appointmentId.isEmpty()) {
-        response.sendRedirect(request.getContextPath() + "/doctor/index.jsp");
+    // Get appointment from request attribute
+    Appointment appointment = (Appointment) request.getAttribute("appointment");
+    if (appointment == null) {
+        response.sendRedirect(request.getContextPath() + "/doctor/appointments-list");
         return;
     }
 
-    // In a real application, you would fetch the appointment details from the database
-    // For now, we'll use dummy data
-    String patientName = "John Doe";
-    String appointmentDate = "2023-10-10";
-    String appointmentTime = "10:30 AM";
-    String status = "Active";
-    String symptoms = "Headache, Fever";
-    String notes = "Follow-up required";
+    // Format date
+    SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy");
+    String formattedDate = appointment.getAppointmentDate() != null ?
+                          dateFormat.format(appointment.getAppointmentDate()) : "";
+
+    // Determine status class
+    String statusClass = "pending";
+    if ("CONFIRMED".equals(appointment.getStatus())) {
+        statusClass = "confirmed";
+    } else if ("CANCELLED".equals(appointment.getStatus())) {
+        statusClass = "cancelled";
+    } else if ("COMPLETED".equals(appointment.getStatus())) {
+        statusClass = "completed";
+    }
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -39,6 +46,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-profile-dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-buttons.css">
     <style>
         .appointment-details-container {
             background-color: #fff;
@@ -153,7 +161,7 @@
             <div class="appointment-details-container">
                 <div class="appointment-details-header">
                     <h2>Appointment Details</h2>
-                    <a href="appointments.jsp" class="btn btn-outline">
+                    <a href="${pageContext.request.contextPath}/doctor/appointments-list" class="btn btn-outline">
                         <i class="fas fa-arrow-left"></i> Back to Appointments
                     </a>
                 </div>
@@ -161,43 +169,54 @@
                 <div class="appointment-details-content">
                     <div class="detail-item">
                         <label>Appointment ID</label>
-                        <p><%= appointmentId %></p>
+                        <p><%= appointment.getId() %></p>
                     </div>
 
                     <div class="detail-item">
                         <label>Patient Name</label>
-                        <p><%= patientName %></p>
+                        <p><%= appointment.getPatientName() %></p>
                     </div>
 
                     <div class="detail-item">
                         <label>Date</label>
-                        <p><%= appointmentDate %></p>
+                        <p><%= formattedDate %></p>
                     </div>
 
                     <div class="detail-item">
                         <label>Time</label>
-                        <p><%= appointmentTime %></p>
+                        <p><%= appointment.getAppointmentTime() %></p>
                     </div>
 
                     <div class="detail-item">
                         <label>Status</label>
-                        <p><span class="status-badge active"><%= status %></span></p>
+                        <p><span class="status-badge <%= statusClass %>"><%= appointment.getStatus() %></span></p>
                     </div>
 
                     <div class="detail-item">
                         <label>Doctor</label>
-                        <p>Dr. <%= user.getFirstName() + " " + user.getLastName() %></p>
+                        <p><%= appointment.getDoctorName() %></p>
                     </div>
 
                     <div class="detail-item full-width">
                         <label>Symptoms</label>
-                        <p><%= symptoms %></p>
+                        <p><%= appointment.getSymptoms() != null ? appointment.getSymptoms() : "None provided" %></p>
                     </div>
 
                     <div class="detail-item full-width">
                         <label>Notes</label>
-                        <p><%= notes %></p>
+                        <p><%= appointment.getNotes() != null ? appointment.getNotes() : "No notes available" %></p>
                     </div>
+
+                    <% if (!"CANCELLED".equals(appointment.getStatus()) && !"COMPLETED".equals(appointment.getStatus())) { %>
+                    <div class="appointment-actions">
+                        <a href="${pageContext.request.contextPath}/doctor/appointment/update-status?id=<%= appointment.getId() %>&status=COMPLETED" class="btn btn-success">
+                            <i class="fas fa-check-circle"></i> Mark as Completed
+                        </a>
+                        <a href="${pageContext.request.contextPath}/doctor/appointment/cancel?id=<%= appointment.getId() %>" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this appointment?')">
+                            <i class="fas fa-times-circle"></i> Cancel Appointment
+                        </a>
+                    </div>
+                    <% } %>
                 </div>
 
                 <div class="medical-notes">

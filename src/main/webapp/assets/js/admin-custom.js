@@ -2,6 +2,55 @@
  * Custom JavaScript to replace Bootstrap functionality
  */
 
+// Custom Modal implementation to replace Bootstrap Modal
+class CustomModal {
+    constructor(element) {
+        this.element = element;
+        this.backdrop = null;
+    }
+
+    show() {
+        // Create backdrop if it doesn't exist
+        if (!document.querySelector('.modal-backdrop')) {
+            this.backdrop = document.createElement('div');
+            this.backdrop.className = 'modal-backdrop';
+            document.body.appendChild(this.backdrop);
+        }
+
+        // Show modal
+        this.element.classList.add('show');
+        document.body.classList.add('modal-open');
+    }
+
+    hide() {
+        this.element.classList.remove('show');
+        document.body.classList.remove('modal-open');
+
+        // Remove backdrop
+        if (this.backdrop) {
+            this.backdrop.remove();
+            this.backdrop = null;
+        }
+    }
+
+    toggle() {
+        if (this.element.classList.contains('show')) {
+            this.hide();
+        } else {
+            this.show();
+        }
+    }
+
+    static getInstance(element) {
+        return new CustomModal(element);
+    }
+}
+
+// Make CustomModal available globally
+window.customModal = {
+    Modal: CustomModal
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     // Alert dismissal
     const alerts = document.querySelectorAll('.alert');
@@ -20,14 +69,14 @@ document.addEventListener('DOMContentLoaded', function() {
         toggle.addEventListener('click', function(e) {
             e.preventDefault();
             const dropdown = this.nextElementSibling;
-            
+
             // Close all other dropdowns
             document.querySelectorAll('.dropdown-menu.show').forEach(function(menu) {
                 if (menu !== dropdown) {
                     menu.classList.remove('show');
                 }
             });
-            
+
             // Toggle current dropdown
             dropdown.classList.toggle('show');
         });
@@ -49,11 +98,11 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const modalId = this.getAttribute('data-target');
             const modal = document.querySelector(modalId);
-            
+
             if (modal) {
                 modal.classList.add('show');
                 document.body.classList.add('modal-open');
-                
+
                 // Create backdrop if it doesn't exist
                 if (!document.querySelector('.modal-backdrop')) {
                     const backdrop = document.createElement('div');
@@ -72,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (modal) {
                 modal.classList.remove('show');
                 document.body.classList.remove('modal-open');
-                
+
                 // Remove backdrop
                 const backdrop = document.querySelector('.modal-backdrop');
                 if (backdrop) {
@@ -87,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target.classList.contains('modal') && e.target.classList.contains('show')) {
             e.target.classList.remove('show');
             document.body.classList.remove('modal-open');
-            
+
             // Remove backdrop
             const backdrop = document.querySelector('.modal-backdrop');
             if (backdrop) {
@@ -107,14 +156,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 tooltipElement.className = 'custom-tooltip';
                 tooltipElement.textContent = title;
                 document.body.appendChild(tooltipElement);
-                
+
                 // Position tooltip
                 const rect = tooltip.getBoundingClientRect();
                 tooltipElement.style.top = (rect.top - tooltipElement.offsetHeight - 5) + 'px';
                 tooltipElement.style.left = (rect.left + (rect.width / 2) - (tooltipElement.offsetWidth / 2)) + 'px';
                 tooltipElement.style.opacity = '1';
             });
-            
+
             tooltip.addEventListener('mouseleave', function() {
                 const tooltipElement = document.querySelector('.custom-tooltip');
                 if (tooltipElement) {
@@ -131,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const targetId = this.getAttribute('data-target') || this.getAttribute('href');
             const target = document.querySelector(targetId);
-            
+
             if (target) {
                 target.classList.toggle('show');
             }
@@ -143,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
     tabLinks.forEach(function(link) {
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            
+
             // Remove active class from all tabs
             const tabContainer = this.closest('.nav-tabs, .nav-pills');
             if (tabContainer) {
@@ -151,10 +200,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     navLink.classList.remove('active');
                 });
             }
-            
+
             // Add active class to clicked tab
             this.classList.add('active');
-            
+
             // Hide all tab content
             const tabContentContainer = document.querySelector(this.getAttribute('data-tab-content') || '.tab-content');
             if (tabContentContainer) {
@@ -162,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     pane.classList.remove('active');
                 });
             }
-            
+
             // Show target tab content
             const targetId = this.getAttribute('data-target') || this.getAttribute('href');
             const target = document.querySelector(targetId);

@@ -26,6 +26,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-profile-dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-buttons.css">
 </head>
 <body>
     <div class="dashboard-container">
@@ -115,7 +116,7 @@
                                 <td class="appointment-date">2023-10-13</td>
                                 <td><span class="status-badge completed">Completed</span></td>
                                 <td>
-                                    <a href="#" class="action-btn view">View</a>
+                                    <a href="${pageContext.request.contextPath}/doctor/appointment/details?id=004" class="action-btn view">View</a>
                                 </td>
                                 <td>
                                     <span class="notes-badge">Routine check-up</span>
@@ -207,7 +208,7 @@
 
                         // Replace approve/reject buttons with view button
                         const actionCell = this.closest('td');
-                        actionCell.innerHTML = '<a href="#" class="action-btn view">View</a>';
+                        actionCell.innerHTML = '<a href="${pageContext.request.contextPath}/doctor/appointment/details?id=' + appointmentId + '" class="action-btn view">View</a>';
 
                         alert('Appointment approved successfully!');
                     }
@@ -240,7 +241,7 @@
 
                         // Replace approve/reject buttons with view button
                         const actionCell = this.closest('td');
-                        actionCell.innerHTML = '<a href="#" class="action-btn view">View</a>';
+                        actionCell.innerHTML = '<a href="${pageContext.request.contextPath}/doctor/appointment/details?id=' + appointmentId + '" class="action-btn view">View</a>';
 
                         // Update notes
                         const notesCell = this.closest('tr').querySelector('.notes-badge');

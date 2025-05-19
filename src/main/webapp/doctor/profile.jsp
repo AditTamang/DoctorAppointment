@@ -28,6 +28,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-buttons.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctorDashboard.css">
     <style>
         /* Main Profile Styles */
@@ -514,6 +515,13 @@
                     <p>View and manage your profile information</p>
                 </div>
 
+                <% if (session.getAttribute("successMessage") != null) { %>
+                <div class="alert alert-success" style="padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; color: #155724; background-color: #d4edda; border-color: #c3e6cb;">
+                    <%= session.getAttribute("successMessage") %>
+                    <% session.removeAttribute("successMessage"); %>
+                </div>
+                <% } %>
+
                 <div class="profile-container">
                     <div class="profile-header">
                         <div class="profile-avatar">
@@ -610,7 +618,7 @@
                         </div>
 
                         <div class="profile-actions">
-                            <a href="edit-profile.jsp" class="btn-edit">
+                            <a href="${pageContext.request.contextPath}/doctor/edit-profile" class="btn-edit">
                                 <i class="fas fa-edit"></i> Edit Profile
                             </a>
                         </div>

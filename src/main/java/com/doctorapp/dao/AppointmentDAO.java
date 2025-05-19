@@ -24,20 +24,34 @@ public class AppointmentDAO {
              // Get patient name if not provided
              if (appointment.getPatientName() == null || appointment.getPatientName().isEmpty()) {
                  try (Connection conn = DBConnection.getConnection()) {
-                     String patientQuery = "SELECT CONCAT(u.first_name, ' ', u.last_name) as full_name " +
-                                          "FROM users u JOIN patients p ON u.id = p.user_id " +
+                     // Log the patient ID for debugging
+                     LOGGER.log(Level.INFO, "Retrieving name for patient ID: " + appointment.getPatientId());
+
+                     // Updated query to correctly join users and patients tables
+                     String patientQuery = "SELECT u.first_name, u.last_name " +
+                                          "FROM patients p " +
+                                          "JOIN users u ON p.user_id = u.id " +
                                           "WHERE p.id = ?";
 
                      try (PreparedStatement pstmt = conn.prepareStatement(patientQuery)) {
                          pstmt.setInt(1, appointment.getPatientId());
                          try (ResultSet rs = pstmt.executeQuery()) {
                              if (rs.next()) {
-                                 appointment.setPatientName(rs.getString("full_name"));
+                                 String firstName = rs.getString("first_name");
+                                 String lastName = rs.getString("last_name");
+                                 String fullName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                                 fullName = fullName.trim();
+
+                                 LOGGER.log(Level.INFO, "Retrieved patient name: " + fullName);
+                                 appointment.setPatientName(fullName);
+                             } else {
+                                 LOGGER.log(Level.WARNING, "No user found for patient ID: " + appointment.getPatientId());
                              }
                          }
                      }
                  } catch (SQLException | ClassNotFoundException e) {
                      LOGGER.log(Level.WARNING, "Could not retrieve patient name: " + e.getMessage());
+                     e.printStackTrace();
                  }
              }
 
@@ -88,7 +102,11 @@ public class AppointmentDAO {
 
      // Get appointment by ID
      public Appointment getAppointmentById(int id) {
-         String query = "SELECT * FROM appointments WHERE id = ?";
+         String query = "SELECT a.*, p.user_id as patient_user_id, d.user_id as doctor_user_id " +
+                       "FROM appointments a " +
+                       "JOIN patients p ON a.patient_id = p.id " +
+                       "JOIN doctors d ON a.doctor_id = d.id " +
+                       "WHERE a.id = ?";
 
          try (Connection conn = DBConnection.getConnection();
               PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -101,15 +119,50 @@ public class AppointmentDAO {
                     appointment.setId(rs.getInt("id"));
                     appointment.setPatientId(rs.getInt("patient_id"));
                     appointment.setDoctorId(rs.getInt("doctor_id"));
-                    appointment.setPatientName(rs.getString("patient_name"));
-                    appointment.setDoctorName(rs.getString("doctor_name"));
                     appointment.setAppointmentDate(rs.getDate("appointment_date"));
                     appointment.setAppointmentTime(rs.getString("appointment_time"));
                     appointment.setStatus(rs.getString("status"));
                     appointment.setSymptoms(rs.getString("symptoms"));
                     appointment.setPrescription(rs.getString("prescription"));
+                    appointment.setReason(rs.getString("reason"));
+                    appointment.setNotes(rs.getString("notes"));
+                    appointment.setFee(rs.getDouble("fee"));
 
-                     return appointment;
+                    // Get patient user ID and doctor user ID
+                    int patientUserId = rs.getInt("patient_user_id");
+                    int doctorUserId = rs.getInt("doctor_user_id");
+
+                    // Get patient name from users table
+                    String patientQuery = "SELECT first_name, last_name FROM users WHERE id = ?";
+                    try (PreparedStatement patientStmt = conn.prepareStatement(patientQuery)) {
+                        patientStmt.setInt(1, patientUserId);
+                        try (ResultSet patientRs = patientStmt.executeQuery()) {
+                            if (patientRs.next()) {
+                                String firstName = patientRs.getString("first_name");
+                                String lastName = patientRs.getString("last_name");
+                                String patientName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                                appointment.setPatientName(patientName.trim());
+                                LOGGER.log(Level.INFO, "Retrieved patient name: " + patientName);
+                            }
+                        }
+                    }
+
+                    // Get doctor name from users table
+                    String doctorQuery = "SELECT first_name, last_name FROM users WHERE id = ?";
+                    try (PreparedStatement doctorStmt = conn.prepareStatement(doctorQuery)) {
+                        doctorStmt.setInt(1, doctorUserId);
+                        try (ResultSet doctorRs = doctorStmt.executeQuery()) {
+                            if (doctorRs.next()) {
+                                String firstName = doctorRs.getString("first_name");
+                                String lastName = doctorRs.getString("last_name");
+                                String doctorName = "Dr. " + (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                                appointment.setDoctorName(doctorName.trim());
+                                LOGGER.log(Level.INFO, "Retrieved doctor name: " + doctorName);
+                            }
+                        }
+                    }
+
+                    return appointment;
                  }
              }
          } catch (SQLException | ClassNotFoundException e) {
@@ -383,9 +436,9 @@ public class AppointmentDAO {
              dbStatus = "CANCELLED";
          }
 
-         String query = "SELECT a.*, u.first_name as patient_first_name, u.last_name as patient_last_name " +
+         String query = "SELECT a.*, p.user_id as patient_user_id " +
                        "FROM appointments a " +
-                       "JOIN users u ON a.patient_id = u.id " +
+                       "JOIN patients p ON a.patient_id = p.id " +
                        "WHERE a.doctor_id = ? AND a.status = ? " +
                        "ORDER BY a.appointment_date, a.appointment_time";
 
@@ -418,27 +471,34 @@ public class AppointmentDAO {
                      appointment.setNotes(rs.getString("notes"));
                      appointment.setFee(rs.getDouble("fee"));
 
-                     // Safely handle patient name
-                     String firstName = rs.getString("patient_first_name");
-                     String lastName = rs.getString("patient_last_name");
-                     String patientName = "";
+                     // Get patient user ID
+                     int patientUserId = rs.getInt("patient_user_id");
 
-                     if (firstName != null) {
-                         patientName += firstName;
-                     }
+                     // Get patient name from users table
+                     String patientQuery = "SELECT first_name, last_name FROM users WHERE id = ?";
+                     try (PreparedStatement patientStmt = conn.prepareStatement(patientQuery)) {
+                         patientStmt.setInt(1, patientUserId);
+                         try (ResultSet patientRs = patientStmt.executeQuery()) {
+                             if (patientRs.next()) {
+                                 String firstName = patientRs.getString("first_name");
+                                 String lastName = patientRs.getString("last_name");
+                                 String patientName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                                 patientName = patientName.trim();
 
-                     if (lastName != null) {
-                         if (!patientName.isEmpty()) {
-                             patientName += " ";
+                                 if (patientName.isEmpty()) {
+                                     patientName = "Unknown";
+                                 }
+
+                                 appointment.setPatientName(patientName);
+                                 LOGGER.log(Level.INFO, "Retrieved patient name: " + patientName);
+                             } else {
+                                 appointment.setPatientName("Unknown");
+                             }
                          }
-                         patientName += lastName;
+                     } catch (SQLException e) {
+                         LOGGER.log(Level.WARNING, "Error retrieving patient name: " + e.getMessage());
+                         appointment.setPatientName("Unknown");
                      }
-
-                     if (patientName.isEmpty()) {
-                         patientName = "Unknown";
-                     }
-
-                     appointment.setPatientName(patientName);
 
                      appointments.add(appointment);
                  }
@@ -507,9 +567,9 @@ public class AppointmentDAO {
      // Get today's appointments by doctor
      public List<Appointment> getTodayAppointmentsByDoctor(int doctorId) {
          List<Appointment> appointments = new ArrayList<>();
-         String query = "SELECT a.*, u.first_name as patient_first_name, u.last_name as patient_last_name " +
+         String query = "SELECT a.*, p.user_id as patient_user_id " +
                        "FROM appointments a " +
-                       "JOIN users u ON a.patient_id = u.id " +
+                       "JOIN patients p ON a.patient_id = p.id " +
                        "WHERE a.doctor_id = ? AND a.appointment_date = CURRENT_DATE " +
                        "ORDER BY a.appointment_time";
 
@@ -541,27 +601,34 @@ public class AppointmentDAO {
                      appointment.setNotes(rs.getString("notes"));
                      appointment.setFee(rs.getDouble("fee"));
 
-                     // Safely handle patient name
-                     String firstName = rs.getString("patient_first_name");
-                     String lastName = rs.getString("patient_last_name");
-                     String patientName = "";
+                     // Get patient user ID
+                     int patientUserId = rs.getInt("patient_user_id");
 
-                     if (firstName != null) {
-                         patientName += firstName;
-                     }
+                     // Get patient name from users table
+                     String patientQuery = "SELECT first_name, last_name FROM users WHERE id = ?";
+                     try (PreparedStatement patientStmt = conn.prepareStatement(patientQuery)) {
+                         patientStmt.setInt(1, patientUserId);
+                         try (ResultSet patientRs = patientStmt.executeQuery()) {
+                             if (patientRs.next()) {
+                                 String firstName = patientRs.getString("first_name");
+                                 String lastName = patientRs.getString("last_name");
+                                 String patientName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                                 patientName = patientName.trim();
 
-                     if (lastName != null) {
-                         if (!patientName.isEmpty()) {
-                             patientName += " ";
+                                 if (patientName.isEmpty()) {
+                                     patientName = "Unknown";
+                                 }
+
+                                 appointment.setPatientName(patientName);
+                                 LOGGER.log(Level.INFO, "Retrieved patient name for today's appointment: " + patientName);
+                             } else {
+                                 appointment.setPatientName("Unknown");
+                             }
                          }
-                         patientName += lastName;
+                     } catch (SQLException e) {
+                         LOGGER.log(Level.WARNING, "Error retrieving patient name: " + e.getMessage());
+                         appointment.setPatientName("Unknown");
                      }
-
-                     if (patientName.isEmpty()) {
-                         patientName = "Unknown";
-                     }
-
-                     appointment.setPatientName(patientName);
 
                      appointments.add(appointment);
                  }
@@ -829,30 +896,9 @@ public class AppointmentDAO {
              }
          }
 
-         // If still no appointments, create some sample data for display
+         // Return empty list if no appointments found
          if (appointments.isEmpty() && limit > 0) {
-             LOGGER.info("Creating sample appointments for doctor ID: " + doctorId);
-
-             // Create sample appointments
-             for (int i = 0; i < Math.min(limit, 2); i++) {
-                 Appointment appointment = new Appointment();
-                 appointment.setId(i + 1);
-                 appointment.setPatientId(i + 100);
-                 appointment.setDoctorId(doctorId);
-
-                 // Set a future date
-                 java.util.Calendar cal = java.util.Calendar.getInstance();
-                 cal.add(java.util.Calendar.DAY_OF_MONTH, i + 1);
-                 appointment.setAppointmentDate(cal.getTime());
-
-                 appointment.setAppointmentTime((9 + i) + ":00 AM");
-                 appointment.setStatus("PENDING");
-                 appointment.setReason("Consultation");
-                 appointment.setNotes("Sample appointment");
-                 appointment.setPatientName("Sample Patient " + (i + 1));
-
-                 appointments.add(appointment);
-             }
+             LOGGER.info("No appointments found for doctor ID: " + doctorId);
          }
 
          return appointments;
@@ -1031,10 +1077,64 @@ public class AppointmentDAO {
      }
 
      /**
+      * Get appointments by patient and doctor ID
+      * @param patientId Patient ID
+      * @param doctorId Doctor ID
+      * @return List of appointments for the patient with the specified doctor
+      */
+     public List<Appointment> getAppointmentsByPatientAndDoctorId(int patientId, int doctorId) {
+         List<Appointment> appointments = new ArrayList<>();
+         String query = "SELECT a.* " +
+                       "FROM appointments a " +
+                       "WHERE a.patient_id = ? AND a.doctor_id = ? " +
+                       "ORDER BY a.appointment_date DESC, a.appointment_time DESC";
+
+         try (Connection conn = DBConnection.getConnection();
+              PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+             pstmt.setInt(1, patientId);
+             pstmt.setInt(2, doctorId);
+
+             try (ResultSet rs = pstmt.executeQuery()) {
+                 while (rs.next()) {
+                     Appointment appointment = new Appointment();
+                     appointment.setId(rs.getInt("id"));
+                     appointment.setPatientId(rs.getInt("patient_id"));
+                     appointment.setDoctorId(rs.getInt("doctor_id"));
+
+                     // Safely handle date conversion
+                     try {
+                         java.sql.Date sqlDate = rs.getDate("appointment_date");
+                         if (sqlDate != null) {
+                             appointment.setAppointmentDate(new java.util.Date(sqlDate.getTime()));
+                         }
+                     } catch (Exception e) {
+                         LOGGER.log(Level.WARNING, "Error converting appointment date: " + e.getMessage());
+                     }
+
+                     appointment.setAppointmentTime(rs.getString("appointment_time"));
+                     appointment.setStatus(rs.getString("status"));
+                     appointment.setSymptoms(rs.getString("symptoms"));
+                     appointment.setPrescription(rs.getString("prescription"));
+                     appointment.setReason(rs.getString("reason"));
+
+                     appointments.add(appointment);
+                 }
+             }
+
+         } catch (SQLException | ClassNotFoundException e) {
+             LOGGER.log(Level.SEVERE, "Error getting appointments by patient ID " + patientId + " and doctor ID " + doctorId, e);
+         }
+
+         return appointments;
+     }
+
+     /**
       * Get all upcoming appointments
       * @param limit Maximum number of appointments to return
       * @return List of upcoming appointments
-      */public List<Appointment> getUpcomingAppointments(int limit) {
+      */
+     public List<Appointment> getUpcomingAppointments(int limit) {
          List<Appointment> appointments = new ArrayList<>();
          String query = "SELECT a.*, u.first_name as patient_first_name, u.last_name as patient_last_name, " +
                        "d.name as doctor_name, d.specialization " +

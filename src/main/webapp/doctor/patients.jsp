@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Date" %>
 <%@ page import="com.doctorapp.model.User" %>
 <%@ page import="com.doctorapp.model.Patient" %>
 <%@ page import="com.doctorapp.model.Appointment" %>
@@ -15,6 +17,13 @@
 
     // Get doctor information
     String doctorName = "Dr. " + user.getFirstName() + " " + user.getLastName();
+
+    // Get patients list from request
+    List<Patient> patients = (List<Patient>) request.getAttribute("patients");
+    String searchTerm = (String) request.getAttribute("searchTerm");
+
+    // Date formatter for last visit
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -26,6 +35,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-profile-dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-buttons.css">
     <style>
         .patients-container {
             background-color: #fff;
@@ -217,13 +227,15 @@
                 </div>
 
                 <div class="patients-filter">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Search patients">
-                    </div>
-                    <button class="filter-btn">
-                        <i class="fas fa-filter"></i> Filter
-                    </button>
+                    <form action="${pageContext.request.contextPath}/doctor/patients" method="get" class="search-form">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" name="search" placeholder="Search patients" value="${searchTerm}">
+                        </div>
+                        <button type="submit" class="filter-btn">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </form>
                 </div>
 
                 <table class="patients-table">

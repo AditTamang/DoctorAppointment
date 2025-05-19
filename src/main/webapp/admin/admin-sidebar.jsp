@@ -12,7 +12,7 @@
 
     // Get current page path to highlight active menu item
     String currentPath = request.getRequestURI();
-    
+
     // Extract the last part of the path for active menu highlighting
     String activePage = "";
     if (currentPath.contains("/")) {
@@ -22,7 +22,7 @@
             activePage = "dashboard";
         }
     }
-    
+
     // Get the count of pending doctor requests
     DoctorRegistrationService doctorRegistrationService = new DoctorRegistrationService();
     int pendingRequestsCount = doctorRegistrationService.getPendingRequests().size();
@@ -76,30 +76,7 @@
                 <span>Appointments</span>
             </a>
         </li>
-        <li class="menu-item <%= activePage.equals("departments") ? "active" : "" %>">
-            <a href="${pageContext.request.contextPath}/admin/departments" class="menu-link">
-                <i class="fas fa-hospital"></i>
-                <span>Departments</span>
-            </a>
-        </li>
-        <li class="menu-item <%= activePage.equals("specializations") ? "active" : "" %>">
-            <a href="${pageContext.request.contextPath}/admin/specializations" class="menu-link">
-                <i class="fas fa-stethoscope"></i>
-                <span>Specializations</span>
-            </a>
-        </li>
-        <li class="menu-item <%= activePage.equals("reports") ? "active" : "" %>">
-            <a href="${pageContext.request.contextPath}/admin/reports" class="menu-link">
-                <i class="fas fa-chart-bar"></i>
-                <span>Reports</span>
-            </a>
-        </li>
-        <li class="menu-item <%= activePage.equals("settings") ? "active" : "" %>">
-            <a href="${pageContext.request.contextPath}/admin/settings" class="menu-link">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-            </a>
-        </li>
+
         <li class="menu-item">
             <a href="${pageContext.request.contextPath}/logout" class="menu-link">
                 <i class="fas fa-sign-out-alt"></i>

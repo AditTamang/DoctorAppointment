@@ -81,7 +81,7 @@
                     <div class="form-group">
                         <label for="appointmentDate">Appointment Date</label>
                         <input type="date" id="appointmentDate" name="appointmentDate" class="form-control"
-                               value="${appointmentDate}" required>
+                               value="${selectedDate != null ? selectedDate : appointmentDate}" required>
                         <% if(request.getAttribute("dateError") != null) { %>
                             <div class="form-error">${dateError}</div>
                         <% } %>
@@ -90,41 +90,29 @@
                     <div class="form-group">
                         <label>Appointment Time</label>
                         <div class="time-slots">
+                            <%
+                            // Get available time slots from request attribute
+                            java.util.List<String> availableTimeSlots = (java.util.List<String>) request.getAttribute("availableTimeSlots");
+                            if (availableTimeSlots != null && !availableTimeSlots.isEmpty()) {
+                                // Display all available time slots
+                                for (String timeSlot : availableTimeSlots) {
+                                    // Create a unique ID for each time slot by replacing spaces and colons
+                                    String timeId = "time_" + timeSlot.replace(" ", "_").replace(":", "_");
+                            %>
                             <div class="time-slot">
-                                <input type="radio" id="time_11_00" name="appointmentTime" value="11:00 AM"
-                                       ${appointmentTime == '11:00 AM' ? 'checked' : ''} required>
-                                <label for="time_11_00">11:00 AM</label>
+                                <input type="radio" id="<%= timeId %>" name="appointmentTime" value="<%= timeSlot %>"
+                                       <%= timeSlot.equals(request.getParameter("appointmentTime")) ? "checked" : "" %> required>
+                                <label for="<%= timeId %>"><%= timeSlot %></label>
                             </div>
-                            <div class="time-slot">
-                                <input type="radio" id="time_12_00" name="appointmentTime" value="12:00 PM"
-                                       ${appointmentTime == '12:00 PM' ? 'checked' : ''}>
-                                <label for="time_12_00">12:00 PM</label>
+                            <%
+                                }
+                            } else {
+                                // If no time slots are available, display a message
+                            %>
+                            <div class="no-slots-message">
+                                <p>No time slots available for this doctor. Please select another date or doctor.</p>
                             </div>
-                            <div class="time-slot">
-                                <input type="radio" id="time_01_00" name="appointmentTime" value="01:00 PM"
-                                       ${appointmentTime == '01:00 PM' ? 'checked' : ''}>
-                                <label for="time_01_00">01:00 PM</label>
-                            </div>
-                            <div class="time-slot">
-                                <input type="radio" id="time_02_00" name="appointmentTime" value="02:00 PM"
-                                       ${appointmentTime == '02:00 PM' ? 'checked' : ''}>
-                                <label for="time_02_00">02:00 PM</label>
-                            </div>
-                            <div class="time-slot">
-                                <input type="radio" id="time_03_00" name="appointmentTime" value="03:00 PM"
-                                       ${appointmentTime == '03:00 PM' ? 'checked' : ''}>
-                                <label for="time_03_00">03:00 PM</label>
-                            </div>
-                            <div class="time-slot">
-                                <input type="radio" id="time_04_00" name="appointmentTime" value="04:00 PM"
-                                       ${appointmentTime == '04:00 PM' ? 'checked' : ''}>
-                                <label for="time_04_00">04:00 PM</label>
-                            </div>
-                            <div class="time-slot">
-                                <input type="radio" id="time_05_00" name="appointmentTime" value="05:00 PM"
-                                       ${appointmentTime == '05:00 PM' ? 'checked' : ''}>
-                                <label for="time_05_00">05:00 PM</label>
-                            </div>
+                            <% } %>
                         </div>
                         <% if(request.getAttribute("timeError") != null) { %>
                             <div class="form-error">${timeError}</div>
@@ -159,6 +147,15 @@
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('appointmentDate').min = today;
+
+            // Add event listener to date picker to refresh time slots
+            document.getElementById('appointmentDate').addEventListener('change', function() {
+                const selectedDate = this.value;
+                const doctorId = <%= doctor.getId() %>;
+
+                // Redirect to the same page with the selected date
+                window.location.href = '../appointment/book?doctorId=' + doctorId + '&date=' + selectedDate;
+            });
 
             // Add click event listeners to time slots for better visual feedback
             const timeSlots = document.querySelectorAll('.time-slot input[type="radio"]');

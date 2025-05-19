@@ -68,12 +68,7 @@
                 <span>My Profile</span>
             </a>
         </li>
-        <li class="<%= activePage.equals("changePassword.jsp") ? "active" : "" %>">
-            <a href="${pageContext.request.contextPath}/patient/changePassword.jsp">
-                <i class="fas fa-lock"></i>
-                <span>Change Password</span>
-            </a>
-        </li>
+
         <li class="logout">
             <a href="${pageContext.request.contextPath}/logout">
                 <i class="fas fa-sign-out-alt"></i>
@@ -83,5 +78,6 @@
     </ul>
 </div>
 
-<!-- Include sidebar JavaScript -->
+<!-- Include sidebar CSS and JavaScript -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-sidebar.css">
 <script src="${pageContext.request.contextPath}/js/patient-sidebar.js"></script>
