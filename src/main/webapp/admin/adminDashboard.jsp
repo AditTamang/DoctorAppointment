@@ -493,7 +493,7 @@
                                             <tr>
                                                 <td>
                                                     <div class="user-info">
-                                                        <img src="${doctor.profileImage != null ? doctor.profileImage : '../assets/images/doctors/default-doctor.png'}"
+                                                        <img src="${pageContext.request.contextPath}${doctor.getProfileImage() != null && !doctor.getProfileImage().isEmpty() ? doctor.getProfileImage() : (doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty() ? doctor.getImageUrl() : '/assets/images/doctors/default-doctor.png')}"
                                                              alt="${doctor.name}" class="user-avatar">
                                                         <div class="user-details">
                                                             <div class="user-name">${doctor.name}</div>
@@ -554,7 +554,8 @@
                                             <tr>
                                                 <td>
                                                     <div class="user-info">
-                                                        <img src="../assets/images/patients/default-patient.png"
+                                                        <c:set var="patientImage" value="${appointment.patientImage != null && !appointment.patientImage.isEmpty() ? appointment.patientImage : '/assets/images/patients/default.jpg'}" />
+                                                        <img src="${pageContext.request.contextPath}${patientImage}"
                                                              alt="${appointment.patientName}" class="user-avatar">
                                                         <div class="user-details">
                                                             <div class="user-name">${appointment.patientName}</div>

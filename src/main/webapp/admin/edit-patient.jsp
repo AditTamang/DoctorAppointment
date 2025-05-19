@@ -140,7 +140,7 @@
             color: #3756a4;
             transform: translateX(-3px);
         }
-        
+
         .page-title {
             font-size: 24px;
             font-weight: 600;
@@ -150,23 +150,23 @@
             padding-bottom: 10px;
             display: inline-block;
         }
-        
+
         textarea.form-control {
             min-height: 100px;
             resize: vertical;
         }
-        
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .form-row {
                 flex-direction: column;
                 gap: 0;
             }
-            
+
             .form-col {
                 width: 100%;
             }
-            
+
             .form-actions {
                 justify-content: center;
             }
@@ -208,8 +208,27 @@
             %>
             <div class="form-container">
                 <h2 class="page-title">Edit Patient Information</h2>
-                <form action="${pageContext.request.contextPath}/admin/update-patient" method="post">
+                <form action="${pageContext.request.contextPath}/admin/update-patient" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="id" value="<%= patient.getId() %>">
+
+                    <div class="form-group">
+                        <label>Profile Image</label>
+                        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+                            <div style="width: 100px; height: 100px; border-radius: 50%; overflow: hidden; border: 2px solid #ddd;">
+                                <img id="profile-preview" src="${pageContext.request.contextPath}${patient.getProfileImage() != null && !patient.getProfileImage().isEmpty() ? patient.getProfileImage() : '/assets/images/patients/default.jpg'}" alt="Patient" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div>
+                                <input type="file" id="profileImage" name="profileImage" accept="image/*" style="display: none;">
+                                <button type="button" class="btn-secondary" style="margin-right: 10px;" onclick="document.getElementById('profileImage').click();">
+                                    <i class="fas fa-upload"></i> Upload Image
+                                </button>
+                                <button type="button" class="btn-secondary" onclick="removeImage()">
+                                    <i class="fas fa-trash"></i> Remove Image
+                                </button>
+                                <input type="hidden" id="removeImage" name="removeImage" value="false">
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="form-row">
                         <div class="form-col">
@@ -318,7 +337,29 @@
                     document.querySelector('.sidebar').classList.toggle('active');
                 });
             }
+
+            // Image preview functionality
+            const profileImage = document.getElementById('profileImage');
+            if (profileImage) {
+                profileImage.addEventListener('change', function() {
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            document.getElementById('profile-preview').src = e.target.result;
+                            document.getElementById('removeImage').value = "false";
+                        };
+                        reader.readAsDataURL(this.files[0]);
+                    }
+                });
+            }
         });
+
+        // Function to remove profile image
+        function removeImage() {
+            document.getElementById('profile-preview').src = '${pageContext.request.contextPath}/assets/images/patients/default.jpg';
+            document.getElementById('profileImage').value = '';
+            document.getElementById('removeImage').value = "true";
+        }
     </script>
 </body>
 </html>

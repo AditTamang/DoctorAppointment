@@ -22,13 +22,13 @@ public class DoctorToggleStatusServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private final DoctorDAO doctorDAO;
     private final DoctorAvailabilityDAO availabilityDAO;
-    
+
     public DoctorToggleStatusServlet() {
         super();
         doctorDAO = new DoctorDAO();
         availabilityDAO = new DoctorAvailabilityDAO();
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
@@ -38,26 +38,39 @@ public class DoctorToggleStatusServlet extends HttpServlet {
                 JsonResponse.send(response, false, "You must be logged in to update status");
                 return;
             }
-            
+
             User user = (User) session.getAttribute("user");
             if (!"DOCTOR".equals(user.getRole())) {
                 JsonResponse.send(response, false, "Only doctors can update status");
                 return;
             }
-            
+
             // Get doctor information
             int userId = user.getId();
             int doctorId = doctorDAO.getDoctorIdByUserId(userId);
-            
+
             if (doctorId == 0) {
                 JsonResponse.send(response, false, "Doctor profile not found");
                 return;
             }
-            
+
             // Toggle doctor status
             String newStatus = availabilityDAO.toggleDoctorStatus(doctorId);
-            
+
             if (newStatus != null) {
+                // Update the doctor in the session
+                try {
+                    var doctor = doctorDAO.getDoctorById(doctorId);
+                    if (doctor != null) {
+                        // Update the doctor in the session
+                        request.getSession().setAttribute("doctor", doctor);
+                        System.out.println("Updated doctor in session with new status: " + doctor.getStatus());
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error updating doctor in session: " + e.getMessage());
+                    // Continue anyway
+                }
+
                 JsonResponse.send(response, true, "Status updated successfully", "status", newStatus);
             } else {
                 JsonResponse.send(response, false, "Failed to update status");

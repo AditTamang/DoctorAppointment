@@ -39,57 +39,91 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctorDashboard.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-buttons.css">
     <style>
+        /* Main Content Styling */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         .profile-edit-container {
             background-color: #fff;
             border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+            padding: 25px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 900px;
         }
 
         .profile-edit-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
             border-bottom: 1px solid #e0e0e0;
         }
 
         .profile-edit-header h2 {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 600;
+            color: #333;
         }
 
         .profile-edit-content {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            gap: 25px;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .form-group:hover {
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
         }
 
         .form-group label {
             display: block;
             font-weight: 500;
-            margin-bottom: 5px;
-            color: #6c757d;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
-            font-size: 16px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #4361ee;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+            outline: none;
         }
 
         .form-group textarea {
-            height: 100px;
+            height: 120px;
             resize: vertical;
         }
 
@@ -100,15 +134,22 @@
         .profile-image-upload {
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            width: 100%;
         }
 
         .profile-image-preview {
-            width: 100px;
-            height: 100px;
-            border-radius: 10px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
             overflow: hidden;
-            margin-right: 20px;
+            margin-right: 25px;
+            border: 4px solid #f0f2f5;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
         }
 
         .profile-image-preview img {
@@ -120,20 +161,64 @@
         .profile-image-actions {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
+            flex: 1;
         }
 
         .profile-actions {
-            margin-top: 20px;
+            margin-top: 30px;
             display: flex;
-            gap: 10px;
+            gap: 15px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .profile-actions button,
+        .profile-actions a {
+            padding: 12px 25px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .profile-actions button:hover,
+        .profile-actions a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .profile-actions .btn-primary {
+            background-color: #4361ee;
+            color: white;
+            border: none;
+        }
+
+        .profile-actions .btn-primary:hover {
+            background-color: #3a56d4;
         }
 
         .alert {
             padding: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             border: 1px solid transparent;
-            border-radius: 4px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            width: 100%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .alert i {
+            margin-right: 10px;
+            font-size: 16px;
         }
 
         .alert-success {
@@ -149,12 +234,60 @@
         }
 
         @media (max-width: 768px) {
+            .profile-edit-container {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .profile-edit-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
             .profile-edit-content {
                 grid-template-columns: 1fr;
+                gap: 15px;
             }
 
             .form-group.full-width {
                 grid-column: span 1;
+            }
+
+            .profile-image-upload {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .profile-image-preview {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+
+            .profile-image-actions {
+                width: 100%;
+            }
+
+            .profile-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .profile-actions button,
+            .profile-actions a {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-edit-container {
+                padding: 12px;
+            }
+
+            .form-group {
+                padding: 12px;
             }
         }
     </style>
@@ -179,7 +312,17 @@
                         <i class="fas fa-search"></i>
                     </div>
                     <div class="user-profile-icon">
-                        <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
+                        <%
+                        String headerImagePath = "";
+                        if (doctor.getProfileImage() != null && !doctor.getProfileImage().isEmpty()) {
+                            headerImagePath = request.getContextPath() + doctor.getProfileImage();
+                        } else if (doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty()) {
+                            headerImagePath = request.getContextPath() + doctor.getImageUrl();
+                        } else {
+                            headerImagePath = request.getContextPath() + "/assets/images/doctors/default-doctor.png";
+                        }
+                        %>
+                        <img src="<%= headerImagePath %>" alt="Doctor">
                     </div>
                 </div>
             </div>
@@ -198,18 +341,30 @@
                     <!-- Add success/error message display -->
                     <% if (request.getAttribute("successMessage") != null) { %>
                         <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i>
                             <%= request.getAttribute("successMessage") %>
                         </div>
                     <% } %>
                     <% if (request.getAttribute("errorMessage") != null) { %>
                         <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle"></i>
                             <%= request.getAttribute("errorMessage") %>
                         </div>
                     <% } %>
 
                     <div class="profile-image-upload">
                         <div class="profile-image-preview">
-                            <img src="${pageContext.request.contextPath}${doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty() ? doctor.getImageUrl() : '/assets/images/doctors/default.jpg'}" alt="Doctor" id="profile-preview">
+                            <%
+                            String previewImagePath = "";
+                            if (doctor.getProfileImage() != null && !doctor.getProfileImage().isEmpty()) {
+                                previewImagePath = request.getContextPath() + doctor.getProfileImage();
+                            } else if (doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty()) {
+                                previewImagePath = request.getContextPath() + doctor.getImageUrl();
+                            } else {
+                                previewImagePath = request.getContextPath() + "/assets/images/doctors/default-doctor.png";
+                            }
+                            %>
+                            <img src="<%= previewImagePath %>" alt="Doctor" id="profile-preview">
                         </div>
                         <div class="profile-image-actions">
                             <input type="file" id="profile-image" name="profileImage" accept="image/*" style="display: none;">
@@ -369,7 +524,7 @@
 
             if (removeBtn) {
                 removeBtn.addEventListener('click', function() {
-                    profilePreview.src = '${pageContext.request.contextPath}/assets/images/doctors/default.jpg';
+                    profilePreview.src = '${pageContext.request.contextPath}/assets/images/doctors/default-doctor.png';
                     profileImage.value = '';
                     imageRemoved = true;
 

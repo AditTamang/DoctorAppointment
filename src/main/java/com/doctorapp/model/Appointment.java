@@ -21,6 +21,7 @@ public class Appointment {
     private double fee;
     private String doctorSpecialization;
     private String medicalReport;
+    private String patientImage;
 
     public Appointment() {
     }
@@ -209,6 +210,14 @@ public class Appointment {
 
     public void setMedicalReport(String medicalReport) {
         this.medicalReport = medicalReport;
+    }
+
+    public String getPatientImage() {
+        return patientImage;
+    }
+
+    public void setPatientImage(String patientImage) {
+        this.patientImage = patientImage;
     }
 
     // Helper method to format date and time

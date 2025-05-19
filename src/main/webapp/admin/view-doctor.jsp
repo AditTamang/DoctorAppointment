@@ -353,7 +353,7 @@
                 <div class="doctor-profile">
                     <div class="profile-header">
                         <div class="profile-image">
-                            <img src="${pageContext.request.contextPath}${doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty() ? (doctor.getImageUrl().startsWith('/') ? doctor.getImageUrl() : '/assets/images/doctors/'.concat(doctor.getImageUrl())) : '/assets/images/doctors/d1.png'}" alt="${doctor.getName()}">
+                            <img src="${pageContext.request.contextPath}${doctor.getProfileImage() != null && !doctor.getProfileImage().isEmpty() ? doctor.getProfileImage() : (doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty() ? (doctor.getImageUrl().startsWith('/') ? doctor.getImageUrl() : '/assets/images/doctors/'.concat(doctor.getImageUrl())) : '/assets/images/doctors/d1.png')}" alt="${doctor.getName()}">
                         </div>
                         <div class="profile-info">
                             <h2><%= doctor.getName() %></h2>

@@ -134,8 +134,19 @@ a:hover {
 /* Main Content */
 .main-content {
     flex: 1;
-    margin-left: 240px;
+    margin-left: 180px;
     padding: 20px;
+    max-width: calc(100% - 180px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Dashboard Content */
+.dashboard-content {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 /* Profile Overview */
@@ -407,20 +418,20 @@ table tr:last-child td {
     .sidebar {
         width: 70px;
     }
-    
+
     .sidebar-header h2,
     .sidebar-menu li a span {
         display: none;
     }
-    
+
     .main-content {
         margin-left: 70px;
     }
-    
+
     .profile-overview {
         flex-direction: column;
     }
-    
+
     .doctor-profile {
         margin-bottom: 20px;
     }
@@ -430,7 +441,7 @@ table tr:last-child td {
     .stats-container {
         grid-template-columns: 1fr;
     }
-    
+
     .profile-actions {
         flex-direction: column;
     }

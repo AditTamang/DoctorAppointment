@@ -1,12 +1,20 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="com.doctorapp.model.User" %>
 <%@ page import="com.doctorapp.model.Patient" %>
+<%@ page import="com.doctorapp.service.PatientService" %>
 <%
     // Get current user from session
     User user = (User) session.getAttribute("user");
     if (user == null) {
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
+    }
+
+    // Get patient information including profile image
+    Patient patient = null;
+    if ("PATIENT".equals(user.getRole())) {
+        PatientService patientService = new PatientService();
+        patient = patientService.getPatientByUserId(user.getId());
     }
 
     // Get current page path to highlight active menu item
@@ -26,7 +34,9 @@
 <div class="sidebar">
     <div class="user-profile">
         <div class="profile-image">
-            <% if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) { %>
+            <% if (patient != null && patient.getProfileImage() != null && !patient.getProfileImage().isEmpty()) { %>
+                <img src="${pageContext.request.contextPath}${patient.getProfileImage()}" alt="Patient">
+            <% } else if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) { %>
                 <div class="profile-initials">AT</div>
             <% } else { %>
                 <img src="${pageContext.request.contextPath}/assets/images/patients/default.jpg" alt="Patient">

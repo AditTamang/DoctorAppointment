@@ -435,7 +435,7 @@
                                                 <tr>
                                                     <td>
                                                         <div class="d-flex align-items-center">
-                                                            <img src="${doctor.profileImage != null ? doctor.profileImage : '../assets/images/doctors/default-doctor.png'}"
+                                                            <img src="${pageContext.request.contextPath}${doctor.getProfileImage() != null && !doctor.getProfileImage().isEmpty() ? doctor.getProfileImage() : (doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty() ? doctor.getImageUrl() : '/assets/images/doctors/default-doctor.png')}"
                                                                  alt="${doctor.name}" class="rounded-circle me-2" width="40" height="40">
                                                             <div>
                                                                 <div class="fw-bold">${doctor.name}</div>

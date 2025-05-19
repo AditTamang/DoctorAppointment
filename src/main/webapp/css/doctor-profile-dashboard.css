@@ -200,6 +200,9 @@ body {
     margin-left: 250px;
     padding: 20px 30px;
     background-color: var(--white);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .top-header {
@@ -209,6 +212,8 @@ body {
     margin-bottom: 30px;
     padding-bottom: 15px;
     border-bottom: 1px solid var(--gray-200);
+    width: 100%;
+    max-width: 900px;
 }
 
 .top-header-left {
@@ -271,6 +276,8 @@ body {
 /* Profile Section */
 .profile-section {
     margin-bottom: 40px;
+    width: 100%;
+    max-width: 900px;
 }
 
 .profile-header {
@@ -359,6 +366,12 @@ body {
 /* Appointment Management Section */
 .appointment-section {
     margin-bottom: 30px;
+    width: 100%;
+    max-width: 900px;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
 }
 
 .appointment-header {
@@ -591,19 +604,36 @@ body {
 /* Responsive Styles */
 @media (max-width: 992px) {
     .sidebar {
-        width: 180px;
+        width: 80px;
     }
 
     .sidebar-header h2 {
-        font-size: 16px;
+        display: none;
     }
 
     .sidebar-menu a {
         padding: 10px;
+        justify-content: center;
+    }
+
+    .sidebar-menu a i {
+        margin-right: 0;
+    }
+
+    .sidebar-menu a span {
+        display: none;
     }
 
     .main-content {
-        margin-left: 180px;
+        margin-left: 80px;
+        width: calc(100% - 80px);
+        padding: 15px;
+    }
+
+    .appointment-section,
+    .profile-section,
+    .top-header {
+        max-width: 100%;
     }
 }
 
@@ -633,7 +663,7 @@ body {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 576px) {
     .dashboard-container {
         flex-direction: column;
     }
@@ -657,11 +687,19 @@ body {
 
     .main-content {
         margin-left: 0;
+        width: 100%;
+        padding: 10px;
+    }
+
+    .appointment-section,
+    .profile-section {
         padding: 15px;
     }
 
     .appointment-table th:nth-child(3),
-    .appointment-table td:nth-child(3) {
+    .appointment-table td:nth-child(3),
+    .appointment-table th:nth-child(4),
+    .appointment-table td:nth-child(4) {
         display: none;
     }
 
@@ -682,5 +720,14 @@ body {
     .action-btn {
         padding: 5px 8px;
         font-size: 12px;
+    }
+
+    .appointment-stats {
+        flex-direction: column;
+    }
+
+    .stat-item {
+        width: 100%;
+        margin-bottom: 5px;
     }
 }

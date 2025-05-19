@@ -12,6 +12,7 @@ public class Patient {
     private String bloodGroup;
     private String allergies;
     private String medicalHistory;
+    private String profileImage;
     private String email;
     private String lastVisit;
     private String status;
@@ -136,6 +137,14 @@ public class Patient {
 
     public void setMedicalHistory(String medicalHistory) {
         this.medicalHistory = medicalHistory;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 
     public String getStatus() {

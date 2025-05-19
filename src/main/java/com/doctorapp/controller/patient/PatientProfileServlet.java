@@ -1,12 +1,23 @@
 package com.doctorapp.controller.patient;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
 import com.doctorapp.model.Patient;
 import com.doctorapp.model.User;
@@ -21,7 +32,13 @@ import com.doctorapp.util.ValidationUtil;
     "/patient/profile",
     "/patient/profile/update"
 })
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024, // 1 MB
+    maxFileSize = 1024 * 1024 * 10,  // 10 MB
+    maxRequestSize = 1024 * 1024 * 15 // 15 MB
+)
 public class PatientProfileServlet extends HttpServlet {
+    private static final Logger LOGGER = Logger.getLogger(PatientProfileServlet.class.getName());
     private static final long serialVersionUID = 1L;
     private PatientService patientService;
     private UserService userService;
@@ -164,6 +181,57 @@ public class PatientProfileServlet extends HttpServlet {
             patient.setAllergies(allergies);
             patient.setMedicalHistory(medicalHistory);
 
+            // Handle profile image upload
+            try {
+                // Check if the request is multipart
+                boolean isMultipart = request.getContentType() != null &&
+                                     request.getContentType().toLowerCase().startsWith("multipart/");
+
+                if (isMultipart) {
+                    // Get the profile image part
+                    Part filePart = request.getPart("profileImage");
+
+                    if (filePart != null && filePart.getSize() > 0) {
+                        // Get the file name
+                        String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+
+                        // Create the upload directory if it doesn't exist
+                        String uploadPath = getServletContext().getRealPath("") + File.separator + "assets" +
+                                          File.separator + "images" + File.separator + "patients";
+                        File uploadDir = new File(uploadPath);
+                        if (!uploadDir.exists()) {
+                            uploadDir.mkdirs();
+                        }
+
+                        // Generate a unique file name to prevent overwriting
+                        String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
+                        String filePath = uploadPath + File.separator + uniqueFileName;
+
+                        // Save the file
+                        try (InputStream input = filePart.getInputStream()) {
+                            Files.copy(input, Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
+                            LOGGER.log(Level.INFO, "File saved to: " + filePath);
+
+                            // Update the patient's profile image
+                            String imageUrl = "/assets/images/patients/" + uniqueFileName;
+                            patient.setProfileImage(imageUrl);
+                            LOGGER.log(Level.INFO, "Profile image set to: " + imageUrl);
+                        }
+                    }
+                }
+
+                // Check if image should be removed
+                String removeImage = request.getParameter("removeImage");
+                if (removeImage != null && removeImage.equals("true")) {
+                    // Set profile image to default
+                    patient.setProfileImage("/assets/images/patients/default.jpg");
+                    LOGGER.log(Level.INFO, "Image removed and set to default");
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error handling image upload: " + e.getMessage(), e);
+                // Continue with the update even if image handling fails
+            }
+
             boolean patientUpdated = patientService.updatePatient(patient);
 
             if (userUpdated && patientUpdated) {
@@ -189,6 +257,52 @@ public class PatientProfileServlet extends HttpServlet {
             patient.setBloodGroup(bloodGroup);
             patient.setAllergies(allergies);
             patient.setMedicalHistory(medicalHistory);
+
+            // Set default profile image
+            patient.setProfileImage("/assets/images/patients/default.jpg");
+
+            // Handle profile image upload
+            try {
+                // Check if the request is multipart
+                boolean isMultipart = request.getContentType() != null &&
+                                     request.getContentType().toLowerCase().startsWith("multipart/");
+
+                if (isMultipart) {
+                    // Get the profile image part
+                    Part filePart = request.getPart("profileImage");
+
+                    if (filePart != null && filePart.getSize() > 0) {
+                        // Get the file name
+                        String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+
+                        // Create the upload directory if it doesn't exist
+                        String uploadPath = getServletContext().getRealPath("") + File.separator + "assets" +
+                                          File.separator + "images" + File.separator + "patients";
+                        File uploadDir = new File(uploadPath);
+                        if (!uploadDir.exists()) {
+                            uploadDir.mkdirs();
+                        }
+
+                        // Generate a unique file name to prevent overwriting
+                        String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
+                        String filePath = uploadPath + File.separator + uniqueFileName;
+
+                        // Save the file
+                        try (InputStream input = filePart.getInputStream()) {
+                            Files.copy(input, Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
+                            LOGGER.log(Level.INFO, "File saved to: " + filePath);
+
+                            // Update the patient's profile image
+                            String imageUrl = "/assets/images/patients/" + uniqueFileName;
+                            patient.setProfileImage(imageUrl);
+                            LOGGER.log(Level.INFO, "Profile image set to: " + imageUrl);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error handling image upload for new patient: " + e.getMessage(), e);
+                // Continue with the creation even if image handling fails
+            }
 
             boolean patientAdded = patientService.addPatient(patient);
 

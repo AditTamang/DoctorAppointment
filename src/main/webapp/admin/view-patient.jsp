@@ -252,7 +252,7 @@
         .btn-cancel:hover {
             background-color: #eaecf4;
         }
-        
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .profile-header {
@@ -260,25 +260,25 @@
                 align-items: center;
                 text-align: center;
             }
-            
+
             .profile-image {
                 margin-right: 0;
                 margin-bottom: 20px;
             }
-            
+
             .profile-info p {
                 justify-content: center;
             }
-            
+
             .detail-row {
                 flex-direction: column;
             }
-            
+
             .detail-label {
                 width: 100%;
                 margin-bottom: 5px;
             }
-            
+
             .action-buttons {
                 justify-content: center;
             }
@@ -330,7 +330,11 @@
             <div class="patient-profile">
                 <div class="profile-header">
                     <div class="profile-image">
-                        <i class="fas fa-user"></i>
+                        <% if (patient.getProfileImage() != null && !patient.getProfileImage().isEmpty()) { %>
+                            <img src="${pageContext.request.contextPath}${patient.getProfileImage()}" alt="<%= fullName %>">
+                        <% } else { %>
+                            <img src="${pageContext.request.contextPath}/assets/images/patients/default.jpg" alt="<%= fullName %>">
+                        <% } %>
                     </div>
                     <div class="profile-info">
                         <h2><%= fullName %></h2>
@@ -406,17 +410,17 @@
                 });
             }
         });
-        
+
         // Delete confirmation modal
         function confirmDelete(patientId) {
             document.getElementById('deleteModal').style.display = 'block';
             document.getElementById('confirmDeleteBtn').href = '${pageContext.request.contextPath}/admin/delete-patient?id=' + patientId;
         }
-        
+
         function closeModal() {
             document.getElementById('deleteModal').style.display = 'none';
         }
-        
+
         // Close modal when clicking outside
         window.onclick = function(event) {
             var modal = document.getElementById('deleteModal');

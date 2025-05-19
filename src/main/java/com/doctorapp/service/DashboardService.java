@@ -167,6 +167,7 @@ public class DashboardService {
 
         String sql = "SELECT a.id, a.appointment_date, a.status, " +
                      "p.id as patient_id, CONCAT(u_p.first_name, ' ', u_p.last_name) as patient_name, " +
+                     "p.profile_image as patient_image, " +
                      "d.id as doctor_id, CONCAT(u_d.first_name, ' ', u_d.last_name) as doctor_name " +
                      "FROM appointments a " +
                      "JOIN patients p ON a.patient_id = p.id " +
@@ -186,6 +187,7 @@ public class DashboardService {
                 appointment.setStatus(rs.getString("status"));
                 appointment.setPatientId(rs.getInt("patient_id"));
                 appointment.setPatientName(rs.getString("patient_name"));
+                appointment.setPatientImage(rs.getString("patient_image"));
                 appointment.setDoctorId(rs.getInt("doctor_id"));
                 appointment.setDoctorName(rs.getString("doctor_name"));
 

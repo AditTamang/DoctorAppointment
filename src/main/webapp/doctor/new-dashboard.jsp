@@ -82,7 +82,7 @@
                     </div>
 
                     <div class="user-profile">
-                        <img src="${(doctor != null && doctor.profileImage != null) ? doctor.profileImage : pageContext.request.contextPath.concat('/assets/images/default-doctor.png')}" alt="Doctor Profile">
+                        <img src="${pageContext.request.contextPath}${doctor.getProfileImage() != null && !doctor.getProfileImage().isEmpty() ? doctor.getProfileImage() : (doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty() ? doctor.getImageUrl() : '/assets/images/doctors/default-doctor.png')}" alt="Doctor Profile">
                         <div class="user-info">
                             <span class="user-name">Dr. ${(user != null) ? user.firstName : ''} ${(user != null) ? user.lastName : ''}</span>
                             <span class="user-role">${(doctor != null) ? doctor.specialization : 'Specialist'}</span>
@@ -97,7 +97,7 @@
                 <!-- Profile Card -->
                 <div class="card">
                     <div class="profile-card">
-                        <img src="${(doctor != null && doctor.profileImage != null) ? doctor.profileImage : pageContext.request.contextPath.concat('/assets/images/default-doctor.png')}" alt="Doctor Profile" class="profile-image">
+                        <img src="${pageContext.request.contextPath}${doctor.getProfileImage() != null && !doctor.getProfileImage().isEmpty() ? doctor.getProfileImage() : (doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty() ? doctor.getImageUrl() : '/assets/images/doctors/default-doctor.png')}" alt="Doctor Profile" class="profile-image">
 
                         <div class="profile-details">
                             <h1 class="profile-name">Dr. ${(user != null) ? user.firstName : ''} ${(user != null) ? user.lastName : ''}</h1>

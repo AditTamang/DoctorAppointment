@@ -65,7 +65,17 @@
             <!-- Profile Overview -->
             <div class="profile-overview">
                 <div class="doctor-profile">
-                    <img src="${pageContext.request.contextPath}/assets/images/default-doctor.png" alt="Doctor Profile" class="profile-image">
+                    <%
+                    String dashboardImagePath = "";
+                    if (doctor.getProfileImage() != null && !doctor.getProfileImage().isEmpty()) {
+                        dashboardImagePath = request.getContextPath() + doctor.getProfileImage();
+                    } else if (doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty()) {
+                        dashboardImagePath = request.getContextPath() + doctor.getImageUrl();
+                    } else {
+                        dashboardImagePath = request.getContextPath() + "/assets/images/doctors/default-doctor.png";
+                    }
+                    %>
+                    <img src="<%= dashboardImagePath %>" alt="Doctor Profile" class="profile-image">
                     <div class="profile-info">
                         <h2>Dr. ${user.firstName} ${user.lastName}</h2>
                         <p>${doctor.specialization}</p>
@@ -179,7 +189,7 @@
                                 <td><%= appointmentDate %></td>
                                 <td><span class="status <%= statusClass %>"><%= status %></span></td>
                                 <td>
-                                    <img src="${pageContext.request.contextPath}/assets/images/default-doctor.png" alt="Doctor" style="width: 30px; height: 30px; border-radius: 50%;">
+                                    <img src="${pageContext.request.contextPath}/assets/images/doctors/default-doctor.png" alt="Doctor" style="width: 30px; height: 30px; border-radius: 50%;">
                                 </td>
                                 <td>
                                     <div class="table-actions">

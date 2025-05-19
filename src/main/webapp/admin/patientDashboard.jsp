@@ -163,7 +163,7 @@
             background-color: #3756a4;
             transform: translateY(-2px);
         }
-        
+
         /* Modal styles */
         .modal {
             display: none;
@@ -220,7 +220,7 @@
         .btn-cancel:hover {
             background-color: #eaecf4;
         }
-        
+
         /* Responsive styles */
         @media (max-width: 768px) {
             .patient-card {
@@ -276,7 +276,7 @@
 
             <!-- Search and Filter -->
             <form action="${pageContext.request.contextPath}/admin/patients" method="get" class="search-bar">
-                <input type="text" name="search" class="search-input" placeholder="Search patients by name or email..." 
+                <input type="text" name="search" class="search-input" placeholder="Search patients by name or email..."
                        value="<%= request.getParameter("search") != null ? request.getParameter("search") : "" %>">
                 <button type="submit" class="search-btn">
                     <i class="fas fa-search"></i>
@@ -285,11 +285,15 @@
 
             <!-- Patient List -->
             <div class="patient-list">
-                <% if (patients != null && !patients.isEmpty()) { 
+                <% if (patients != null && !patients.isEmpty()) {
                     for (Patient patient : patients) { %>
                 <div class="patient-card">
                     <div class="patient-avatar">
-                        <i class="fas fa-user"></i>
+                        <% if (patient.getProfileImage() != null && !patient.getProfileImage().isEmpty()) { %>
+                            <img src="${pageContext.request.contextPath}${patient.getProfileImage()}" alt="<%= patient.getFirstName() %>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        <% } else { %>
+                            <i class="fas fa-user"></i>
+                        <% } %>
                     </div>
                     <div class="patient-info">
                         <h3 class="patient-name"><%= patient.getFirstName() + " " + patient.getLastName() %></h3>
@@ -359,17 +363,17 @@
                 });
             }
         });
-        
+
         // Delete confirmation modal
         function confirmDelete(patientId) {
             document.getElementById('deleteModal').style.display = 'block';
             document.getElementById('confirmDeleteBtn').href = '${pageContext.request.contextPath}/admin/delete-patient?id=' + patientId;
         }
-        
+
         function closeModal() {
             document.getElementById('deleteModal').style.display = 'none';
         }
-        
+
         // Close modal when clicking outside
         window.onclick = function(event) {
             var modal = document.getElementById('deleteModal');

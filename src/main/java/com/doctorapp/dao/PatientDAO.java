@@ -44,8 +44,8 @@ public class PatientDAO {
         }
 
         // Insert new patient
-        String query = "INSERT INTO patients (user_id, blood_group, allergies, medical_history) " +
-                      "VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO patients (user_id, blood_group, allergies, medical_history, profile_image) " +
+                      "VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -54,6 +54,7 @@ public class PatientDAO {
             pstmt.setString(2, patient.getBloodGroup());
             pstmt.setString(3, patient.getAllergies());
             pstmt.setString(4, patient.getMedicalHistory());
+            pstmt.setString(5, patient.getProfileImage() != null ? patient.getProfileImage() : "/assets/images/patients/default.jpg");
 
             int rowsAffected = pstmt.executeUpdate();
 
@@ -146,7 +147,7 @@ public class PatientDAO {
                           "phone = ?, address = ?, username = ? WHERE id = ?";
 
         // Then update the patient-specific information
-        String patientQuery = "UPDATE patients SET blood_group = ?, allergies = ?, medical_history = ? " +
+        String patientQuery = "UPDATE patients SET blood_group = ?, allergies = ?, medical_history = ?, profile_image = ? " +
                              "WHERE id = ?";
 
         Connection conn = null;
@@ -307,7 +308,19 @@ public class PatientDAO {
                 // Update the patient object with the value that will be saved
                 patient.setMedicalHistory(medicalHistory);
 
-                patientStmt.setInt(4, patient.getId());
+                // Handle profile image
+                String profileImage = patient.getProfileImage();
+                if (profileImage == null || profileImage.isEmpty()) {
+                    profileImage = existingPatient.getProfileImage();
+                    if (profileImage == null || profileImage.isEmpty()) {
+                        profileImage = "/assets/images/patients/default.jpg";
+                    }
+                }
+                patientStmt.setString(4, profileImage);
+                // Update the patient object with the value that will be saved
+                patient.setProfileImage(profileImage);
+
+                patientStmt.setInt(5, patient.getId());
 
                 int rowsAffected = patientStmt.executeUpdate();
                 LOGGER.log(Level.INFO, "Updated patient information: " + rowsAffected + " rows affected");
@@ -324,7 +337,8 @@ public class PatientDAO {
                       "Name=" + patient.getFirstName() + " " + patient.getLastName() + ", " +
                       "BloodGroup=" + patient.getBloodGroup() + ", " +
                       "Allergies=" + patient.getAllergies() + ", " +
-                      "MedicalHistory=" + patient.getMedicalHistory());
+                      "MedicalHistory=" + patient.getMedicalHistory() + ", " +
+                      "ProfileImage=" + patient.getProfileImage());
 
             return true;
 
@@ -374,8 +388,8 @@ public class PatientDAO {
             StringBuilder patientQueryBuilder = new StringBuilder("UPDATE patients SET ");
             List<Object> patientParams = new ArrayList<>();
 
-            // Update blood_group, allergies, and medical_history fields
-            patientQueryBuilder.append("blood_group = ?, allergies = ?, medical_history = ? ");
+            // Update blood_group, allergies, medical_history, and profile_image fields
+            patientQueryBuilder.append("blood_group = ?, allergies = ?, medical_history = ?, profile_image = ? ");
 
             // Preserve existing values if new values are null
             String bloodGroup = patient.getBloodGroup();
@@ -396,6 +410,16 @@ public class PatientDAO {
             }
             patientParams.add(medicalHistory != null ? medicalHistory : "");
 
+            // Handle profile image
+            String profileImage = patient.getProfileImage();
+            if (profileImage == null || profileImage.isEmpty()) {
+                profileImage = existingPatient.getProfileImage();
+                if (profileImage == null || profileImage.isEmpty()) {
+                    profileImage = "/assets/images/patients/default.jpg";
+                }
+            }
+            patientParams.add(profileImage);
+
             // Add WHERE clause
             String patientQuery = patientQueryBuilder + "WHERE id = ?";
             patientParams.add(patient.getId());
@@ -404,6 +428,7 @@ public class PatientDAO {
             LOGGER.log(Level.INFO, "Blood Group: " + bloodGroup);
             LOGGER.log(Level.INFO, "Allergies: " + allergies);
             LOGGER.log(Level.INFO, "Medical History: " + medicalHistory);
+            LOGGER.log(Level.INFO, "Profile Image: " + profileImage);
 
             LOGGER.log(Level.INFO, "Patient update query: " + patientQuery);
 
@@ -420,6 +445,7 @@ public class PatientDAO {
                 patient.setBloodGroup(bloodGroup);
                 patient.setAllergies(allergies);
                 patient.setMedicalHistory(medicalHistory);
+                patient.setProfileImage(profileImage);
             }
 
             // 2. Now update the users table
@@ -543,7 +569,8 @@ public class PatientDAO {
                       "Name=" + patient.getFirstName() + " " + patient.getLastName() + ", " +
                       "BloodGroup=" + patient.getBloodGroup() + ", " +
                       "Allergies=" + patient.getAllergies() + ", " +
-                      "MedicalHistory=" + patient.getMedicalHistory());
+                      "MedicalHistory=" + patient.getMedicalHistory() + ", " +
+                      "ProfileImage=" + patient.getProfileImage());
 
             success = true;
             return true;
@@ -641,6 +668,16 @@ public class PatientDAO {
                     patient.setAddress(rs.getString("address"));
                     patient.setGender(rs.getString("gender"));
 
+                    // Try to get profile image
+                    try {
+                        String profileImage = rs.getString("profile_image");
+                        if (profileImage != null && !profileImage.isEmpty()) {
+                            patient.setProfileImage(profileImage);
+                        }
+                    } catch (Exception e) {
+                        // Ignore if profile_image is not available
+                    }
+
                     // Try to get date_of_birth and calculate age
                     try {
                         String dateOfBirth = rs.getString("date_of_birth");
@@ -698,6 +735,7 @@ public class PatientDAO {
                     try { patient.setBloodGroup(rs.getString("blood_group")); } catch (Exception e) {}
                     try { patient.setAllergies(rs.getString("allergies")); } catch (Exception e) {}
                     try { patient.setMedicalHistory(rs.getString("medical_history")); } catch (Exception e) {}
+                    try { patient.setProfileImage(rs.getString("profile_image")); } catch (Exception e) {}
 
                     // Set status
                     patient.setStatus("Active");
@@ -787,6 +825,16 @@ public class PatientDAO {
                     patient.setMedicalHistory(rs.getString("medical_history"));
                     patient.setEmail(rs.getString("email"));
 
+                    // Get profile image if it exists
+                    try {
+                        String profileImage = rs.getString("profile_image");
+                        if (profileImage != null && !profileImage.isEmpty()) {
+                            patient.setProfileImage(profileImage);
+                        }
+                    } catch (Exception e) {
+                        // Ignore if profile_image is not available
+                    }
+
                     return patient;
                 }
             }
@@ -831,6 +879,7 @@ public class PatientDAO {
                     try { patient.setBloodGroup(rs.getString("blood_group")); } catch (Exception e) {}
                     try { patient.setAllergies(rs.getString("allergies")); } catch (Exception e) {}
                     try { patient.setMedicalHistory(rs.getString("medical_history")); } catch (Exception e) {}
+                    try { patient.setProfileImage(rs.getString("profile_image")); } catch (Exception e) {}
 
                     // Set default values for missing fields
                     if (patient.getFirstName() == null) patient.setFirstName("Patient");
@@ -886,6 +935,16 @@ public class PatientDAO {
                     patient.setAllergies(rs.getString("allergies"));
                     patient.setEmail(rs.getString("email"));
                     patient.setLastVisit(rs.getString("last_visit"));
+
+                    // Try to get profile image
+                    try {
+                        String profileImage = rs.getString("profile_image");
+                        if (profileImage != null && !profileImage.isEmpty()) {
+                            patient.setProfileImage(profileImage);
+                        }
+                    } catch (Exception e) {
+                        // Ignore if profile_image is not available
+                    }
 
                     patients.add(patient);
                 }

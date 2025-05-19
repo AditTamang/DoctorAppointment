@@ -1,6 +1,12 @@
 package com.doctorapp.controller.admin;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -9,11 +15,13 @@ import com.doctorapp.model.User;
 import com.doctorapp.service.PatientService;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
 /**
  * Servlet for handling patient management operations by admin
@@ -24,6 +32,11 @@ import jakarta.servlet.http.HttpSession;
     "/admin/update-patient",
     "/admin/delete-patient"
 })
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024, // 1 MB
+    maxFileSize = 1024 * 1024 * 10,  // 10 MB
+    maxRequestSize = 1024 * 1024 * 50 // 50 MB
+)
 public class AdminPatientManagementServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = Logger.getLogger(AdminPatientManagementServlet.class.getName());
@@ -278,6 +291,66 @@ public class AdminPatientManagementServlet extends HttpServlet {
                 LOGGER.log(Level.INFO, "Updating medicalHistory to '" + medicalHistory + "'");
             }
 
+            // Handle profile image upload
+            try {
+                // Check if the request is multipart
+                boolean isMultipart = request.getContentType() != null && request.getContentType().toLowerCase().startsWith("multipart/");
+                LOGGER.log(Level.INFO, "Is multipart request: " + isMultipart);
+
+                if (isMultipart) {
+                    // Check for new image upload
+                    Part filePart = request.getPart("profileImage");
+                    LOGGER.log(Level.INFO, "File part: " + filePart);
+
+                    if (filePart != null && filePart.getSize() > 0) {
+                        String fileName = getSubmittedFileName(filePart);
+                        LOGGER.log(Level.INFO, "File name: " + fileName);
+
+                        if (fileName != null && !fileName.isEmpty()) {
+                            // Create directory if it doesn't exist
+                            String uploadPath = request.getServletContext().getRealPath("/assets/images/patients/");
+                            LOGGER.log(Level.INFO, "Upload path: " + uploadPath);
+
+                            // Make sure the directory exists
+                            File uploadDir = new File(uploadPath);
+                            if (!uploadDir.exists()) {
+                                boolean created = uploadDir.mkdirs();
+                                LOGGER.log(Level.INFO, "Directory created: " + created);
+                            }
+
+                            // Generate a unique file name to prevent overwriting
+                            String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
+                            String filePath = uploadPath + File.separator + uniqueFileName;
+
+                            // Save the file
+                            try (InputStream input = filePart.getInputStream()) {
+                                Files.copy(input, Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
+                                LOGGER.log(Level.INFO, "File saved to: " + filePath);
+
+                                // Update the patient's profile image
+                                String imageUrl = "/assets/images/patients/" + uniqueFileName;
+                                patient.setProfileImage(imageUrl);
+                                LOGGER.log(Level.INFO, "Profile image set to: " + imageUrl);
+
+                                // Log the full path for debugging
+                                LOGGER.log(Level.INFO, "Full image path: " + filePath);
+                            }
+                        }
+                    }
+                }
+
+                // Check if image should be removed
+                String removeImage = request.getParameter("removeImage");
+                if (removeImage != null && removeImage.equals("true")) {
+                    // Set profile image to default
+                    patient.setProfileImage("/assets/images/patients/default.jpg");
+                    LOGGER.log(Level.INFO, "Image removed and set to default");
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error handling image upload: " + e.getMessage(), e);
+                // Continue with the update even if image handling fails
+            }
+
             LOGGER.log(Level.INFO, "Patient data prepared for update: " +
                       "firstName=" + patient.getFirstName() +
                       ", lastName=" + patient.getLastName() +
@@ -312,6 +385,17 @@ public class AdminPatientManagementServlet extends HttpServlet {
             request.getSession().setAttribute("errorMessage", "An error occurred while updating the patient: " + e.getMessage());
             response.sendRedirect(request.getContextPath() + "/admin/patients");
         }
+    }
+
+    // Helper method to get the submitted file name from a Part
+    private String getSubmittedFileName(Part part) {
+        for (String cd : part.getHeader("content-disposition").split(";")) {
+            if (cd.trim().startsWith("filename")) {
+                String fileName = cd.substring(cd.indexOf('=') + 1).trim().replace("\"", "");
+                return fileName.substring(fileName.lastIndexOf('/') + 1).substring(fileName.lastIndexOf('\\') + 1);
+            }
+        }
+        return null;
     }
 
     private void deletePatient(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

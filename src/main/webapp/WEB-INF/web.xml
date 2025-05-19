@@ -132,10 +132,10 @@
         <servlet-name>DoctorProfileServlet</servlet-name>
         <servlet-class>com.doctorapp.controller.doctor.DoctorProfileServlet</servlet-class>
         <multipart-config>
-            <location>/tmp</location>
+            <!-- Using relative path instead of absolute path -->
+            <file-size-threshold>1048576</file-size-threshold>
             <max-file-size>5242880</max-file-size>
             <max-request-size>10485760</max-request-size>
-            <file-size-threshold>1048576</file-size-threshold>
         </multipart-config>
     </servlet>
     <servlet-mapping>
@@ -143,6 +143,16 @@
         <url-pattern>/doctor/profile</url-pattern>
         <url-pattern>/doctor/profile/update</url-pattern>
         <url-pattern>/doctor/edit-profile</url-pattern>
+    </servlet-mapping>
+
+    <!-- Image Servlet Configuration -->
+    <servlet>
+        <servlet-name>ImageServlet</servlet-name>
+        <servlet-class>com.doctorapp.controller.servlets.ImageServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ImageServlet</servlet-name>
+        <url-pattern>/image/*</url-pattern>
     </servlet-mapping>
 
 </web-app>

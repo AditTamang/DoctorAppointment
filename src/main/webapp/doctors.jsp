@@ -209,7 +209,17 @@
                  <div class="doctor-card">
                      <div class="doctor-status">Available Today</div>
                      <div class="doctor-img">
-                         <img src="${pageContext.request.contextPath}${doctor.imageUrl != null && !doctor.imageUrl.isEmpty() ? (doctor.imageUrl.startsWith('/') ? doctor.imageUrl : '/assets/images/doctors/'.concat(doctor.imageUrl)) : '/assets/images/doctors/d1.png'}" alt="${doctor.name}">
+                         <%
+                         String doctorImagePath = "";
+                         if (doctor.getProfileImage() != null && !doctor.getProfileImage().isEmpty()) {
+                             doctorImagePath = request.getContextPath() + doctor.getProfileImage();
+                         } else if (doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty()) {
+                             doctorImagePath = request.getContextPath() + doctor.getImageUrl();
+                         } else {
+                             doctorImagePath = request.getContextPath() + "/assets/images/doctors/default-doctor.png";
+                         }
+                         %>
+                         <img src="<%= doctorImagePath %>" alt="${doctor.name}">
                          <div class="doctor-rating">
                              <i class="fas fa-star"></i>
                              <span><%= doctor.getRating() > 0 ? String.format("%.1f", doctor.getRating()) : "4.8" %></span>

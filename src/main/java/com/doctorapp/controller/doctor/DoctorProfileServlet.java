@@ -1,10 +1,7 @@
 package com.doctorapp.controller.doctor;
 
-import java.io.IOException;
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.io.IOException;
 
 import com.doctorapp.model.Doctor;
 import com.doctorapp.model.User;
@@ -13,7 +10,6 @@ import com.doctorapp.service.UserService;
 import com.doctorapp.util.ValidationUtil;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,12 +18,8 @@ import jakarta.servlet.http.Part;
 
 /**
  * Servlet for handling doctor profile operations
+ * URL mappings are defined in web.xml
  */
-@WebServlet(urlPatterns = {
-    "/doctor/profile",
-    "/doctor/profile/update",
-    "/doctor/edit-profile"
-})
 @jakarta.servlet.annotation.MultipartConfig(
     fileSizeThreshold = 1024 * 1024,     // 1 MB
     maxFileSize = 1024 * 1024 * 5,       // 5 MB
@@ -258,9 +250,10 @@ public class DoctorProfileServlet extends HttpServlet {
                 // Check if image should be removed
                 String removeImage = request.getParameter("removeImage");
                 if (removeImage != null && removeImage.equals("true")) {
-                    // Set image URL to null or default
-                    doctor.setImageUrl("");
-                    System.out.println("Image removed");
+                    // Set image URL and profile image to default
+                    doctor.setImageUrl("/assets/images/doctors/default-doctor.png");
+                    doctor.setProfileImage("/assets/images/doctors/default-doctor.png");
+                    System.out.println("Image removed and set to default");
                 } else {
                     try {
                         System.out.println("Checking for file upload");
@@ -288,32 +281,57 @@ public class DoctorProfileServlet extends HttpServlet {
 
                             if (fileName != null && !fileName.isEmpty()) {
                                 // Create directory if it doesn't exist
-                                String uploadPath = request.getServletContext().getRealPath("/assets/images/doctors/");
-                                System.out.println("Upload path: " + uploadPath);
+                                // Use a permanent directory outside the webapp for storing images
+                                String webappPath = request.getServletContext().getRealPath("/");
+                                String projectRoot = new File(webappPath).getParentFile().getParentFile().getAbsolutePath();
+                                String uploadPath = projectRoot + File.separator + "doctor-images";
 
-                                // Make sure the assets/images/doctors directory exists
+                                // Also create the webapp directory for development testing
+                                String webappUploadPath = request.getServletContext().getRealPath("/assets/images/doctors/");
+
+                                System.out.println("Permanent upload path: " + uploadPath);
+                                System.out.println("Webapp upload path: " + webappUploadPath);
+
+                                // Make sure the permanent directory exists
                                 File uploadDir = new File(uploadPath);
                                 if (!uploadDir.exists()) {
-                                    boolean created = uploadDir.mkdirs();
-                                    System.out.println("Directory created: " + created);
+                                    try {
+                                        boolean created = uploadDir.mkdirs();
+                                        System.out.println("Permanent directory created: " + created);
+                                    } catch (Exception e) {
+                                        System.err.println("Error creating permanent directory: " + e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                }
 
-                                    if (!created) {
-                                        // Try to create parent directories one by one
-                                        File assetsDir = new File(request.getServletContext().getRealPath("/assets/"));
-                                        if (!assetsDir.exists()) {
-                                            boolean assetsCreated = assetsDir.mkdir();
-                                            System.out.println("Assets directory created: " + assetsCreated);
+                                // Make sure the webapp directory exists too
+                                File webappUploadDir = new File(webappUploadPath);
+                                if (!webappUploadDir.exists()) {
+                                    try {
+                                        boolean created = webappUploadDir.mkdirs();
+                                        System.out.println("Webapp directory created: " + created);
+
+                                        if (!created) {
+                                            // Try to create parent directories one by one
+                                            File assetsDir = new File(request.getServletContext().getRealPath("/assets/"));
+                                            if (!assetsDir.exists()) {
+                                                boolean assetsCreated = assetsDir.mkdir();
+                                                System.out.println("Assets directory created: " + assetsCreated);
+                                            }
+
+                                            File imagesDir = new File(request.getServletContext().getRealPath("/assets/images/"));
+                                            if (!imagesDir.exists()) {
+                                                boolean imagesCreated = imagesDir.mkdir();
+                                                System.out.println("Images directory created: " + imagesCreated);
+                                            }
+
+                                            // Try again to create the doctors directory
+                                            boolean doctorsCreated = webappUploadDir.mkdir();
+                                            System.out.println("Doctors directory created (second attempt): " + doctorsCreated);
                                         }
-
-                                        File imagesDir = new File(request.getServletContext().getRealPath("/assets/images/"));
-                                        if (!imagesDir.exists()) {
-                                            boolean imagesCreated = imagesDir.mkdir();
-                                            System.out.println("Images directory created: " + imagesCreated);
-                                        }
-
-                                        // Try again to create the doctors directory
-                                        boolean doctorsCreated = uploadDir.mkdir();
-                                        System.out.println("Doctors directory created (second attempt): " + doctorsCreated);
+                                    } catch (Exception e) {
+                                        System.err.println("Error creating webapp directories: " + e.getMessage());
+                                        e.printStackTrace();
                                     }
                                 }
 
@@ -327,40 +345,100 @@ public class DoctorProfileServlet extends HttpServlet {
 
                                 // Generate unique filename to avoid overwriting
                                 String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
-                                String filePath = uploadPath + File.separator + uniqueFileName;
-                                System.out.println("File will be saved to: " + filePath);
+                                String permanentFilePath = uploadPath + File.separator + uniqueFileName;
+                                String webappFilePath = webappUploadPath + File.separator + uniqueFileName;
 
-                                // Save the file
-                                try {
-                                    filePart.write(filePath);
-                                    System.out.println("File written successfully to: " + filePath);
+                                System.out.println("File will be saved to permanent path: " + permanentFilePath);
+                                System.out.println("File will be saved to webapp path: " + webappFilePath);
+
+                                boolean savedSuccessfully = false;
+
+                                // Save to permanent directory first
+                                try (java.io.InputStream inputStream = filePart.getInputStream();
+                                     java.io.FileOutputStream outputStream = new java.io.FileOutputStream(permanentFilePath)) {
+
+                                    byte[] buffer = new byte[8192];
+                                    int bytesRead;
+                                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                        outputStream.write(buffer, 0, bytesRead);
+                                    }
+                                    System.out.println("File saved successfully to permanent path: " + permanentFilePath);
+                                    savedSuccessfully = true;
                                 } catch (Exception e) {
-                                    System.err.println("Error writing file: " + e.getMessage());
+                                    System.err.println("Error saving file to permanent path: " + e.getMessage());
                                     e.printStackTrace();
+                                }
 
-                                    // Try alternative method to save the file
+                                // If permanent save failed, try alternative approach
+                                if (!savedSuccessfully) {
                                     try {
-                                        java.io.InputStream inputStream = filePart.getInputStream();
-                                        java.io.FileOutputStream outputStream = new java.io.FileOutputStream(filePath);
-                                        byte[] buffer = new byte[8192];
-                                        int bytesRead;
-                                        while ((bytesRead = inputStream.read(buffer)) != -1) {
-                                            outputStream.write(buffer, 0, bytesRead);
+                                        // Create a temporary file in the system's default temp directory
+                                        File tempFile = File.createTempFile("upload_", "_" + fileName);
+                                        filePart.write(tempFile.getAbsolutePath());
+
+                                        // Now copy from temp file to permanent destination
+                                        try (java.io.FileInputStream fis = new java.io.FileInputStream(tempFile);
+                                             java.io.FileOutputStream fos = new java.io.FileOutputStream(permanentFilePath)) {
+                                            byte[] buffer = new byte[8192];
+                                            int bytesRead;
+                                            while ((bytesRead = fis.read(buffer)) != -1) {
+                                                fos.write(buffer, 0, bytesRead);
+                                            }
+                                            savedSuccessfully = true;
+                                            System.out.println("File saved using alternative method to permanent path: " + permanentFilePath);
                                         }
-                                        outputStream.close();
-                                        inputStream.close();
-                                        System.out.println("File saved using alternative method to: " + filePath);
+
+                                        // Delete the temp file
+                                        tempFile.delete();
                                     } catch (Exception ex) {
-                                        System.err.println("Alternative file saving method failed: " + ex.getMessage());
+                                        System.err.println("Alternative file saving method failed for permanent path: " + ex.getMessage());
                                         ex.printStackTrace();
                                     }
                                 }
 
-                                // Update the doctor's image URL
+                                // Now save to webapp directory
+                                try (java.io.InputStream inputStream = filePart.getInputStream();
+                                     java.io.FileOutputStream outputStream = new java.io.FileOutputStream(webappFilePath)) {
+
+                                    byte[] buffer = new byte[8192];
+                                    int bytesRead;
+                                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                        outputStream.write(buffer, 0, bytesRead);
+                                    }
+                                    System.out.println("File saved successfully to webapp path: " + webappFilePath);
+                                } catch (Exception e) {
+                                    System.err.println("Error saving file to webapp path: " + e.getMessage());
+                                    e.printStackTrace();
+
+                                    // If we saved to permanent path but failed to save to webapp path,
+                                    // try to copy from permanent path to webapp path
+                                    if (savedSuccessfully) {
+                                        try {
+                                            try (java.io.FileInputStream fis = new java.io.FileInputStream(permanentFilePath);
+                                                 java.io.FileOutputStream fos = new java.io.FileOutputStream(webappFilePath)) {
+                                                byte[] buffer = new byte[8192];
+                                                int bytesRead;
+                                                while ((bytesRead = fis.read(buffer)) != -1) {
+                                                    fos.write(buffer, 0, bytesRead);
+                                                }
+                                                System.out.println("File copied from permanent path to webapp path: " + webappFilePath);
+                                            }
+                                        } catch (Exception ex) {
+                                            System.err.println("Error copying file from permanent path to webapp path: " + ex.getMessage());
+                                            ex.printStackTrace();
+                                        }
+                                    }
+                                }
+
+                                // Update the doctor's image URL and profile image
+                                // Use a web-accessible path that starts with /assets/
                                 String imageUrl = "/assets/images/doctors/" + uniqueFileName;
                                 doctor.setImageUrl(imageUrl);
-                                System.out.println("Image uploaded to: " + filePath);
+                                doctor.setProfileImage(imageUrl);
+                                System.out.println("Image uploaded to permanent path: " + permanentFilePath);
+                                System.out.println("Image uploaded to webapp path: " + webappFilePath);
                                 System.out.println("Image URL set to: " + imageUrl);
+                                System.out.println("Profile Image set to: " + imageUrl);
                             }
                             }
                         }

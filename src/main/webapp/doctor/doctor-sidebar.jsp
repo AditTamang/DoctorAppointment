@@ -1,12 +1,22 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="com.doctorapp.model.User" %>
 <%@ page import="com.doctorapp.model.Doctor" %>
+<%@ page import="com.doctorapp.service.DoctorService" %>
+<!-- Include the doctor sidebar CSS -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/doctor-sidebar.css">
 <%
     // Get current user from session
     User user = (User) session.getAttribute("user");
     if (user == null) {
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
+    }
+
+    // Get doctor information for profile image
+    Doctor doctor = null;
+    if ("DOCTOR".equals(user.getRole())) {
+        DoctorService doctorService = new DoctorService();
+        doctor = doctorService.getDoctorByUserId(user.getId());
     }
 
     // Get current page path to highlight active menu item
@@ -31,10 +41,26 @@
 
     <div class="user-profile">
         <div class="profile-image">
-            <% if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) { %>
+            <%
+            String imagePath = "";
+            if (doctor != null && doctor.getProfileImage() != null && !doctor.getProfileImage().isEmpty()) {
+                imagePath = request.getContextPath() + doctor.getProfileImage();
+            } else if (doctor != null && doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty()) {
+                imagePath = request.getContextPath() + doctor.getImageUrl();
+            } else if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) {
+            %>
                 <div class="profile-initials">AT</div>
-            <% } else { %>
-                <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
+            <% } else {
+                imagePath = request.getContextPath() + "/assets/images/doctors/default-doctor.png";
+            %>
+                <img src="<%= imagePath %>" alt="Doctor" onerror="this.src='${pageContext.request.contextPath}/assets/images/doctors/default-doctor.png'">
+            <%
+            }
+
+            // Only show image if we have a path and not showing initials
+            if (!imagePath.isEmpty() && !user.getFirstName().equals("Adit") && !user.getLastName().equals("Tamang")) {
+            %>
+                <img src="<%= imagePath %>" alt="Doctor" onerror="this.src='${pageContext.request.contextPath}/assets/images/doctors/default-doctor.png'">
             <% } %>
         </div>
         <h3 class="user-name"><%= user.getFirstName() + " " + user.getLastName() %></h3>

@@ -282,7 +282,9 @@
             <div class="profile-container">
                 <div class="profile-header">
                     <div class="profile-image">
-                        <% if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) { %>
+                        <% if (patient != null && patient.getProfileImage() != null && !patient.getProfileImage().isEmpty()) { %>
+                            <img src="${pageContext.request.contextPath}${patient.getProfileImage()}" alt="Patient">
+                        <% } else if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) { %>
                             <div class="profile-initials">AT</div>
                         <% } else { %>
                             <img src="${pageContext.request.contextPath}/assets/images/patients/default.jpg" alt="Patient">
@@ -309,7 +311,25 @@
                 </c:if>
 
                 <!-- Profile Form -->
-                <form action="${pageContext.request.contextPath}/patient/profile/update" method="post">
+                <form action="${pageContext.request.contextPath}/patient/profile/update" method="post" enctype="multipart/form-data">
+                    <!-- Profile Image Upload -->
+                    <div style="margin-bottom: 20px; text-align: center;">
+                        <h3 style="margin-bottom: 15px;"><i class="fas fa-camera"></i> Update Profile Picture</h3>
+                        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                            <div>
+                                <input type="file" id="profileImage" name="profileImage" accept="image/*" style="display: none;">
+                                <button type="button" class="edit-profile-btn" style="background-color: #4e73df;" onclick="document.getElementById('profileImage').click();">
+                                    <i class="fas fa-upload"></i> Upload New Image
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" class="edit-profile-btn" style="background-color: #e74a3b;" onclick="removeProfileImage()">
+                                    <i class="fas fa-trash"></i> Remove Image
+                                </button>
+                                <input type="hidden" id="removeImage" name="removeImage" value="false">
+                            </div>
+                        </div>
+                    </div>
                     <div class="profile-details">
                         <div class="detail-card">
                             <h3><i class="fas fa-user"></i> Personal Information</h3>
@@ -412,5 +432,43 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Image preview functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileImage = document.getElementById('profileImage');
+            if (profileImage) {
+                profileImage.addEventListener('change', function() {
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            // Update all profile images on the page
+                            const images = document.querySelectorAll('.profile-image img');
+                            images.forEach(img => {
+                                img.src = e.target.result;
+                            });
+
+                            // Reset remove flag
+                            document.getElementById('removeImage').value = "false";
+                        };
+                        reader.readAsDataURL(this.files[0]);
+                    }
+                });
+            }
+        });
+
+        // Function to remove profile image
+        function removeProfileImage() {
+            // Update all profile images on the page to default
+            const images = document.querySelectorAll('.profile-image img');
+            images.forEach(img => {
+                img.src = '${pageContext.request.contextPath}/assets/images/patients/default.jpg';
+            });
+
+            // Clear file input and set remove flag
+            document.getElementById('profileImage').value = '';
+            document.getElementById('removeImage').value = "true";
+        }
+    </script>
 </body>
 </html>

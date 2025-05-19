@@ -321,7 +321,7 @@ public class DoctorDAO {
              // First update the doctors table
              String doctorQuery = "UPDATE doctors SET name = ?, specialization = ?, qualification = ?, experience = ?, " +
                                 "email = ?, phone = ?, address = ?, consultation_fee = ?, available_days = ?, " +
-                                "available_time = ?, image_url = ?, status = ?, bio = ? WHERE id = ?";
+                                "available_time = ?, image_url = ?, profile_image = ?, status = ?, bio = ? WHERE id = ?";
 
              try (PreparedStatement pstmt = conn.prepareStatement(doctorQuery)) {
                  pstmt.setString(1, doctor.getName());
@@ -352,9 +352,10 @@ public class DoctorDAO {
                  }
                  pstmt.setString(10, availableTime);
                  pstmt.setString(11, doctor.getImageUrl());
-                 pstmt.setString(12, doctor.getStatus() != null ? doctor.getStatus() : "ACTIVE");
-                 pstmt.setString(13, doctor.getBio() != null ? doctor.getBio() : "");
-                 pstmt.setInt(14, doctor.getId());
+                 pstmt.setString(12, doctor.getProfileImage());
+                 pstmt.setString(13, doctor.getStatus() != null ? doctor.getStatus() : "ACTIVE");
+                 pstmt.setString(14, doctor.getBio() != null ? doctor.getBio() : "");
+                 pstmt.setInt(15, doctor.getId());
 
                  System.out.println("Doctor email: " + doctor.getEmail());
                  System.out.println("Doctor bio: " + doctor.getBio());
@@ -529,7 +530,7 @@ public class DoctorDAO {
      private boolean tryFallbackUpdate(Doctor doctor) {
          // First try a simpler update as a fallback
          String fallbackQuery = "UPDATE doctors SET specialization = ?, qualification = ?, experience = ?, " +
-                       "consultation_fee = ?, available_days = ?, available_time = ?, bio = ? WHERE id = ?";
+                       "consultation_fee = ?, available_days = ?, available_time = ?, bio = ?, image_url = ?, profile_image = ? WHERE id = ?";
 
          try (Connection conn = DBConnection.getConnection();
               PreparedStatement pstmt = conn.prepareStatement(fallbackQuery)) {
@@ -558,7 +559,9 @@ public class DoctorDAO {
              }
              pstmt.setString(6, availableTime);
              pstmt.setString(7, doctor.getBio() != null ? doctor.getBio() : "");
-             pstmt.setInt(8, doctor.getId());
+             pstmt.setString(8, doctor.getImageUrl() != null ? doctor.getImageUrl() : "");
+             pstmt.setString(9, doctor.getProfileImage() != null ? doctor.getProfileImage() : "");
+             pstmt.setInt(10, doctor.getId());
 
              System.out.println("Fallback: Doctor email: " + doctor.getEmail());
              System.out.println("Fallback: Doctor bio: " + doctor.getBio());
@@ -650,6 +653,16 @@ public class DoctorDAO {
             // Try to update the name if available
             if (doctor.getName() != null && !doctor.getName().isEmpty()) {
                 success |= updateSingleField(conn, "name", doctor.getName(), doctor.getId());
+            }
+
+            // Try to update the image_url if available
+            if (doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty()) {
+                success |= updateSingleField(conn, "image_url", doctor.getImageUrl(), doctor.getId());
+            }
+
+            // Try to update the profile_image if available
+            if (doctor.getProfileImage() != null && !doctor.getProfileImage().isEmpty()) {
+                success |= updateSingleField(conn, "profile_image", doctor.getProfileImage(), doctor.getId());
             }
 
             System.out.println("Individual field updates result: " + success);

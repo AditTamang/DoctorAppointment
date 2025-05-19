@@ -341,8 +341,11 @@ public class DoctorAvailabilityDAO {
                 currentStatus = "ACTIVE"; // Default status
             }
 
+            System.out.println("Current doctor status: " + currentStatus);
+
             // Toggle the status
             String newStatus = "ACTIVE".equals(currentStatus) ? "INACTIVE" : "ACTIVE";
+            System.out.println("New doctor status will be: " + newStatus);
 
             // Update the status
             String updateQuery = "UPDATE doctors SET status = ? WHERE id = ?";
@@ -351,8 +354,37 @@ public class DoctorAvailabilityDAO {
                 updateStmt.setInt(2, doctorId);
 
                 int rowsAffected = updateStmt.executeUpdate();
+                System.out.println("Status update affected " + rowsAffected + " rows");
+
                 if (rowsAffected > 0) {
+                    // Also update the doctor in DoctorDAO to ensure consistency
+                    try {
+                        DoctorDAO doctorDAO = new DoctorDAO();
+                        var doctor = doctorDAO.getDoctorById(doctorId);
+                        if (doctor != null) {
+                            doctor.setStatus(newStatus);
+                            boolean updated = doctorDAO.updateDoctor(doctor);
+                            System.out.println("Updated doctor status in DoctorDAO: " + updated);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error updating doctor status in DoctorDAO: " + e.getMessage());
+                        // Don't fail the operation if this fails
+                    }
+
                     return newStatus;
+                }
+            }
+
+            // If the standard update fails, try a direct SQL approach
+            if (currentStatus != null) {
+                try (Statement stmt = conn.createStatement()) {
+                    String directSql = "UPDATE doctors SET status = '" + newStatus + "' WHERE id = " + doctorId;
+                    int directRowsAffected = stmt.executeUpdate(directSql);
+                    System.out.println("Direct SQL status update affected " + directRowsAffected + " rows");
+
+                    if (directRowsAffected > 0) {
+                        return newStatus;
+                    }
                 }
             }
 

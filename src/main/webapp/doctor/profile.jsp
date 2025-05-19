@@ -38,27 +38,32 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             margin-bottom: 20px;
-            max-width: 1200px;
+            width: 100%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* Profile Header */
         .profile-header {
-            background-color: #4361ee;
+            background: linear-gradient(135deg, #4361ee, #3a56d4);
             color: white;
-            padding: 20px;
+            padding: 30px;
             display: flex;
             align-items: center;
+            border-radius: 8px 8px 0 0;
         }
 
         .profile-avatar {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            border: 3px solid white;
+            border: 4px solid rgba(255, 255, 255, 0.8);
             overflow: hidden;
-            margin-right: 20px;
+            margin-right: 25px;
             background-color: #fff;
             flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .profile-avatar img {
@@ -72,41 +77,50 @@
         }
 
         .profile-info h2 {
-            margin: 0 0 5px 0;
-            font-size: 22px;
-            font-weight: 600;
+            margin: 0 0 10px 0;
+            font-size: 26px;
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         .profile-info p {
-            margin: 0 0 8px 0;
-            font-size: 14px;
+            margin: 0 0 10px 0;
+            font-size: 15px;
             display: flex;
             align-items: center;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
         }
 
         .profile-info i {
-            margin-right: 8px;
-            width: 16px;
+            margin-right: 10px;
+            width: 18px;
+            font-size: 16px;
         }
 
         /* Profile Body */
         .profile-body {
-            padding: 20px;
+            padding: 25px;
         }
 
         .profile-section {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             background-color: #f8f9fa;
-            border-radius: 6px;
-            padding: 15px;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .profile-section:hover {
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
         }
 
         .profile-section h3 {
             color: #4361ee;
             border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 8px;
-            margin-bottom: 15px;
-            font-size: 16px;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 18px;
             font-weight: 600;
         }
 
@@ -114,53 +128,69 @@
         .profile-details {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            gap: 20px;
         }
 
         .detail-item {
-            margin-bottom: 12px;
+            margin-bottom: 15px;
+            background-color: white;
+            padding: 12px 15px;
+            border-radius: 6px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .detail-item:hover {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
         }
 
         .detail-item label {
             display: block;
             color: #666;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
             font-size: 13px;
             font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .detail-item p {
             color: #333;
             font-weight: 500;
             margin: 0;
-            font-size: 14px;
+            font-size: 15px;
         }
 
         /* Profile Actions */
         .profile-actions {
             display: flex;
-            justify-content: flex-end;
-            margin-top: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 15px;
         }
 
         .btn-edit {
             background-color: #4361ee;
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            padding: 10px 20px;
+            border-radius: 6px;
             cursor: pointer;
-            font-weight: 500;
-            font-size: 14px;
+            font-weight: 600;
+            font-size: 15px;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            transition: all 0.2s ease;
+            gap: 8px;
+            transition: all 0.3s ease;
             text-decoration: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .btn-edit:hover {
             background-color: #3a56d4;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
         /* Availability Section */
@@ -171,27 +201,41 @@
         .availability-days {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 10px;
+            gap: 10px;
+            margin-top: 15px;
         }
 
         .day-badge {
             background-color: #e1e8ff;
             color: #4361ee;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 13px;
-            font-weight: 500;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .day-badge:hover {
+            background-color: #4361ee;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
         }
 
         /* Biography Section */
         .bio-section {
-            line-height: 1.5;
+            line-height: 1.7;
             color: #444;
         }
 
         .bio-section p {
-            font-size: 14px;
+            font-size: 15px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            text-align: justify;
         }
 
         /* Dashboard Layout */
@@ -203,7 +247,15 @@
 
         .dashboard-main {
             flex: 1;
-            padding: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .dashboard-content {
+            width: 100%;
+            max-width: 900px;
         }
 
         .dashboard-nav {
@@ -215,6 +267,10 @@
             border-radius: 6px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             margin-bottom: 15px;
+            width: 100%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* Sidebar Improvements */
@@ -327,18 +383,23 @@
         }
 
         .page-header {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
         }
 
         .page-header h1 {
-            font-size: 20px;
+            font-size: 24px;
             color: #333;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
 
         .page-header p {
             color: #666;
-            font-size: 14px;
+            font-size: 16px;
         }
 
         /* Responsive Styles */
@@ -411,17 +472,31 @@
                 margin-left: auto;
             }
 
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+                padding: 15px;
+            }
+
+            .dashboard-content,
+            .dashboard-nav,
+            .profile-container,
+            .page-header,
+            .dashboard-footer {
+                max-width: 100%;
+            }
+
             .profile-header {
                 flex-direction: column;
                 text-align: center;
-                padding: 15px;
+                padding: 20px;
             }
 
             .profile-avatar {
                 margin-right: 0;
                 margin-bottom: 15px;
-                width: 80px;
-                height: 80px;
+                width: 100px;
+                height: 100px;
             }
 
             .profile-details {
@@ -429,7 +504,7 @@
             }
 
             .profile-section {
-                padding: 12px;
+                padding: 15px;
             }
 
             .profile-body {
@@ -441,15 +516,25 @@
             }
 
             .dashboard-nav {
-                padding: 8px 10px;
+                padding: 10px;
             }
 
             .page-header h1 {
-                font-size: 18px;
+                font-size: 20px;
             }
 
             .page-header p {
-                font-size: 13px;
+                font-size: 14px;
+            }
+
+            .profile-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn-edit {
+                width: 100%;
+                justify-content: center;
             }
         }
 
@@ -516,7 +601,8 @@
                 </div>
 
                 <% if (session.getAttribute("successMessage") != null) { %>
-                <div class="alert alert-success" style="padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; color: #155724; background-color: #d4edda; border-color: #c3e6cb;">
+                <div class="alert alert-success" style="padding: 15px; margin-bottom: 25px; border: 1px solid transparent; border-radius: 8px; color: #155724; background-color: #d4edda; border-color: #c3e6cb; box-shadow: 0 2px 5px rgba(0,0,0,0.05); width: 100%; max-width: 900px; text-align: center; font-weight: 500;">
+                    <i class="fas fa-check-circle" style="margin-right: 10px;"></i>
                     <%= session.getAttribute("successMessage") %>
                     <% session.removeAttribute("successMessage"); %>
                 </div>
@@ -525,13 +611,31 @@
                 <div class="profile-container">
                     <div class="profile-header">
                         <div class="profile-avatar">
-                            <img src="${pageContext.request.contextPath}${doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty() ? doctor.getImageUrl() : '/assets/images/doctors/default.jpg'}" alt="Doctor Profile">
+                            <%
+                            String imagePath = "";
+                            if (doctor.getProfileImage() != null && !doctor.getProfileImage().isEmpty()) {
+                                imagePath = request.getContextPath() + doctor.getProfileImage();
+                            } else if (doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty()) {
+                                imagePath = request.getContextPath() + doctor.getImageUrl();
+                            } else if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) {
+                            %>
+                                <div class="profile-initials">AT</div>
+                            <% } else {
+                                imagePath = request.getContextPath() + "/assets/images/doctors/default-doctor.png";
+                            }
+
+                            // Only show image if we have a path and not showing initials
+                            if (!imagePath.isEmpty() && !user.getFirstName().equals("Adit") && !user.getLastName().equals("Tamang")) {
+                            %>
+                                <img src="<%= imagePath %>" alt="Doctor Profile">
+                            <% } %>
                         </div>
                         <div class="profile-info">
                             <h2>Dr. <%= doctor.getName() %></h2>
                             <p><i class="fas fa-stethoscope"></i> <%= doctor.getSpecialization() %></p>
                             <p><i class="fas fa-envelope"></i> <%= doctor.getEmail() %></p>
                             <p><i class="fas fa-phone"></i> <%= doctor.getPhone() %></p>
+                            <p><i class="fas fa-circle" style="color: <%= doctor.getStatus() != null && doctor.getStatus().equals("ACTIVE") ? "#4CAF50" : "#f44336" %>;"></i> Status: <%= doctor.getStatus() != null ? doctor.getStatus() : "ACTIVE" %></p>
                         </div>
                     </div>
 
@@ -621,6 +725,9 @@
                             <a href="${pageContext.request.contextPath}/doctor/edit-profile" class="btn-edit">
                                 <i class="fas fa-edit"></i> Edit Profile
                             </a>
+                            <button id="toggle-status-btn" class="btn-edit" style="margin-left: 10px; background-color: ${doctor.status == 'ACTIVE' ? '#f44336' : '#4CAF50'};">
+                                <i class="fas ${doctor.status == 'ACTIVE' ? 'fa-toggle-off' : 'fa-toggle-on'}"></i> Set Active ${doctor.status == 'ACTIVE' ? 'Off' : 'On'}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -631,14 +738,82 @@
                 <p>&copy; 2023 HealthCare. All Rights Reserved.</p>
                 <p>Version 1.0.0</p>
             </div>
+
+            <style>
+                .dashboard-footer {
+                    margin-top: 40px;
+                    text-align: center;
+                    color: #777;
+                    font-size: 14px;
+                    width: 100%;
+                    max-width: 900px;
+                    padding: 20px 0;
+                    border-top: 1px solid #eee;
+                }
+            </style>
         </div>
     </div>
 
     <script>
+        // Set context path for JavaScript
+        const contextPath = '${pageContext.request.contextPath}';
+
         // Toggle sidebar on mobile
         document.getElementById('menuToggle').addEventListener('click', function() {
             document.querySelector('.sidebar').classList.toggle('active');
         });
+
+        // Toggle status button functionality
+        const toggleStatusBtn = document.getElementById('toggle-status-btn');
+        if (toggleStatusBtn) {
+            toggleStatusBtn.addEventListener('click', function() {
+                // Confirm before changing status
+                const currentStatus = '${doctor.status}';
+                const newStatus = currentStatus == 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+                const confirmMessage = currentStatus == 'ACTIVE'
+                    ? 'Are you sure you want to set your status to inactive? You will not receive new appointments.'
+                    : 'Are you sure you want to set your status to active? You will start receiving new appointments.';
+
+                if (confirm(confirmMessage)) {
+                    // Send request to toggle status
+                    fetch(contextPath + '/doctor/toggle-status', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update button text and style
+                            toggleStatusBtn.textContent = 'Set Active ' + (data.status == 'ACTIVE' ? 'Off' : 'On');
+                            toggleStatusBtn.style.backgroundColor = data.status == 'ACTIVE' ? '#f44336' : '#4CAF50';
+
+                            // Update icon
+                            const icon = document.createElement('i');
+                            icon.className = 'fas ' + (data.status == 'ACTIVE' ? 'fa-toggle-off' : 'fa-toggle-on');
+                            toggleStatusBtn.innerHTML = '';
+                            toggleStatusBtn.appendChild(icon);
+                            toggleStatusBtn.appendChild(document.createTextNode(' Set Active ' + (data.status == 'ACTIVE' ? 'Off' : 'On')));
+
+                            // Show success message
+                            alert(data.message || 'Status updated successfully!');
+
+                            // Reload the page to reflect changes
+                            window.location.reload();
+                        } else {
+                            // Show error message
+                            alert(data.message || 'Failed to update status. Please try again.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while updating status. Please try again.');
+                    });
+                }
+            });
+        }
     </script>
 </body>
 </html>
