@@ -67,11 +67,11 @@ public class PatientAppointmentsServlet extends HttpServlet {
                 }
             }
 
-            // Get appointments - use upcomingAppointments method
-            request.setAttribute("appointments", appointmentDAO.getUpcomingAppointments(10));
+            // Get appointments for the patient
+            request.setAttribute("appointments", appointmentDAO.getAppointmentsByPatientId(patientId));
 
-            // Redirect back to the dashboard with appointments tab active
-            response.sendRedirect(request.getContextPath() + "/patient/dashboard?tab=appointments");
+            // Forward to the appointments page
+            request.getRequestDispatcher("/patient/appointments.jsp").forward(request, response);
         } catch (Exception e) {
             System.err.println("Error loading patient appointments: " + e.getMessage());
             e.printStackTrace();

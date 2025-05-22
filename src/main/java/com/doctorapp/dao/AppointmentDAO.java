@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -319,6 +320,92 @@ public class AppointmentDAO {
              LOGGER.log(Level.SEVERE, "Error updating appointment prescription for ID: " + id, e);
              return false;
          }
+     }
+
+     // Update appointment
+     public boolean updateAppointment(Appointment appointment) {
+         // Print debug information
+         LOGGER.log(Level.INFO, "Updating appointment with ID: " + appointment.getId());
+         LOGGER.log(Level.INFO, "New date: " + appointment.getAppointmentDate());
+         LOGGER.log(Level.INFO, "New time: " + appointment.getAppointmentTime());
+         LOGGER.log(Level.INFO, "Reason: " + appointment.getReason());
+         LOGGER.log(Level.INFO, "Rescheduling reason: " + appointment.getReschedulingReason());
+
+         // First try with the standard query
+         String query = "UPDATE appointments SET appointment_date = ?, appointment_time = ?, " +
+                       "reason = ?, notes = ? WHERE id = ?";
+
+         Connection conn = null;
+         PreparedStatement pstmt = null;
+         boolean success = false;
+
+         try {
+             conn = DBConnection.getConnection();
+             pstmt = conn.prepareStatement(query);
+
+             pstmt.setDate(1, new java.sql.Date(appointment.getAppointmentDate().getTime()));
+             pstmt.setString(2, appointment.getAppointmentTime());
+
+             // Use reschedulingReason if available, otherwise fall back to reason
+             String reasonToStore = null;
+             if (appointment.getReschedulingReason() != null && !appointment.getReschedulingReason().trim().isEmpty()) {
+                 reasonToStore = appointment.getReschedulingReason().trim();
+             } else if (appointment.getReason() != null) {
+                 reasonToStore = appointment.getReason();
+             } else {
+                 reasonToStore = "Appointment rescheduled";
+             }
+
+             pstmt.setString(3, reasonToStore);
+             pstmt.setString(4, appointment.getNotes());
+             pstmt.setInt(5, appointment.getId());
+
+             int rowsAffected = pstmt.executeUpdate();
+             LOGGER.log(Level.INFO, "Updated appointment ID: " + appointment.getId() +
+                       " with date: " + appointment.getAppointmentDate() +
+                       ", time: " + appointment.getAppointmentTime() +
+                       ", reason: " + reasonToStore);
+             success = rowsAffected > 0;
+
+         } catch (SQLException | ClassNotFoundException e) {
+             LOGGER.log(Level.SEVERE, "Error updating appointment with ID: " + appointment.getId(), e);
+
+             // Try a direct SQL approach as a fallback
+             try {
+                 if (conn != null) {
+                     Statement stmt = conn.createStatement();
+                     java.sql.Date sqlDate = new java.sql.Date(appointment.getAppointmentDate().getTime());
+                     String reason = appointment.getReschedulingReason() != null ?
+                                    appointment.getReschedulingReason().replace("'", "''") :
+                                    "Appointment rescheduled";
+
+                     String directSql = "UPDATE appointments SET " +
+                                       "appointment_date = '" + sqlDate + "', " +
+                                       "appointment_time = '" + appointment.getAppointmentTime().replace("'", "''") + "', " +
+                                       "reason = '" + reason + "' " +
+                                       "WHERE id = " + appointment.getId();
+
+                     LOGGER.log(Level.INFO, "Trying direct SQL: " + directSql);
+                     int directRowsAffected = stmt.executeUpdate(directSql);
+                     LOGGER.log(Level.INFO, "Direct SQL update affected " + directRowsAffected + " rows");
+                     success = directRowsAffected > 0;
+                     stmt.close();
+                 }
+             } catch (SQLException ex) {
+                 LOGGER.log(Level.SEVERE, "Error with direct SQL update: " + ex.getMessage(), ex);
+                 return false;
+             }
+         } finally {
+             // Close resources
+             try {
+                 if (pstmt != null) pstmt.close();
+                 if (conn != null) conn.close();
+             } catch (SQLException e) {
+                 LOGGER.log(Level.WARNING, "Error closing database resources", e);
+             }
+         }
+
+         return success;
      }
 
      // Delete appointment

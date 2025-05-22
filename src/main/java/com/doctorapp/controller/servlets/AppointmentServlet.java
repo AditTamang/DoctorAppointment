@@ -55,11 +55,35 @@ public class AppointmentServlet extends HttpServlet {
             case "/appointment/details":
                 showAppointmentDetails(request, response);
                 break;
+            case "/appointment/cancel":
+                // For GET requests, redirect to POST
+                if (request.getParameter("id") != null) {
+                    // Forward to the same URL but as a POST request
+                    request.getRequestDispatcher("/appointment/cancel").forward(request, response);
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/appointments");
+                }
+                break;
             case "/doctor/appointments":
                 listDoctorAppointments(request, response);
                 break;
             default:
-                response.sendRedirect(request.getContextPath() + "/index.jsp");
+                // Get the user role to determine where to redirect
+                HttpSession session = request.getSession(false);
+                if (session != null && session.getAttribute("user") != null) {
+                    User user = (User) session.getAttribute("user");
+                    if ("ADMIN".equals(user.getRole())) {
+                        response.sendRedirect(request.getContextPath() + "/appointments");
+                    } else if ("DOCTOR".equals(user.getRole())) {
+                        response.sendRedirect(request.getContextPath() + "/doctor/appointments");
+                    } else if ("PATIENT".equals(user.getRole())) {
+                        response.sendRedirect(request.getContextPath() + "/patient/dashboard");
+                    } else {
+                        response.sendRedirect(request.getContextPath() + "/dashboard");
+                    }
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/login.jsp");
+                }
                 break;
         }
     }
@@ -76,7 +100,22 @@ public class AppointmentServlet extends HttpServlet {
                 updateAppointmentStatus(request, response);
                 break;
             default:
-                response.sendRedirect(request.getContextPath() + "/index.jsp");
+                // Get the user role to determine where to redirect
+                HttpSession session = request.getSession(false);
+                if (session != null && session.getAttribute("user") != null) {
+                    User user = (User) session.getAttribute("user");
+                    if ("ADMIN".equals(user.getRole())) {
+                        response.sendRedirect(request.getContextPath() + "/appointments");
+                    } else if ("DOCTOR".equals(user.getRole())) {
+                        response.sendRedirect(request.getContextPath() + "/doctor/appointments");
+                    } else if ("PATIENT".equals(user.getRole())) {
+                        response.sendRedirect(request.getContextPath() + "/patient/dashboard");
+                    } else {
+                        response.sendRedirect(request.getContextPath() + "/dashboard");
+                    }
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/login.jsp");
+                }
                 break;
         }
     }
@@ -284,17 +323,28 @@ public class AppointmentServlet extends HttpServlet {
                 // Set success status
                 response.setStatus(HttpServletResponse.SC_OK);
 
-                // If it's not an AJAX request, redirect
-                if (!"XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+                // If it's an AJAX request, return JSON response
+                if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"success\": true, \"message\": \"Appointment cancelled successfully\"}");
+                } else {
+                    // For non-AJAX requests, set a success message and redirect
+                    request.getSession().setAttribute("message", "Appointment cancelled successfully");
                     if ("PATIENT".equals(user.getRole())) {
                         response.sendRedirect(request.getContextPath() + "/patient/dashboard");
                     } else {
-                        response.sendRedirect(request.getContextPath() + "/admin/appointments");
+                        response.sendRedirect(request.getContextPath() + "/appointments");
                     }
                 }
             } else {
                 // Set error status
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+                // If it's an AJAX request, return JSON response
+                if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"success\": false, \"message\": \"Failed to cancel appointment\"}");
+                }
             }
         } catch (Exception e) {
             // Log the error
@@ -302,6 +352,25 @@ public class AppointmentServlet extends HttpServlet {
 
             // Set error status
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+            // Handle response based on request type
+            if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+                // For AJAX requests, return JSON error response
+                response.setContentType("application/json");
+                response.getWriter().write("{\"success\": false, \"message\": \"Error cancelling appointment: " + e.getMessage() + "\"}");
+            } else {
+                // For non-AJAX requests, set error message in session and redirect
+                User user = (User) session.getAttribute("user");
+                request.getSession().setAttribute("error", "Failed to cancel appointment: " + e.getMessage());
+
+                if ("PATIENT".equals(user.getRole())) {
+                    response.sendRedirect(request.getContextPath() + "/patient/dashboard");
+                } else if ("ADMIN".equals(user.getRole())) {
+                    response.sendRedirect(request.getContextPath() + "/appointments");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/dashboard");
+                }
+            }
         }
     }
 

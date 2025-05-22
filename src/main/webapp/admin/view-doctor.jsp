@@ -38,12 +38,23 @@
             border: 4px solid #4e73df;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             flex-shrink: 0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .profile-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
+        }
+
+        /* Error handling for images */
+        .profile-image img[src=""],
+        .profile-image img:not([src]) {
+            display: none;
         }
 
         .profile-info {
@@ -247,7 +258,7 @@
             <div class="sidebar-menu">
                 <ul>
                     <li>
-                        <a href="${pageContext.request.contextPath}/dashboard">
+                        <a href="${pageContext.request.contextPath}/redirect-dashboard">
                             <i class="fas fa-tachometer-alt"></i>
                             <span>Dashboard</span>
                         </a>
@@ -410,7 +421,7 @@
                     </div>
 
                     <div class="action-buttons">
-                        <a href="${pageContext.request.contextPath}/admin/doctor/edit?id=<%= doctor.getId() %>" class="btn btn-primary">
+                        <a href="${pageContext.request.contextPath}/admin/doctors/edit?id=<%= doctor.getId() %>" class="btn btn-primary">
                             <i class="fas fa-edit"></i> Edit
                         </a>
                         <a href="#" onclick="confirmDelete(<%= doctor.getId() %>)" class="btn btn-danger">
@@ -446,7 +457,7 @@
         // Confirm delete function
         function confirmDelete(doctorId) {
             if (confirm('Are you sure you want to delete this doctor?')) {
-                window.location.href = '${pageContext.request.contextPath}/admin/doctor/delete?id=' + doctorId;
+                window.location.href = '${pageContext.request.contextPath}/admin/doctors/delete?id=' + doctorId;
             }
         }
     </script>

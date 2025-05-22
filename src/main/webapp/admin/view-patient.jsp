@@ -42,6 +42,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+        }
+
+        .profile-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Error handling for images */
+        .profile-image img[src=""],
+        .profile-image img:not([src]) {
+            display: none;
         }
 
         .profile-image i {

@@ -6,10 +6,9 @@ package com.doctorapp.service;
  import com.doctorapp.dao.AppointmentDAO;
  import com.doctorapp.model.Appointment;
 
- /**
-  * Service layer for Appointment-related operations.
-  * This class acts as an intermediary between controllers and DAOs.
-  */
+/**
+ * Service for managing appointments between doctors and patients
+ */
  public class AppointmentService {
      private AppointmentDAO appointmentDAO;
 
@@ -20,39 +19,28 @@ package com.doctorapp.service;
 
 
      /**
-      * Book a new appointment
-      * @param appointment The appointment to book
-      * @return true if booking was successful, false otherwise
+      * Creates a new appointment booking
       */
      public boolean bookAppointment(Appointment appointment) {
          return appointmentDAO.bookAppointment(appointment);
      }
 
-
      /**
-      * Get an appointment by ID
-      * @param id Appointment ID
-      * @return Appointment object if found, null otherwise
+      * Retrieves appointment by ID
       */
      public Appointment getAppointmentById(int id) {
          return appointmentDAO.getAppointmentById(id);
      }
 
-
      /**
-      * Get appointments by patient ID
-      * @param patientId Patient ID
-      * @return List of appointments for the patient
+      * Gets all appointments for a patient
       */
      public List<Appointment> getAppointmentsByPatientId(int patientId) {
          return appointmentDAO.getAppointmentsByPatientId(patientId);
      }
 
-
      /**
-      * Get appointments by doctor ID
-      * @param doctorId Doctor ID
-      * @return List of appointments for the doctor
+      * Gets all appointments for a doctor
       */
      public List<Appointment> getAppointmentsByDoctorId(int doctorId) {
          return appointmentDAO.getAppointmentsByDoctorId(doctorId);
@@ -60,40 +48,35 @@ package com.doctorapp.service;
 
 
      /**
-      * Get all appointments
-      * @return List of all appointments
+      * Gets all appointments in the system
       */
      public List<Appointment> getAllAppointments() {
          return appointmentDAO.getAllAppointments();
      }
 
-
      /**
-      * Update appointment status
-      * @param id Appointment ID
-      * @param status New status
-      * @return true if update was successful, false otherwise
+      * Updates the status of an appointment
       */
      public boolean updateAppointmentStatus(int id, String status) {
          return appointmentDAO.updateAppointmentStatus(id, status);
      }
 
-
      /**
-      * Update appointment prescription
-      * @param id Appointment ID
-      * @param prescription New prescription
-      * @return true if update was successful, false otherwise
+      * Updates the prescription for an appointment
       */
      public boolean updateAppointmentPrescription(int id, String prescription) {
          return appointmentDAO.updateAppointmentPrescription(id, prescription);
      }
 
+     /**
+      * Updates an appointment with new information
+      */
+     public boolean updateAppointment(Appointment appointment) {
+         return appointmentDAO.updateAppointment(appointment);
+     }
 
      /**
-      * Delete an appointment
-      * @param id Appointment ID
-      * @return true if deletion was successful, false otherwise
+      * Deletes an appointment from the system
       */
      public boolean deleteAppointment(int id) {
          return appointmentDAO.deleteAppointment(id);
@@ -101,38 +84,28 @@ package com.doctorapp.service;
 
 
      /**
-      * Get recent appointments
-      * @param limit Number of appointments to return
-      * @return List of recent appointments
+      * Gets most recent appointments, limited by count
       */
      public List<Appointment> getRecentAppointments(int limit) {
          return appointmentDAO.getRecentAppointments(limit);
      }
 
-
      /**
-      * Get today's appointments by doctor
-      * @param doctorId Doctor ID
-      * @return List of today's appointments for the doctor
+      * Gets today's appointments for a specific doctor
       */
      public List<Appointment> getTodayAppointmentsByDoctor(int doctorId) {
          return appointmentDAO.getTodayAppointmentsByDoctor(doctorId);
      }
 
      /**
-      * Get count of today's appointments by doctor
-      * @param doctorId Doctor ID
-      * @return Count of today's appointments for the doctor
+      * Counts today's appointments for a doctor
       */
      public int getTodayAppointmentsCountByDoctor(int doctorId) {
          return appointmentDAO.getTodayAppointmentsCountByDoctor(doctorId);
      }
 
-
      /**
-      * Get next appointment by patient
-      * @param patientId Patient ID
-      * @return Next appointment for the patient
+      * Gets the next upcoming appointment for a patient
       */
      public Appointment getNextAppointmentByPatient(int patientId) {
          return appointmentDAO.getNextAppointmentByPatient(patientId);
@@ -140,123 +113,93 @@ package com.doctorapp.service;
 
 
      /**
-      * Get upcoming appointments by patient
-      * @param patientId Patient ID
-      * @param limit Number of appointments to return
-      * @return List of upcoming appointments for the patient
+      * Gets upcoming appointments for a patient
       */
      public List<Appointment> getUpcomingAppointmentsByPatient(int patientId, int limit) {
          return appointmentDAO.getUpcomingAppointmentsByPatient(patientId, limit);
      }
 
-
      /**
-      * Get past appointments by patient
-      * @param patientId Patient ID
-      * @param limit Number of appointments to return
-      * @return List of past appointments for the patient
+      * Gets past appointments for a patient
       */
      public List<Appointment> getPastAppointmentsByPatient(int patientId, int limit) {
          return appointmentDAO.getPastAppointmentsByPatient(patientId, limit);
      }
 
      /**
-      * Get cancelled appointments by patient
-      * @param patientId Patient ID
-      * @param limit Number of appointments to return
-      * @return List of cancelled appointments for the patient
+      * Gets cancelled appointments for a patient
       */
      public List<Appointment> getCancelledAppointmentsByPatient(int patientId, int limit) {
          return appointmentDAO.getCancelledAppointmentsByPatient(patientId, limit);
      }
 
      /**
-      * Get total number of appointments by patient
-      * @param patientId Patient ID
-      * @return Total number of appointments for the patient
+      * Counts total appointments for a patient
       */
      public int getTotalAppointmentsByPatient(int patientId) {
          return appointmentDAO.getTotalAppointmentsByPatient(patientId);
      }
 
      /**
-      * Get upcoming appointment count by patient
-      * @param patientId Patient ID
-      * @return Count of upcoming appointments for the patient
+      * Counts upcoming appointments for a patient
       */
      public int getUpcomingAppointmentCountByPatient(int patientId) {
          return appointmentDAO.getUpcomingAppointmentCountByPatient(patientId);
      }
 
      /**
-      * Get total number of appointments
-      * @return Total number of appointments
+      * Counts all appointments in the system
       */
      public int getTotalAppointments() {
          return appointmentDAO.getTotalAppointments();
      }
 
-
      /**
-      * Get total revenue from appointments
-      * @return Total revenue
+      * Calculates total revenue from all appointments
       */
      public double getTotalRevenue() {
          return appointmentDAO.getTotalRevenue();
      }
 
      /**
-      * Get appointments by doctor ID and status
-      * @param doctorId Doctor ID
-      * @param status Appointment status
-      * @return List of appointments for the doctor with the specified status
+      * Gets appointments for a doctor with specific status
       */
      public List<Appointment> getAppointmentsByDoctorIdAndStatus(int doctorId, String status) {
          return appointmentDAO.getAppointmentsByDoctorIdAndStatus(doctorId, status);
      }
 
      /**
-      * Get appointments by patient and doctor ID
-      * @param patientId Patient ID
-      * @param doctorId Doctor ID
-      * @return List of appointments for the patient with the specified doctor
+      * Gets appointments between a specific patient and doctor
       */
      public List<Appointment> getAppointmentsByPatientAndDoctorId(int patientId, int doctorId) {
          return appointmentDAO.getAppointmentsByPatientAndDoctorId(patientId, doctorId);
      }
 
      /**
-      * Get available time slots for a doctor on a specific date
-      * @param doctorId Doctor ID
-      * @param date Appointment date (optional, can be null)
-      * @return List of available time slots
+      * Gets available appointment time slots for a doctor on a specific date
       */
      public List<String> getAvailableTimeSlots(int doctorId, String date) {
          List<String> timeSlots = new java.util.ArrayList<>();
 
          try {
-             // Get doctor information to check availability
+             // Get doctor data
              com.doctorapp.dao.DoctorDAO doctorDAO = new com.doctorapp.dao.DoctorDAO();
              com.doctorapp.model.Doctor doctor = doctorDAO.getDoctorById(doctorId);
 
              if (doctor == null) {
-                 System.err.println("Doctor not found with ID: " + doctorId);
-                 return getDefaultTimeSlots(); // Return default slots if doctor not found
+                 return getDefaultTimeSlots(); // Use default slots if doctor not found
              }
 
-             // Check if doctor is active
+             // Check doctor status
              if (!"ACTIVE".equals(doctor.getStatus())) {
-                 System.out.println("Doctor is not active: " + doctorId);
-                 return new java.util.ArrayList<>(); // Return empty list if doctor is not active
+                 return new java.util.ArrayList<>(); // No slots for inactive doctors
              }
 
-             // Get doctor's available time
+             // Get doctor's schedule
              String availableTime = doctor.getAvailableTime();
              if (availableTime == null || availableTime.isEmpty()) {
-                 availableTime = "09:00 AM - 05:00 PM"; // Default
+                 availableTime = "09:00 AM - 05:00 PM"; // Default schedule
              }
-
-             System.out.println("Doctor available time: " + availableTime);
 
              // Parse available time range
              String[] timeRange = availableTime.split("-");

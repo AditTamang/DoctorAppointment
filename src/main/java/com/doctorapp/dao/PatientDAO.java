@@ -100,6 +100,22 @@ public class PatientDAO {
                     patient.setMedicalHistory(rs.getString("medical_history"));
                     patient.setEmail(rs.getString("email"));
 
+                    // Get profile image if it exists
+                    try {
+                        String profileImage = rs.getString("profile_image");
+                        if (profileImage != null && !profileImage.isEmpty()) {
+                            patient.setProfileImage(profileImage);
+                            LOGGER.log(Level.INFO, "Retrieved profile image: " + profileImage);
+                        } else {
+                            patient.setProfileImage("/assets/images/patients/default.jpg");
+                            LOGGER.log(Level.INFO, "No profile image found, using default");
+                        }
+                    } catch (Exception e) {
+                        // Ignore if profile_image is not available
+                        patient.setProfileImage("/assets/images/patients/default.jpg");
+                        LOGGER.log(Level.INFO, "Error getting profile image, using default: " + e.getMessage());
+                    }
+
                     return patient;
                 }
             }
@@ -830,9 +846,15 @@ public class PatientDAO {
                         String profileImage = rs.getString("profile_image");
                         if (profileImage != null && !profileImage.isEmpty()) {
                             patient.setProfileImage(profileImage);
+                            LOGGER.log(Level.INFO, "Retrieved profile image: " + profileImage);
+                        } else {
+                            patient.setProfileImage("/assets/images/patients/default.jpg");
+                            LOGGER.log(Level.INFO, "No profile image found, using default");
                         }
                     } catch (Exception e) {
                         // Ignore if profile_image is not available
+                        patient.setProfileImage("/assets/images/patients/default.jpg");
+                        LOGGER.log(Level.INFO, "Error getting profile image, using default: " + e.getMessage());
                     }
 
                     return patient;
@@ -879,7 +901,19 @@ public class PatientDAO {
                     try { patient.setBloodGroup(rs.getString("blood_group")); } catch (Exception e) {}
                     try { patient.setAllergies(rs.getString("allergies")); } catch (Exception e) {}
                     try { patient.setMedicalHistory(rs.getString("medical_history")); } catch (Exception e) {}
-                    try { patient.setProfileImage(rs.getString("profile_image")); } catch (Exception e) {}
+                    try {
+                        String profileImage = rs.getString("profile_image");
+                        if (profileImage != null && !profileImage.isEmpty()) {
+                            patient.setProfileImage(profileImage);
+                            LOGGER.log(Level.INFO, "Retrieved profile image in simple method: " + profileImage);
+                        } else {
+                            patient.setProfileImage("/assets/images/patients/default.jpg");
+                            LOGGER.log(Level.INFO, "No profile image found in simple method, using default");
+                        }
+                    } catch (Exception e) {
+                        patient.setProfileImage("/assets/images/patients/default.jpg");
+                        LOGGER.log(Level.INFO, "Error getting profile image in simple method, using default: " + e.getMessage());
+                    }
 
                     // Set default values for missing fields
                     if (patient.getFirstName() == null) patient.setFirstName("Patient");
@@ -1152,7 +1186,50 @@ public class PatientDAO {
             conn = DBConnection.getConnection();
             conn.setAutoCommit(false); // Start transaction
 
-            // First delete from patients table
+            // First try to delete related records that might have foreign key constraints
+            try {
+                // Delete appointments associated with this patient
+                String appointmentsQuery = "DELETE FROM appointments WHERE patient_id = ?";
+                try (PreparedStatement pstmt = conn.prepareStatement(appointmentsQuery)) {
+                    pstmt.setInt(1, id);
+                    int rowsAffected = pstmt.executeUpdate();
+                    LOGGER.log(Level.INFO, "Deleted from appointments table: " + rowsAffected + " rows affected");
+                } catch (SQLException e) {
+                    // Log but continue if table doesn't exist or other error
+                    LOGGER.log(Level.WARNING, "Could not delete from appointments table: " + e.getMessage());
+                }
+
+                // Delete medical records associated with this patient
+                try {
+                    String medicalRecordsQuery = "DELETE FROM medical_records WHERE patient_id = ?";
+                    try (PreparedStatement pstmt = conn.prepareStatement(medicalRecordsQuery)) {
+                        pstmt.setInt(1, id);
+                        int rowsAffected = pstmt.executeUpdate();
+                        LOGGER.log(Level.INFO, "Deleted from medical_records table: " + rowsAffected + " rows affected");
+                    }
+                } catch (SQLException e) {
+                    // Log but continue if table doesn't exist or other error
+                    LOGGER.log(Level.WARNING, "Could not delete from medical_records table: " + e.getMessage());
+                }
+
+                // Delete prescriptions associated with this patient
+                try {
+                    String prescriptionsQuery = "DELETE FROM prescriptions WHERE patient_id = ?";
+                    try (PreparedStatement pstmt = conn.prepareStatement(prescriptionsQuery)) {
+                        pstmt.setInt(1, id);
+                        int rowsAffected = pstmt.executeUpdate();
+                        LOGGER.log(Level.INFO, "Deleted from prescriptions table: " + rowsAffected + " rows affected");
+                    }
+                } catch (SQLException e) {
+                    // Log but continue if table doesn't exist or other error
+                    LOGGER.log(Level.WARNING, "Could not delete from prescriptions table: " + e.getMessage());
+                }
+            } catch (Exception e) {
+                // Log but continue with patient deletion even if related records can't be deleted
+                LOGGER.log(Level.WARNING, "Error deleting related records: " + e.getMessage());
+            }
+
+            // Now delete from patients table
             String patientQuery = "DELETE FROM patients WHERE id = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(patientQuery)) {
                 pstmt.setInt(1, id);
@@ -1167,55 +1244,40 @@ public class PatientDAO {
                 }
             }
 
-            // Delete appointments associated with this patient
-            String appointmentsQuery = "DELETE FROM appointments WHERE patient_id = ?";
-            try (PreparedStatement pstmt = conn.prepareStatement(appointmentsQuery)) {
-                pstmt.setInt(1, id);
-                int rowsAffected = pstmt.executeUpdate();
-                LOGGER.log(Level.INFO, "Deleted from appointments table: " + rowsAffected + " rows affected");
-            }
-
-            // Delete medical records associated with this patient
-            String medicalRecordsQuery = "DELETE FROM medical_records WHERE patient_id = ?";
-            try (PreparedStatement pstmt = conn.prepareStatement(medicalRecordsQuery)) {
-                pstmt.setInt(1, id);
-                int rowsAffected = pstmt.executeUpdate();
-                LOGGER.log(Level.INFO, "Deleted from medical_records table: " + rowsAffected + " rows affected");
-            }
-
-            // Delete prescriptions associated with this patient
-            String prescriptionsQuery = "DELETE FROM prescriptions WHERE patient_id = ?";
-            try (PreparedStatement pstmt = conn.prepareStatement(prescriptionsQuery)) {
-                pstmt.setInt(1, id);
-                int rowsAffected = pstmt.executeUpdate();
-                LOGGER.log(Level.INFO, "Deleted from prescriptions table: " + rowsAffected + " rows affected");
-            }
-
-            // Finally, delete the user record if it exists and is not used by other entities
+            // Finally, try to delete the user record if it exists and is not used by other entities
             if (userId > 0) {
-                // Check if this user is also a doctor
-                String checkDoctorQuery = "SELECT COUNT(*) FROM doctors WHERE user_id = ?";
-                boolean isDoctor = false;
-
-                try (PreparedStatement pstmt = conn.prepareStatement(checkDoctorQuery)) {
-                    pstmt.setInt(1, userId);
-                    try (ResultSet rs = pstmt.executeQuery()) {
-                        if (rs.next() && rs.getInt(1) > 0) {
-                            isDoctor = true;
+                try {
+                    // Check if this user is also a doctor
+                    boolean isDoctor = false;
+                    try {
+                        String checkDoctorQuery = "SELECT COUNT(*) FROM doctors WHERE user_id = ?";
+                        try (PreparedStatement pstmt = conn.prepareStatement(checkDoctorQuery)) {
+                            pstmt.setInt(1, userId);
+                            try (ResultSet rs = pstmt.executeQuery()) {
+                                if (rs.next() && rs.getInt(1) > 0) {
+                                    isDoctor = true;
+                                }
+                            }
                         }
+                    } catch (SQLException e) {
+                        // If we can't check, assume it's not a doctor
+                        LOGGER.log(Level.WARNING, "Could not check if user is a doctor: " + e.getMessage());
                     }
-                }
 
-                if (!isDoctor) {
-                    // User is not a doctor, safe to delete
-                    String userQuery = "DELETE FROM users WHERE id = ?";
-                    try (PreparedStatement pstmt = conn.prepareStatement(userQuery)) {
-                        pstmt.setInt(1, userId);
-                        int rowsAffected = pstmt.executeUpdate();
-                        LOGGER.log(Level.INFO, "Deleted from users table: " + rowsAffected + " rows affected");
+                    if (!isDoctor) {
+                        // User is not a doctor, safe to delete
+                        String userQuery = "DELETE FROM users WHERE id = ?";
+                        try (PreparedStatement pstmt = conn.prepareStatement(userQuery)) {
+                            pstmt.setInt(1, userId);
+                            int rowsAffected = pstmt.executeUpdate();
+                            LOGGER.log(Level.INFO, "Deleted from users table: " + rowsAffected + " rows affected");
+                        }
+                    } else {
+                        LOGGER.log(Level.INFO, "User is also a doctor, not deleting user record");
                     }
-                } else {
-                    LOGGER.log(Level.INFO, "User is also a doctor, not deleting user record");
+                } catch (SQLException e) {
+                    // Log but continue - patient deletion is still successful even if user can't be deleted
+                    LOGGER.log(Level.WARNING, "Could not delete user: " + e.getMessage());
                 }
             }
 

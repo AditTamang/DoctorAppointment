@@ -146,7 +146,7 @@
             <div class="sidebar-menu">
                 <ul>
                     <li>
-                        <a href="${pageContext.request.contextPath}/dashboard">
+                        <a href="${pageContext.request.contextPath}/redirect-dashboard">
                             <i class="fas fa-tachometer-alt"></i>
                             <span>Dashboard</span>
                         </a>

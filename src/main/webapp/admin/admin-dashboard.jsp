@@ -509,10 +509,10 @@
                                                         <span class="badge bg-success">Active</span>
                                                     </td>
                                                     <td>
-                                                        <a href="${pageContext.request.contextPath}/admin/patients/view?id=${appointment.patientId}" class="btn btn-sm btn-info">
+                                                        <a href="${pageContext.request.contextPath}/admin/view-patient?id=${appointment.patientId}" class="btn btn-sm btn-info">
                                                             <i class="fas fa-eye"></i>
                                                         </a>
-                                                        <a href="${pageContext.request.contextPath}/admin/patients/edit?id=${appointment.patientId}" class="btn btn-sm btn-primary">
+                                                        <a href="${pageContext.request.contextPath}/admin/edit-patient?id=${appointment.patientId}" class="btn btn-sm btn-primary">
                                                             <i class="fas fa-edit"></i>
                                                         </a>
                                                         <a href="#" onclick="confirmDeletePatient(${appointment.patientId})" class="btn btn-sm btn-danger">
@@ -552,7 +552,7 @@
         // Function to confirm patient deletion
         function confirmDeletePatient(patientId) {
             if (confirm('Are you sure you want to delete this patient?')) {
-                window.location.href = '${pageContext.request.contextPath}/admin/patients/delete?id=' + patientId;
+                window.location.href = '${pageContext.request.contextPath}/admin/delete-patient?id=' + patientId;
             }
         }
     </script>

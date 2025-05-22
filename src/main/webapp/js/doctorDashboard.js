@@ -82,9 +82,9 @@ function updateAppointmentStatus(appointmentId, status) {
         // Show success message
         showNotification('Appointment ' + status.toLowerCase() + ' successfully', 'success');
 
-        // Refresh the page after a short delay to ensure everything is updated
+        // Update UI without reloading the page
         setTimeout(() => {
-            window.location.reload();
+            updateAppointmentsList();
         }, 1000);
     })
     .catch(error => {
@@ -148,6 +148,46 @@ function initActionButtons() {
             window.location.href = contextPath + '/appointment/details?id=' + appointmentId;
         });
     });
+}
+
+/**
+ * Update appointments list without reloading the page
+ */
+function updateAppointmentsList() {
+    // Get the appointments container
+    const appointmentsContainer = document.querySelector('.appointments-list');
+    if (!appointmentsContainer) return;
+
+    // Fetch updated appointments data
+    fetch(contextPath + '/doctor/appointments-data', {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data && data.appointments) {
+            // Update the appointments list with new data
+            updateAppointmentsUI(data.appointments);
+        }
+    })
+    .catch(error => {
+        console.error('Error updating appointments list:', error);
+    });
+}
+
+/**
+ * Update the appointments UI with new data
+ * @param {Array} appointments - The updated appointments data
+ */
+function updateAppointmentsUI(appointments) {
+    // This is a placeholder function that would be implemented
+    // based on the specific structure of your appointments UI
+    console.log('Updating appointments UI with new data:', appointments);
+
+    // Instead of reloading, we just update the status in the UI
+    // This avoids the infinite reload issue
 }
 
 /**

@@ -425,7 +425,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <a href="${pageContext.request.contextPath}/admin/appointments" class="show-all-btn">Show all Appointments</a>
+                        <a href="javascript:void(0);" onclick="showAllAppointments()" class="show-all-btn">Show all Appointments</a>
                     </div>
                 </div>
 
@@ -464,7 +464,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <a href="${pageContext.request.contextPath}/admin/appointments" class="show-all-btn">Show all Sessions</a>
+                        <a href="javascript:void(0);" onclick="showAllSessions()" class="show-all-btn">Show all Sessions</a>
                     </div>
                 </div>
             </div>
@@ -614,6 +614,17 @@
             if (confirm('Are you sure you want to delete this patient?')) {
                 window.location.href = '${pageContext.request.contextPath}/admin/delete-patient?id=' + patientId;
             }
+        }
+
+        // Function to show all appointments
+        function showAllAppointments() {
+            window.location.href = '${pageContext.request.contextPath}/appointments';
+        }
+
+        // Function to show all sessions
+        function showAllSessions() {
+            // Since sessions are the same as appointments, we'll use the same endpoint
+            window.location.href = '${pageContext.request.contextPath}/appointments';
         }
 
         // Add active class to current menu item

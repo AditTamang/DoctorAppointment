@@ -26,18 +26,18 @@ import jakarta.servlet.http.HttpSession;
 public class DoctorAddMedicalRecordServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = Logger.getLogger(DoctorAddMedicalRecordServlet.class.getName());
-    
+
     private PatientService patientService;
     private MedicalRecordService medicalRecordService;
     private DoctorDAO doctorDAO;
-    
+
     @Override
     public void init() {
         patientService = new PatientService();
         medicalRecordService = new MedicalRecordService();
         doctorDAO = new DoctorDAO();
     }
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Check if user is logged in and is a doctor
@@ -46,13 +46,13 @@ public class DoctorAddMedicalRecordServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
-        
+
         User user = (User) session.getAttribute("user");
         if (!"DOCTOR".equals(user.getRole())) {
             response.sendRedirect(request.getContextPath() + "/access-denied.jsp");
             return;
         }
-        
+
         try {
             // Get doctor ID
             int doctorId = doctorDAO.getDoctorIdByUserId(user.getId());
@@ -60,10 +60,10 @@ public class DoctorAddMedicalRecordServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/doctor/complete-profile");
                 return;
             }
-            
+
             // Get patient ID from request parameter
             int patientId = Integer.parseInt(request.getParameter("patientId"));
-            
+
             // Get patient details
             Patient patient = patientService.getPatientById(patientId);
             if (patient == null) {
@@ -71,14 +71,14 @@ public class DoctorAddMedicalRecordServlet extends HttpServlet {
                 request.getRequestDispatcher("/doctor/patients").forward(request, response);
                 return;
             }
-            
+
             // Set attributes for JSP
             request.setAttribute("patient", patient);
             request.setAttribute("doctorId", doctorId);
-            
+
             // Forward to add medical record form
             request.getRequestDispatcher("/doctor/add-medical-record.jsp").forward(request, response);
-            
+
         } catch (NumberFormatException e) {
             LOGGER.log(Level.SEVERE, "Invalid patient ID", e);
             response.sendRedirect(request.getContextPath() + "/doctor/patients");
@@ -87,7 +87,7 @@ public class DoctorAddMedicalRecordServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/error.jsp");
         }
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Check if user is logged in and is a doctor
@@ -96,13 +96,13 @@ public class DoctorAddMedicalRecordServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
-        
+
         User user = (User) session.getAttribute("user");
         if (!"DOCTOR".equals(user.getRole())) {
             response.sendRedirect(request.getContextPath() + "/access-denied.jsp");
             return;
         }
-        
+
         try {
             // Get doctor ID
             int doctorId = doctorDAO.getDoctorIdByUserId(user.getId());
@@ -110,14 +110,13 @@ public class DoctorAddMedicalRecordServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/doctor/complete-profile");
                 return;
             }
-            
+
             // Get form data
             int patientId = Integer.parseInt(request.getParameter("patientId"));
             String diagnosis = request.getParameter("diagnosis");
             String treatment = request.getParameter("treatment");
             String notes = request.getParameter("notes");
-            String recordType = request.getParameter("recordType");
-            
+
             // Create medical record
             MedicalRecord medicalRecord = new MedicalRecord();
             medicalRecord.setPatientId(patientId);
@@ -125,12 +124,11 @@ public class DoctorAddMedicalRecordServlet extends HttpServlet {
             medicalRecord.setDiagnosis(diagnosis);
             medicalRecord.setTreatment(treatment);
             medicalRecord.setNotes(notes);
-            medicalRecord.setRecordType(recordType != null && !recordType.isEmpty() ? recordType : "GENERAL");
             medicalRecord.setRecordDate(LocalDate.now().toString());
-            
+
             // Save medical record
             boolean added = medicalRecordService.addMedicalRecord(medicalRecord);
-            
+
             if (added) {
                 // Set success message
                 request.getSession().setAttribute("successMessage", "Medical record added successfully");
@@ -147,7 +145,7 @@ public class DoctorAddMedicalRecordServlet extends HttpServlet {
                 // Forward back to form
                 request.getRequestDispatcher("/doctor/add-medical-record.jsp").forward(request, response);
             }
-            
+
         } catch (NumberFormatException e) {
             LOGGER.log(Level.SEVERE, "Invalid patient ID", e);
             response.sendRedirect(request.getContextPath() + "/doctor/patients");

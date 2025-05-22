@@ -8,13 +8,12 @@ import com.doctorapp.service.DoctorRegistrationService;
 import com.doctorapp.service.UserService;
 import com.doctorapp.util.SessionUtil;
 
-import jakarta.servlet.http.HttpSession;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -109,7 +108,7 @@ public class LoginServlet extends HttpServlet {
                         response.sendRedirect(request.getContextPath() + "/admin/index.jsp");
                     } else if ("DOCTOR".equals(user.getRole())) {
                         // Redirect doctors to their dashboard
-                        response.sendRedirect(request.getContextPath() + "/dashboard");
+                        response.sendRedirect(request.getContextPath() + "/redirect-dashboard");
                     } else {
                         // Redirect patients to the index page
                         response.sendRedirect(request.getContextPath() + "/index.jsp");

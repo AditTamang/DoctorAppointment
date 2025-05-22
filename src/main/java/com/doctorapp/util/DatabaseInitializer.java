@@ -11,8 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Simple database initializer that loads and executes the schema.sql script.
- * This class is automatically loaded when the application starts.
+ * Initializes database by executing schema.sql when application starts
  */
 public class DatabaseInitializer {
 
@@ -20,7 +19,7 @@ public class DatabaseInitializer {
     private static boolean initialized = false;
 
     /**
-     * Initialize the database by executing the schema.sql script
+     * Initialize database with schema.sql
      */
     public static synchronized void initialize() {
         if (initialized) {
@@ -31,21 +30,26 @@ public class DatabaseInitializer {
         LOGGER.info("Initializing database...");
 
         try {
-            // Load the schema.sql script
-            InputStream is = DatabaseInitializer.class.getClassLoader().getResourceAsStream("schema.sql");
+            // Try to load consolidated_schema.sql first, fall back to schema.sql if not found
+            InputStream is = DatabaseInitializer.class.getClassLoader().getResourceAsStream("consolidated_schema.sql");
 
-            // If not found, log an error
+            // If consolidated schema is not found, try the original schema
             if (is == null) {
-                LOGGER.warning("schema.sql not found in classpath. Database initialization failed.");
+                LOGGER.info("consolidated_schema.sql not found, trying schema.sql instead.");
+                is = DatabaseInitializer.class.getClassLoader().getResourceAsStream("schema.sql");
+            }
+
+            if (is == null) {
+                LOGGER.warning("Neither consolidated_schema.sql nor schema.sql found in classpath. Database initialization failed.");
                 return;
             }
 
-            // Read the SQL script
+            // Read SQL script
             StringBuilder sqlScript = new StringBuilder();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    // Skip comments and empty lines
+                    // Skip SQL comments and empty lines
                     if (line.trim().startsWith("--") || line.trim().isEmpty()) {
                         continue;
                     }
@@ -58,10 +62,8 @@ public class DatabaseInitializer {
                 }
             }
 
-            // Split the script into individual statements
+            // Split into individual SQL statements
             String[] statements = sqlScript.toString().split(";\\s*\n");
-
-            // Execute each statement
             try (Connection conn = DBConnection.getConnection()) {
                 conn.setAutoCommit(false);
 
@@ -77,16 +79,15 @@ public class DatabaseInitializer {
                             stmt.execute(statement);
                         } catch (SQLException e) {
                             LOGGER.log(Level.WARNING, "Error executing SQL statement: " + e.getMessage());
-                            // Continue with other statements
+                            // Continue execution with remaining statements
                         }
                     }
 
-                    // Commit the transaction
                     conn.commit();
                     LOGGER.info("Database initialization completed successfully.");
                     initialized = true;
                 } catch (SQLException e) {
-                    // Rollback on error
+                    // Rollback transaction on error
                     try {
                         conn.rollback();
                     } catch (SQLException rollbackEx) {
@@ -94,7 +95,6 @@ public class DatabaseInitializer {
                     }
                     LOGGER.log(Level.SEVERE, "Error executing SQL statements", e);
                 } finally {
-                    // Restore auto-commit
                     conn.setAutoCommit(true);
                 }
             }

@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-dashboard.css">
     <style>
         .patient-list {
             margin-top: 20px;
@@ -268,7 +268,12 @@
         <!-- Main Content -->
         <div class="main-content">
             <div class="page-header">
-                <h1>Patient Management</h1>
+                <div class="header-left">
+                    <button id="menuToggle" class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1>Patient Management</h1>
+                </div>
                 <a href="${pageContext.request.contextPath}/admin/add-patient" class="btn-primary">
                     <i class="fas fa-plus"></i> Add New Patient
                 </a>
@@ -357,9 +362,11 @@
         // Toggle sidebar on mobile
         document.addEventListener('DOMContentLoaded', function() {
             const menuToggle = document.getElementById('menuToggle');
-            if (menuToggle) {
+            const sidebar = document.querySelector('.sidebar');
+
+            if (menuToggle && sidebar) {
                 menuToggle.addEventListener('click', function() {
-                    document.querySelector('.sidebar').classList.toggle('active');
+                    sidebar.classList.toggle('active');
                 });
             }
         });

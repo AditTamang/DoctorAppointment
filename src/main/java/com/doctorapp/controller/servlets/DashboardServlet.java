@@ -131,6 +131,27 @@ package com.doctorapp.controller.servlets;
 
      private void loadDoctorDashboard(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
          try {
+             // Check if this request is coming from DoctorDashboardServlet to prevent infinite redirects
+             Boolean fromDoctorDashboard = (Boolean) request.getAttribute("fromDoctorDashboard");
+
+             // Only check for redirect if this is a direct access to /dashboard
+             // and not a forward from /doctor/dashboard
+             String requestURI = request.getRequestURI();
+             String contextPath = request.getContextPath();
+
+             // This code is no longer needed as we're using DashboardRedirectServlet for redirects
+             // Keep the check for doctor dashboard to maintain backward compatibility
+             if (fromDoctorDashboard == null && requestURI.endsWith("/dashboard")) {
+                 HttpSession session = request.getSession(false);
+                 if (session != null && session.getAttribute("user") != null) {
+                     User user = (User) session.getAttribute("user");
+                     if ("DOCTOR".equals(user.getRole())) {
+                         response.sendRedirect(request.getContextPath() + "/doctor/dashboard");
+                         return;
+                     }
+                 }
+             }
+
              // Get the logged-in doctor's ID
              HttpSession session = request.getSession(false);
              User user = (User) session.getAttribute("user");

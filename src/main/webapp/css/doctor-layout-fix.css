@@ -1,0 +1,87 @@
+/*
+ * Doctor Interface Layout Fix
+ * This CSS file fixes layout issues in the doctor interface,
+ * specifically for the appointments and patients pages
+ */
+
+/* Reset conflicting styles */
+.doctor-appointments-page,
+.doctor-patients-page {
+    overflow-x: hidden;
+}
+
+/* Fix for the main content area to prevent overlap with sidebar */
+.doctor-appointments-page .main-content,
+.doctor-patients-page .main-content {
+    margin-left: 240px !important; /* Match the sidebar width */
+    padding: 25px !important;
+    background-color: #f8f9fa !important;
+    min-height: 100vh !important;
+    transition: margin-left 0.3s ease !important;
+    width: calc(100% - 240px) !important; /* Ensure the width accounts for sidebar */
+    box-sizing: border-box !important;
+    position: relative !important;
+    float: none !important; /* Reset float */
+    clear: none !important; /* Reset clear */
+    display: block !important; /* Override flex display */
+    flex-direction: initial !important; /* Reset flex direction */
+    align-items: initial !important; /* Reset align items */
+}
+
+/* Override any inline styles */
+.doctor-appointments-page .main-content[style],
+.doctor-patients-page .main-content[style] {
+    margin-left: 240px !important;
+    width: calc(100% - 240px) !important;
+}
+
+/* Center the content in the available space */
+.doctor-appointments-page .appointment-section,
+.doctor-patients-page .patients-container {
+    max-width: 1200px !important;
+    margin: 0 auto 30px auto !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Fix dashboard container layout */
+.doctor-appointments-page .dashboard-container,
+.doctor-patients-page .dashboard-container {
+    display: flex !important;
+    width: 100% !important;
+    position: relative !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 100vh !important;
+}
+
+/* Sidebar styles moved to doctor-sidebar-clean.css */
+
+/* Ensure tables are properly contained */
+.doctor-appointments-page .appointment-content,
+.doctor-patients-page .patients-table-container {
+    width: 100% !important;
+    overflow-x: auto !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .doctor-appointments-page .main-content,
+    .doctor-patients-page .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 15px !important;
+    }
+
+    .doctor-appointments-page .dashboard-container,
+    .doctor-patients-page .dashboard-container {
+        flex-direction: column !important;
+    }
+
+    .doctor-appointments-page .sidebar,
+    .doctor-patients-page .sidebar {
+        width: 100% !important;
+        height: auto !important;
+        position: relative !important;
+    }
+}

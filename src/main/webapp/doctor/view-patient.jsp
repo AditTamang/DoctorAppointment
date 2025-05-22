@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/dashboard.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-buttons.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/doctor-common.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -26,6 +27,7 @@
             max-width: 1000px;
             margin-left: auto;
             margin-right: auto;
+            width: 100%;
         }
 
         .profile-header {
@@ -119,79 +121,14 @@
             gap: 15px;
             margin-top: 30px;
             flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
-        .btn {
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            font-size: 14px;
-        }
+        /* Buttons are now in doctor-common.css */
 
-        .btn-primary {
-            background-color: #4e73df;
-            color: white;
-            border: none;
-        }
+        /* Back button is now in doctor-common.css */
 
-        .btn-primary:hover {
-            background-color: #3756a4;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-            border: none;
-        }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #4e73df;
-            text-decoration: none;
-            font-weight: 500;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-            font-size: 14px;
-        }
-
-        .back-btn:hover {
-            color: #3756a4;
-            transform: translateX(-3px);
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
+        /* Alert styles are now in doctor-common.css */
 
         .appointments-section, .medical-records-section {
             margin-top: 30px;
@@ -201,6 +138,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
 
         .appointments-table th, .medical-records-table th {
@@ -208,12 +146,12 @@
             color: #333;
             font-weight: 600;
             text-align: left;
-            padding: 12px 15px;
+            padding: 14px 15px;
             border-bottom: 2px solid #e3e6f0;
         }
 
         .appointments-table td, .medical-records-table td {
-            padding: 12px 15px;
+            padding: 14px 15px;
             border-bottom: 1px solid #e3e6f0;
             color: #555;
         }
@@ -222,28 +160,7 @@
             background-color: #f8f9fc;
         }
 
-        .status {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-completed {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .status-scheduled {
-            background-color: #cce5ff;
-            color: #004085;
-        }
-
-        .status-cancelled {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
+        /* Status badges are now in doctor-common.css */
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
@@ -423,7 +340,10 @@
                     <a href="${pageContext.request.contextPath}/doctor/edit-patient?id=<%= patient.getId() %>" class="btn btn-primary">
                         <i class="fas fa-edit"></i> Edit Patient Information
                     </a>
-                    <a href="${pageContext.request.contextPath}/doctor/add-medical-record?patientId=<%= patient.getId() %>" class="btn btn-primary">
+                    <a href="${pageContext.request.contextPath}/doctor/medical-records?patientId=<%= patient.getId() %>" class="btn btn-primary">
+                        <i class="fas fa-file-medical"></i> View Medical Records
+                    </a>
+                    <a href="${pageContext.request.contextPath}/doctor/add-medical-record?patientId=<%= patient.getId() %>" class="btn btn-success">
                         <i class="fas fa-plus"></i> Add Medical Record
                     </a>
                 </div>

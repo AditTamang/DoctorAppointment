@@ -307,9 +307,15 @@ public class DoctorDAO {
 
      // Update doctor
      public boolean updateDoctor(Doctor doctor) {
-         System.out.println("Updating doctor with ID: " + doctor.getId());
+         System.out.println("Updating doctor with ID: " + doctor.getId() + ", User ID: " + doctor.getUserId());
          System.out.println("Doctor available days: " + doctor.getAvailableDays());
          System.out.println("Doctor available time: " + doctor.getAvailableTime());
+
+         // Validate input
+         if (doctor.getUserId() <= 0) {
+             System.out.println("Error: User ID is not set or invalid: " + doctor.getUserId());
+             return false;
+         }
 
          Connection conn = null;
          boolean success = false;
@@ -318,20 +324,108 @@ public class DoctorDAO {
              conn = DBConnection.getConnection();
              conn.setAutoCommit(false); // Start transaction
 
+             // First check if the doctor exists by ID
+             boolean doctorExists = false;
+
+             if (doctor.getId() > 0) {
+                 String checkQuery = "SELECT COUNT(*) FROM doctors WHERE id = ?";
+                 try (PreparedStatement checkStmt = conn.prepareStatement(checkQuery)) {
+                     checkStmt.setInt(1, doctor.getId());
+                     try (ResultSet rs = checkStmt.executeQuery()) {
+                         if (rs.next()) {
+                             doctorExists = rs.getInt(1) > 0;
+                             if (doctorExists) {
+                                 System.out.println("Doctor exists with ID: " + doctor.getId());
+                             }
+                         }
+                     }
+                 }
+             }
+
+             // If doctor doesn't exist by ID, try to find by user_id
+             if (!doctorExists) {
+                 System.out.println("Doctor with ID " + doctor.getId() + " does not exist or ID is not set. Trying to find by user_id: " + doctor.getUserId());
+
+                 String findByUserIdQuery = "SELECT id FROM doctors WHERE user_id = ?";
+                 try (PreparedStatement findStmt = conn.prepareStatement(findByUserIdQuery)) {
+                     findStmt.setInt(1, doctor.getUserId());
+                     try (ResultSet rs = findStmt.executeQuery()) {
+                         if (rs.next()) {
+                             int foundId = rs.getInt("id");
+                             System.out.println("Found doctor with ID " + foundId + " for user_id " + doctor.getUserId());
+                             doctor.setId(foundId);
+                             doctorExists = true;
+                         }
+                     }
+                 }
+             }
+
+             if (!doctorExists) {
+                 System.out.println("Doctor record not found. Cannot update.");
+                 conn.rollback();
+                 return false;
+             }
+
+             // Ensure all required fields have values
+             if (doctor.getAvailableDays() == null || doctor.getAvailableDays().trim().isEmpty()) {
+                 doctor.setAvailableDays("Monday,Tuesday,Wednesday,Thursday,Friday");
+                 System.out.println("Set default available days: " + doctor.getAvailableDays());
+             }
+
+             if (doctor.getAvailableTime() == null || doctor.getAvailableTime().trim().isEmpty()) {
+                 doctor.setAvailableTime("09:00 AM - 05:00 PM");
+                 System.out.println("Set default available time: " + doctor.getAvailableTime());
+             }
+
              // First update the doctors table
              String doctorQuery = "UPDATE doctors SET name = ?, specialization = ?, qualification = ?, experience = ?, " +
                                 "email = ?, phone = ?, address = ?, consultation_fee = ?, available_days = ?, " +
                                 "available_time = ?, image_url = ?, profile_image = ?, status = ?, bio = ? WHERE id = ?";
 
              try (PreparedStatement pstmt = conn.prepareStatement(doctorQuery)) {
-                 pstmt.setString(1, doctor.getName());
-                 pstmt.setString(2, doctor.getSpecialization());
-                 pstmt.setString(3, doctor.getQualification());
-                 pstmt.setString(4, doctor.getExperience());
-                 pstmt.setString(5, doctor.getEmail());
-                 pstmt.setString(6, doctor.getPhone());
-                 pstmt.setString(7, doctor.getAddress());
-                 pstmt.setString(8, doctor.getConsultationFee());
+                 // Set name with null check
+                 String name = doctor.getName();
+                 if (name == null || name.isEmpty()) {
+                     name = "Dr. Unknown";
+                     System.out.println("Warning: Doctor name is null or empty, using default: " + name);
+                 }
+                 pstmt.setString(1, name);
+
+                 // Set specialization with null check
+                 String specialization = doctor.getSpecialization();
+                 if (specialization == null) specialization = "";
+                 pstmt.setString(2, specialization);
+
+                 // Set qualification with null check
+                 String qualification = doctor.getQualification();
+                 if (qualification == null) qualification = "";
+                 pstmt.setString(3, qualification);
+
+                 // Set experience with null check
+                 String experience = doctor.getExperience();
+                 if (experience == null) experience = "0";
+                 pstmt.setString(4, experience);
+
+                 // Set email with null check
+                 String email = doctor.getEmail();
+                 if (email == null) email = "";
+                 pstmt.setString(5, email);
+
+                 // Set phone with null check
+                 String phone = doctor.getPhone();
+                 if (phone == null) phone = "";
+                 pstmt.setString(6, phone);
+
+                 // Set address with null check
+                 String address = doctor.getAddress();
+                 if (address == null) address = "";
+                 pstmt.setString(7, address);
+
+                 // Set consultation fee with null check
+                 String consultationFee = doctor.getConsultationFee();
+                 if (consultationFee == null) consultationFee = "0";
+                 pstmt.setString(8, consultationFee);
+
                  // Ensure availableDays is not null or empty
                  String availableDays = doctor.getAvailableDays();
                  if (availableDays == null || availableDays.trim().isEmpty()) {
@@ -351,10 +445,26 @@ public class DoctorDAO {
                      System.out.println("Using provided available time: " + availableTime);
                  }
                  pstmt.setString(10, availableTime);
-                 pstmt.setString(11, doctor.getImageUrl());
-                 pstmt.setString(12, doctor.getProfileImage());
-                 pstmt.setString(13, doctor.getStatus() != null ? doctor.getStatus() : "ACTIVE");
-                 pstmt.setString(14, doctor.getBio() != null ? doctor.getBio() : "");
+
+                 // Set image URLs with null checks
+                 String imageUrl = doctor.getImageUrl();
+                 if (imageUrl == null) imageUrl = "";
+                 pstmt.setString(11, imageUrl);
+
+                 String profileImage = doctor.getProfileImage();
+                 if (profileImage == null) profileImage = "";
+                 pstmt.setString(12, profileImage);
+
+                 // Set status with null check
+                 String status = doctor.getStatus();
+                 if (status == null || status.isEmpty()) status = "ACTIVE";
+                 pstmt.setString(13, status);
+
+                 // Set bio with null check
+                 String bio = doctor.getBio();
+                 if (bio == null) bio = "";
+                 pstmt.setString(14, bio);
+
                  pstmt.setInt(15, doctor.getId());
 
                  System.out.println("Doctor email: " + doctor.getEmail());
@@ -365,8 +475,9 @@ public class DoctorDAO {
 
                  if (doctorRowsAffected == 0) {
                      System.out.println("No doctor record was updated. Doctor ID may not exist: " + doctor.getId());
-                     conn.rollback();
-                     return false;
+                     // Don't roll back here - it's possible that no rows were affected because the values didn't change
+                     // Continue with the user update
+                     System.out.println("Continuing with user update despite no doctor rows affected");
                  }
              }
 
@@ -441,7 +552,20 @@ public class DoctorDAO {
                              if (rs.next()) {
                                  System.out.println("Email " + doctor.getEmail() + " already exists for another user");
                                  // Don't update email if it already exists for another user
-                                 doctor.setEmail(null);
+                                 // Instead of setting to null, keep the original email
+                                 String originalEmailQuery = "SELECT email FROM users WHERE id = ?";
+                                 try (PreparedStatement origEmailStmt = conn.prepareStatement(originalEmailQuery)) {
+                                     origEmailStmt.setInt(1, userId);
+                                     try (ResultSet origEmailRs = origEmailStmt.executeQuery()) {
+                                         if (origEmailRs.next()) {
+                                             String originalEmail = origEmailRs.getString("email");
+                                             System.out.println("Keeping original email: " + originalEmail);
+                                             doctor.setEmail(originalEmail);
+                                         } else {
+                                             doctor.setEmail(null);
+                                         }
+                                     }
+                                 }
                              }
                          }
                      } catch (SQLException e) {
@@ -482,7 +606,17 @@ public class DoctorDAO {
 
                      if (userRowsAffected == 0) {
                          System.out.println("No user record was updated. User ID may not exist: " + userId);
-                         // Continue anyway since the doctor record was updated successfully
+                         // Try a simpler update with just the essential fields
+                         System.out.println("Trying simplified user update...");
+                         String simpleUserQuery = "UPDATE users SET phone = ?, address = ? WHERE id = ?";
+                         try (PreparedStatement simpleStmt = conn.prepareStatement(simpleUserQuery)) {
+                             simpleStmt.setString(1, doctor.getPhone());
+                             simpleStmt.setString(2, doctor.getAddress());
+                             simpleStmt.setInt(3, userId);
+
+                             int simpleRowsAffected = simpleStmt.executeUpdate();
+                             System.out.println("Simple user update affected " + simpleRowsAffected + " rows");
+                         }
                      }
                  }
              } else {
@@ -491,9 +625,37 @@ public class DoctorDAO {
              }
 
              // Commit the transaction
-             conn.commit();
-             success = true;
-             return true;
+             try {
+                 conn.commit();
+                 System.out.println("Transaction committed successfully");
+                 success = true;
+
+                 // Log the final state of the doctor object
+                 System.out.println("Doctor update successful with the following data:");
+                 System.out.println("Doctor ID: " + doctor.getId());
+                 System.out.println("User ID: " + doctor.getUserId());
+                 System.out.println("Name: " + doctor.getName());
+                 System.out.println("Email: " + doctor.getEmail());
+                 System.out.println("Phone: " + doctor.getPhone());
+                 System.out.println("Specialization: " + doctor.getSpecialization());
+                 System.out.println("Qualification: " + doctor.getQualification());
+                 System.out.println("Experience: " + doctor.getExperience());
+                 System.out.println("Consultation Fee: " + doctor.getConsultationFee());
+                 System.out.println("Available Days: " + doctor.getAvailableDays());
+                 System.out.println("Available Time: " + doctor.getAvailableTime());
+                 System.out.println("Bio: " + doctor.getBio());
+
+                 return true;
+             } catch (SQLException e) {
+                 System.err.println("Error committing transaction: " + e.getMessage());
+                 try {
+                     conn.rollback();
+                     System.err.println("Transaction rolled back due to commit error");
+                 } catch (SQLException ex) {
+                     System.err.println("Error rolling back transaction: " + ex.getMessage());
+                 }
+                 return false;
+             }
          } catch (SQLException | ClassNotFoundException e) {
              System.err.println("Error updating doctor: " + e.getMessage());
              e.printStackTrace();
@@ -1417,6 +1579,15 @@ public class DoctorDAO {
         }
 
         doctor.setSuccessRate(90); // Default value
+
+        // Get license number if it exists
+        try {
+            String licenseNumber = rs.getString("license_number");
+            doctor.setLicenseNumber(licenseNumber);
+        } catch (SQLException e) {
+            // license_number column might not exist yet, ignore
+            doctor.setLicenseNumber(null);
+        }
 
         return doctor;
     }

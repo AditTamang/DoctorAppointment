@@ -22,8 +22,8 @@ public class MedicalRecordDAO {
      * @return true if addition was successful, false otherwise
      */
     public boolean addMedicalRecord(MedicalRecord medicalRecord) {
-        String query = "INSERT INTO medical_records (patient_id, doctor_id, record_date, diagnosis, treatment, notes, record_type) " +
-                      "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO medical_records (patient_id, doctor_id, record_date, diagnosis, treatment, notes) " +
+                      "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -34,7 +34,6 @@ public class MedicalRecordDAO {
             pstmt.setString(4, medicalRecord.getDiagnosis());
             pstmt.setString(5, medicalRecord.getTreatment());
             pstmt.setString(6, medicalRecord.getNotes());
-            pstmt.setString(7, medicalRecord.getRecordType() != null ? medicalRecord.getRecordType() : "GENERAL");
 
             int rowsAffected = pstmt.executeUpdate();
 
@@ -85,7 +84,6 @@ public class MedicalRecordDAO {
                     record.setDiagnosis(rs.getString("diagnosis"));
                     record.setTreatment(rs.getString("treatment"));
                     record.setNotes(rs.getString("notes"));
-                    record.setRecordType(rs.getString("record_type"));
                     record.setDoctorName(rs.getString("doctor_name"));
 
                     records.add(record);
@@ -125,7 +123,6 @@ public class MedicalRecordDAO {
                     record.setDiagnosis(rs.getString("diagnosis"));
                     record.setTreatment(rs.getString("treatment"));
                     record.setNotes(rs.getString("notes"));
-                    record.setRecordType(rs.getString("record_type"));
                     record.setDoctorName(rs.getString("doctor_name"));
 
                     return record;

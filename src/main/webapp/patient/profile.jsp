@@ -23,6 +23,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patientDashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-profile-image.css">
     <style>
         /* Profile Page Specific Styles */
         .profile-container {
@@ -50,12 +51,23 @@
             margin-right: 30px;
             border: 5px solid #f0f0f0;
             flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .profile-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
+        }
+
+        /* Error handling for images */
+        .profile-image img[src=""],
+        .profile-image img:not([src]) {
+            display: none;
         }
 
         .profile-initials {
@@ -247,6 +259,8 @@
             .profile-image {
                 margin-right: 0;
                 margin-bottom: 20px;
+                width: 100px;
+                height: 100px;
             }
 
             .detail-item {
@@ -263,7 +277,7 @@
         }
     </style>
 </head>
-<body>
+<body data-context-path="${pageContext.request.contextPath}">
     <div class="dashboard-container">
         <!-- Include the standardized sidebar -->
         <jsp:include page="patient-sidebar.jsp" />
@@ -281,13 +295,15 @@
             <!-- Profile Content -->
             <div class="profile-container">
                 <div class="profile-header">
-                    <div class="profile-image">
-                        <% if (patient != null && patient.getProfileImage() != null && !patient.getProfileImage().isEmpty()) { %>
-                            <img src="${pageContext.request.contextPath}${patient.getProfileImage()}" alt="Patient">
-                        <% } else if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) { %>
-                            <div class="profile-initials">AT</div>
+                    <div class="profile-image" data-default-image="/assets/images/patients/default.jpg" data-initials="<%= user.getFirstName().charAt(0) %><%= user.getLastName().charAt(0) %>">
+                        <%
+                            if (patient != null && patient.getProfileImage() != null && !patient.getProfileImage().isEmpty()) {
+                                String profileImagePath = patient.getProfileImage();
+                                System.out.println("Profile image path: " + profileImagePath);
+                        %>
+                            <img src="${pageContext.request.contextPath}<%=profileImagePath%>" alt="<%= user.getFirstName() %>" onerror="this.src='${pageContext.request.contextPath}/assets/images/patients/default.jpg'">
                         <% } else { %>
-                            <img src="${pageContext.request.contextPath}/assets/images/patients/default.jpg" alt="Patient">
+                            <div class="profile-initials"><%= user.getFirstName().charAt(0) %><%= user.getLastName().charAt(0) %></div>
                         <% } %>
                     </div>
                     <div class="profile-info">
@@ -298,17 +314,38 @@
                 </div>
 
                 <!-- Success or Error Messages -->
-                <c:if test="${not empty successMessage}">
-                    <div class="alert alert-success">
-                        <i class="fas fa-check-circle"></i> ${successMessage}
-                    </div>
-                </c:if>
+                <%
+                    // Check for messages in both request and session
+                    String successMessage = (String) request.getAttribute("successMessage");
+                    if (successMessage == null) {
+                        successMessage = (String) session.getAttribute("successMessage");
+                        if (successMessage != null) {
+                            // Remove the message from session after displaying it
+                            session.removeAttribute("successMessage");
+                        }
+                    }
 
-                <c:if test="${not empty errorMessage}">
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-circle"></i> ${errorMessage}
+                    String errorMessage = (String) request.getAttribute("errorMessage");
+                    if (errorMessage == null) {
+                        errorMessage = (String) session.getAttribute("errorMessage");
+                        if (errorMessage != null) {
+                            // Remove the error from session after displaying it
+                            session.removeAttribute("errorMessage");
+                        }
+                    }
+                %>
+
+                <% if (successMessage != null) { %>
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> <%= successMessage %>
                     </div>
-                </c:if>
+                <% } %>
+
+                <% if (errorMessage != null) { %>
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> <%= errorMessage %>
+                    </div>
+                <% } %>
 
                 <!-- Profile Form -->
                 <form action="${pageContext.request.contextPath}/patient/profile/update" method="post" enctype="multipart/form-data">
@@ -433,42 +470,53 @@
         </div>
     </div>
 
+    <script src="${pageContext.request.contextPath}/assets/js/profile-image-handler.js"></script>
     <script>
-        // Image preview functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const profileImage = document.getElementById('profileImage');
-            if (profileImage) {
-                profileImage.addEventListener('change', function() {
-                    if (this.files && this.files[0]) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            // Update all profile images on the page
-                            const images = document.querySelectorAll('.profile-image img');
-                            images.forEach(img => {
-                                img.src = e.target.result;
-                            });
-
-                            // Reset remove flag
-                            document.getElementById('removeImage').value = "false";
-                        };
-                        reader.readAsDataURL(this.files[0]);
-                    }
-                });
-            }
-        });
-
-        // Function to remove profile image
+        // Function to remove profile image (overrides the one in profile-image-handler.js)
         function removeProfileImage() {
-            // Update all profile images on the page to default
-            const images = document.querySelectorAll('.profile-image img');
-            images.forEach(img => {
-                img.src = '${pageContext.request.contextPath}/assets/images/patients/default.jpg';
+            // Get the default image path
+            const defaultImagePath = '/assets/images/patients/default.jpg';
+
+            // Get all profile image containers
+            const imageContainers = document.querySelectorAll('.profile-image, .patient-avatar, .user-avatar, .doctor-image, .profile-avatar');
+
+            imageContainers.forEach(container => {
+                // Get the initials from data attribute
+                const initials = container.getAttribute('data-initials');
+
+                // Find the image element
+                const img = container.querySelector('img');
+
+                if (img) {
+                    // Remove the image
+                    img.remove();
+
+                    // Create and add initials element if we have initials data
+                    if (initials) {
+                        const initialsElement = document.createElement('div');
+                        initialsElement.className = 'profile-initials';
+                        initialsElement.textContent = initials;
+                        container.appendChild(initialsElement);
+                    }
+                }
             });
 
             // Clear file input and set remove flag
             document.getElementById('profileImage').value = '';
             document.getElementById('removeImage').value = "true";
         }
+
+        // Initialize profile image handling on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize profile image handling
+            initProfileImageHandling();
+
+            // Add event listener to profile image input
+            const profileImage = document.getElementById('profileImage');
+            if (profileImage) {
+                profileImage.addEventListener('change', handleProfileImageChange);
+            }
+        });
     </script>
 </body>
 </html>

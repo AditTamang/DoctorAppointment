@@ -108,7 +108,10 @@
 
     <!-- Listeners -->
     <listener>
-        <listener-class>com.doctorapp.listener.DatabaseInitListener</listener-class>
+        <listener-class>com.doctorapp.util.AppInitializer</listener-class>
+    </listener>
+    <listener>
+        <listener-class>com.doctorapp.util.DatabaseConnectionListener</listener-class>
     </listener>
 
     <!-- Multipart Configuration -->
@@ -141,7 +144,6 @@
     <servlet-mapping>
         <servlet-name>DoctorProfileServlet</servlet-name>
         <url-pattern>/doctor/profile</url-pattern>
-        <url-pattern>/doctor/profile/update</url-pattern>
         <url-pattern>/doctor/edit-profile</url-pattern>
     </servlet-mapping>
 
@@ -153,6 +155,21 @@
     <servlet-mapping>
         <servlet-name>ImageServlet</servlet-name>
         <url-pattern>/image/*</url-pattern>
+    </servlet-mapping>
+
+    <!--
+        Medical Record View/Edit Servlet is configured via @WebServlet annotation
+        in com.doctorapp.controller.doctor.DoctorViewEditMedicalRecordServlet
+    -->
+
+    <!-- Doctor Appointment Details Page Servlet -->
+    <servlet>
+        <servlet-name>DoctorAppointmentDetailsPageServlet</servlet-name>
+        <servlet-class>com.doctorapp.controller.doctor.DoctorAppointmentDetailsPageServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DoctorAppointmentDetailsPageServlet</servlet-name>
+        <url-pattern>/doctor/appointment-details</url-pattern>
     </servlet-mapping>
 
 </web-app>

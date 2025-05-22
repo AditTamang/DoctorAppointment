@@ -16,7 +16,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-// Handles the admin dashboard page
+/**
+ * Servlet for admin dashboard - displays statistics and recent activity
+ */
 @WebServlet("/admin/dashboard")
 public class AdminDashboardServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -28,8 +30,11 @@ public class AdminDashboardServlet extends HttpServlet {
         dashboardService = new DashboardService();
     }
 
+    /**
+     * Handles GET requests for the admin dashboard
+     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Make sure user is logged in
+        // Verify admin authentication
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
@@ -38,7 +43,7 @@ public class AdminDashboardServlet extends HttpServlet {
 
         User user = (User) session.getAttribute("user");
         if (!"ADMIN".equals(user.getRole())) {
-            // Send users to their correct dashboard
+            // Redirect to appropriate dashboard based on role
             if ("DOCTOR".equals(user.getRole())) {
                 response.sendRedirect(request.getContextPath() + "/doctor/dashboard");
             } else if ("PATIENT".equals(user.getRole())) {
@@ -49,37 +54,33 @@ public class AdminDashboardServlet extends HttpServlet {
             return;
         }
 
-        // Load all dashboard data
+        // Load dashboard data
         try {
-            // Get statistics
+            // Fetch dashboard statistics
             int doctorCount = dashboardService.getDoctorCount();
             int patientCount = dashboardService.getPatientCount();
             int newBookingCount = dashboardService.getNewBookingCount();
             int todaySessionCount = dashboardService.getTodaySessionCount();
 
-            // Get upcoming appointments for this week
+            // Fetch recent activity data
             List<Appointment> upcomingAppointments = dashboardService.getUpcomingAppointments();
-
-            // Get newest doctors
             List<Doctor> recentDoctors = dashboardService.getRecentDoctors();
-
-            // Get latest patient appointments
             List<Appointment> recentPatientAppointments = dashboardService.getRecentPatientAppointments();
 
-            // Add all data to the request
+            // Set attributes for the dashboard view
             request.setAttribute("doctorCount", doctorCount);
             request.setAttribute("patientCount", patientCount);
             request.setAttribute("newBookingCount", newBookingCount);
             request.setAttribute("todaySessionCount", todaySessionCount);
             request.setAttribute("upcomingAppointments", upcomingAppointments);
-            request.setAttribute("upcomingSessions", upcomingAppointments); // Using same data for both
+            request.setAttribute("upcomingSessions", upcomingAppointments);
             request.setAttribute("topDoctors", recentDoctors);
             request.setAttribute("recentAppointments", recentPatientAppointments);
 
-            // Show the admin dashboard page
+            // Display dashboard
             request.getRequestDispatcher("/admin/admin-dashboard.jsp").forward(request, response);
         } catch (Exception e) {
-            // Log the error and show error message
+            // Handle errors
             LOGGER.severe("Error retrieving dashboard data: " + e.getMessage());
             request.setAttribute("error", "Error retrieving dashboard data: " + e.getMessage());
             request.getRequestDispatcher("/admin/admin-dashboard.jsp").forward(request, response);

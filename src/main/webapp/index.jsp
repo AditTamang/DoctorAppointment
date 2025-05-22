@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MedDoc - Doctor Appointment System</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/images/logo.jpg" type="image/jpeg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -384,7 +386,7 @@
             <div class="footer-container">
                 <div class="footer-col">
                     <div class="footer-logo">
-                        <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="MedDoc Logo">
+                        <img src="${pageContext.request.contextPath}/assets/images/logo.jpg" alt="MedDoc Logo">
                         <div class="footer-logo-text">Med<span>Doc</span></div>
                     </div>
                     <p>We are dedicated to providing you with the best medical services. Your health is our priority.</p>

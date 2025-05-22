@@ -1,0 +1,157 @@
+.sidebar {
+    width: 240px !important;
+    height: 100vh !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 100 !important;
+    background-color: white !important;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    transition: all 0.3s ease !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-right: 1px solid #e0e0e0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Fix sidebar profile section */
+.sidebar-profile {
+    padding: 25px 20px !important;
+    text-align: center !important;
+    border-bottom: 1px solid #eee !important;
+    background-color: #f9f9f9 !important;
+    margin: 0 !important;
+}
+
+/* Fix profile image */
+.sidebar-profile .profile-image {
+    width: 80px !important;
+    height: 80px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    margin: 0 auto 15px !important;
+    border: 3px solid white !important;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+.sidebar-profile .profile-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+/* Fix profile name and info */
+.sidebar-profile .profile-name {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+    margin-bottom: 8px !important;
+}
+
+.sidebar-profile .profile-info {
+    font-size: 13px !important;
+    color: #666 !important;
+    margin-bottom: 6px !important;
+    word-break: break-word !important;
+}
+
+/* Fix sidebar navigation */
+.sidebar-nav {
+    flex: 1 !important;
+    padding: 20px 0 !important;
+    overflow-y: auto !important;
+}
+
+.sidebar-nav ul {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.sidebar-nav li {
+    margin-bottom: 8px !important;
+    width: 100% !important;
+}
+
+/* Fix navigation links */
+.sidebar-nav a {
+    display: flex !important;
+    align-items: center !important;
+    padding: 12px 20px !important;
+    color: #555 !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+    font-size: 14px !important;
+    border-left: 3px solid transparent !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.sidebar-nav a i {
+    margin-right: 10px !important;
+    width: 20px !important;
+    text-align: center !important;
+    font-size: 16px !important;
+}
+
+.sidebar-nav a:hover {
+    background-color: #f5f5f5 !important;
+    color: #4CAF50 !important;
+}
+
+.sidebar-nav a.active {
+    background-color: #f5f5f5 !important;
+    color: #4CAF50 !important;
+    border-left: 3px solid #4CAF50 !important;
+    font-weight: 500 !important;
+}
+
+/* Fix logout section */
+.logout {
+    margin-top: auto !important;
+    padding: 15px 20px !important;
+    border-top: 1px solid #eee !important;
+}
+
+.logout a {
+    display: flex !important;
+    align-items: center !important;
+    color: #f44336 !important;
+    text-decoration: none !important;
+    font-size: 14px !important;
+}
+
+.logout i {
+    margin-right: 10px !important;
+    width: 20px !important;
+    text-align: center !important;
+}
+
+/* Fix main content to not overlap with sidebar */
+.main-content {
+    margin-left: 240px !important;
+    padding: 25px !important;
+    transition: margin-left 0.3s ease !important;
+    width: calc(100% - 240px) !important;
+    box-sizing: border-box !important;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%) !important;
+        width: 240px !important;
+    }
+    
+    .sidebar.active {
+        transform: translateX(0) !important;
+    }
+    
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+}

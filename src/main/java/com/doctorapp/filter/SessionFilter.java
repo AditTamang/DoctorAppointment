@@ -91,7 +91,16 @@ public class SessionFilter implements Filter {
 
             // Doctor area protection
             if (requestURI.contains("/doctor/") || requestURI.startsWith(contextPath + "/doctor/")) {
-                if (!"DOCTOR".equals(user.getRole()) && !"ADMIN".equals(user.getRole())) {
+                // If the user is a doctor and accessing doctor dashboard or related resources, allow access
+                if ("DOCTOR".equals(user.getRole())) {
+                    // Allow access to all doctor resources for doctors
+                    chain.doFilter(request, response);
+                    return;
+                } else if ("ADMIN".equals(user.getRole())) {
+                    // Allow access to doctor resources for admins
+                    chain.doFilter(request, response);
+                    return;
+                } else {
                     // Redirect to dashboard if not a doctor or admin
                     httpResponse.sendRedirect(contextPath + "/dashboard");
                     return;
@@ -108,16 +117,19 @@ public class SessionFilter implements Filter {
             }
 
             // Handle dashboard access based on role
-            if (requestURI.endsWith("/dashboard") || requestURI.equals(contextPath + "/dashboard")) {
+            if (requestURI.equals(contextPath + "/redirect-dashboard")) {
+                // Only redirect if accessing the main /redirect-dashboard URL directly
+                // This prevents redirects when forwarding from role-specific dashboards
+
                 // Redirect to role-specific dashboard if accessing the general dashboard
                 if ("ADMIN".equals(user.getRole())) {
-                    httpResponse.sendRedirect(contextPath + "/admin/index.jsp");
+                    httpResponse.sendRedirect(contextPath + "/admin/dashboard");
                     return;
                 } else if ("DOCTOR".equals(user.getRole())) {
-                    httpResponse.sendRedirect(contextPath + "/doctor/doctorDashboard.jsp");
+                    httpResponse.sendRedirect(contextPath + "/doctor/dashboard");
                     return;
                 } else if ("PATIENT".equals(user.getRole())) {
-                    httpResponse.sendRedirect(contextPath + "/patient/patientDashboard.jsp");
+                    httpResponse.sendRedirect(contextPath + "/patient/dashboard");
                     return;
                 }
             }

@@ -84,7 +84,7 @@
                         <p><i class="fas fa-phone"></i> ${doctor.phone != null ? doctor.phone : 'Not available'}</p>
 
                         <div class="profile-actions">
-                            <a href="${pageContext.request.contextPath}/doctor/profile" class="btn btn-primary">Edit Profile</a>
+                            <a href="${pageContext.request.contextPath}/doctor/edit-profile" class="btn btn-primary">Edit Profile</a>
                             <a href="${pageContext.request.contextPath}/doctor/availability" class="btn btn-success">Set Availability</a>
                             <button id="toggle-status-btn" class="btn btn-outline">Set Active ${doctor.status == 'ACTIVE' ? 'Off' : 'On'}</button>
                         </div>
@@ -301,8 +301,8 @@
                                 // Show success message
                                 alert(data.message || 'Status updated successfully!');
 
-                                // Reload the page to reflect changes
-                                window.location.reload();
+                                // Update button text without reloading
+                                toggleStatusBtn.textContent = 'Set Active ' + (data.status == 'ACTIVE' ? 'Off' : 'On');
                             } else {
                                 // Show error message
                                 alert(data.message || 'Failed to update status. Please try again.');

@@ -8,139 +8,16 @@
     <title>Add Medical Record | Doctor Dashboard</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/doctor-common.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .form-container {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            margin-top: 20px;
-            max-width: 1000px;
-            margin-left: auto;
-            margin-right: auto;
-        }
+        /* Form styles are now in doctor-common.css */
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+        /* Button styles are now in doctor-common.css */
 
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-            font-size: 14px;
-        }
+        /* Alert and back button styles are now in doctor-common.css */
 
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
-
-        .form-control:focus {
-            border-color: #4e73df;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.1);
-        }
-
-        .form-row {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .form-col {
-            flex: 1;
-            min-width: 250px;
-        }
-
-        .btn-primary, .btn-secondary {
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-
-        .btn-primary {
-            background-color: #4e73df;
-            color: #fff;
-        }
-
-        .btn-primary:hover {
-            background-color: #3756a4;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: #fff;
-        }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 15px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #4e73df;
-            text-decoration: none;
-            font-weight: 500;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-            font-size: 14px;
-        }
-
-        .back-btn:hover {
-            color: #3756a4;
-            transform: translateX(-3px);
-        }
-        
         .page-title {
             font-size: 24px;
             font-weight: 600;
@@ -150,12 +27,12 @@
             padding-bottom: 10px;
             display: inline-block;
         }
-        
+
         textarea.form-control {
             min-height: 100px;
             resize: vertical;
         }
-        
+
         .patient-info {
             background-color: #f8f9fc;
             padding: 15px;
@@ -163,31 +40,31 @@
             margin-bottom: 20px;
             border-left: 4px solid #4e73df;
         }
-        
+
         .patient-info h3 {
             margin: 0 0 10px 0;
             color: #333;
             font-size: 18px;
             font-weight: 600;
         }
-        
+
         .patient-info p {
             margin: 0 0 5px 0;
             color: #666;
             font-size: 14px;
         }
-        
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .form-row {
                 flex-direction: column;
                 gap: 0;
             }
-            
+
             .form-col {
                 width: 100%;
             }
-            
+
             .form-actions {
                 justify-content: center;
             }
@@ -236,7 +113,7 @@
                     <p><strong>Blood Group:</strong> <%= patient.getBloodGroup() != null ? patient.getBloodGroup() : "Not specified" %></p>
                     <p><strong>Allergies:</strong> <%= patient.getAllergies() != null ? patient.getAllergies() : "None" %></p>
                 </div>
-                
+
                 <h2 class="page-title">New Medical Record</h2>
                 <form action="${pageContext.request.contextPath}/doctor/add-medical-record" method="post">
                     <input type="hidden" name="patientId" value="<%= patient.getId() %>">

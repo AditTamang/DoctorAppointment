@@ -10,6 +10,12 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.doctorapp.model.Patient;
+import com.doctorapp.model.User;
+import com.doctorapp.service.PatientService;
+import com.doctorapp.service.UserService;
+import com.doctorapp.util.ValidationUtil;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,12 +24,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
-
-import com.doctorapp.model.Patient;
-import com.doctorapp.model.User;
-import com.doctorapp.service.PatientService;
-import com.doctorapp.service.UserService;
-import com.doctorapp.util.ValidationUtil;
 
 /**
  * Servlet for handling patient profile operations
@@ -108,8 +108,118 @@ public class PatientProfileServlet extends HttpServlet {
             patient = patientService.getPatientById(patientId);
         }
 
+        // Set patient in both request and session for consistent access across all pages
         request.setAttribute("patient", patient);
+        session.setAttribute("patient", patient);
+        LOGGER.log(Level.INFO, "Patient object set in both request and session in showPatientProfile");
+
+        // Always show the standard profile page
         request.getRequestDispatcher("/patient/profile.jsp").forward(request, response);
+    }
+
+    /**
+     * Handle profile image upload separately
+     */
+    private void updateProfileImage(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+
+        try {
+            // Get patient information
+            int patientId = patientService.getPatientIdByUserId(user.getId());
+            Patient patient = patientService.getPatientById(patientId);
+
+            if (patient == null) {
+                session.setAttribute("errorMessage", "Patient record not found. Please complete your profile first.");
+                response.sendRedirect(request.getContextPath() + "/patient/profile");
+                return;
+            }
+
+            // Check if image should be removed
+            String removeImage = request.getParameter("removeImage");
+            if (removeImage != null && removeImage.equals("true")) {
+                // Set profile image to default
+                patient.setProfileImage("/assets/images/patients/default.jpg");
+                LOGGER.log(Level.INFO, "Image removed and set to default");
+
+                boolean updated = patientService.updatePatient(patient);
+                if (updated) {
+                    session.setAttribute("successMessage", "Profile image removed successfully");
+                } else {
+                    session.setAttribute("errorMessage", "Failed to remove profile image");
+                }
+
+                response.sendRedirect(request.getContextPath() + "/patient/profile?view=dashboard");
+                return;
+            }
+
+            // Check if the request is multipart
+            boolean isMultipart = request.getContentType() != null &&
+                                 request.getContentType().toLowerCase().startsWith("multipart/");
+
+            if (!isMultipart) {
+                session.setAttribute("errorMessage", "Invalid request type for image upload");
+                response.sendRedirect(request.getContextPath() + "/patient/profile");
+                return;
+            }
+
+            // Get the profile image part
+            Part filePart = request.getPart("profileImage");
+
+            if (filePart == null || filePart.getSize() <= 0) {
+                session.setAttribute("errorMessage", "No image file selected");
+                response.sendRedirect(request.getContextPath() + "/patient/profile");
+                return;
+            }
+
+            // Get the file name
+            String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+
+            // Create the upload directory if it doesn't exist
+            String uploadPath = getServletContext().getRealPath("") + File.separator + "assets" +
+                              File.separator + "images" + File.separator + "patients";
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                boolean dirCreated = uploadDir.mkdirs();
+                LOGGER.log(Level.INFO, "Upload directory created: " + dirCreated);
+                LOGGER.log(Level.INFO, "Upload directory path: " + uploadDir.getAbsolutePath());
+            }
+
+            // Generate a unique file name to prevent overwriting
+            String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
+            String filePath = uploadPath + File.separator + uniqueFileName;
+
+            // Save the file
+            try (InputStream input = filePart.getInputStream()) {
+                Files.copy(input, Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
+                LOGGER.log(Level.INFO, "File saved to: " + filePath);
+
+                // Update the patient's profile image with correct path
+                String imageUrl = "/assets/images/patients/" + uniqueFileName;
+                patient.setProfileImage(imageUrl);
+                LOGGER.log(Level.INFO, "Profile image set to: " + imageUrl);
+
+                // Log the file details for debugging
+                File savedFile = new File(filePath);
+                LOGGER.log(Level.INFO, "File exists: " + savedFile.exists());
+                LOGGER.log(Level.INFO, "File size: " + savedFile.length() + " bytes");
+            }
+
+            boolean updated = patientService.updatePatient(patient);
+            if (updated) {
+                // Update the patient in the session
+                session.setAttribute("patient", patient);
+                session.setAttribute("successMessage", "Profile image updated successfully");
+                LOGGER.log(Level.INFO, "Profile image updated successfully and patient object refreshed in session");
+            } else {
+                session.setAttribute("errorMessage", "Failed to update profile image");
+            }
+
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error handling image upload: " + e.getMessage(), e);
+            session.setAttribute("errorMessage", "Error uploading image: " + e.getMessage());
+        }
+
+        response.sendRedirect(request.getContextPath() + "/patient/profile");
     }
 
     /**
@@ -121,6 +231,13 @@ public class PatientProfileServlet extends HttpServlet {
 
         if (user == null || !"PATIENT".equals(user.getRole())) {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        // Check if this is just a profile image update
+        String updateType = request.getParameter("updateType");
+        if (updateType != null && updateType.equals("profileImage")) {
+            updateProfileImage(request, response, user);
             return;
         }
 
@@ -200,8 +317,28 @@ public class PatientProfileServlet extends HttpServlet {
                                           File.separator + "images" + File.separator + "patients";
                         File uploadDir = new File(uploadPath);
                         if (!uploadDir.exists()) {
-                            uploadDir.mkdirs();
+                            boolean dirCreated = uploadDir.mkdirs();
+                            LOGGER.log(Level.INFO, "Upload directory created: " + dirCreated);
+                            LOGGER.log(Level.INFO, "Upload directory path: " + uploadDir.getAbsolutePath());
+
+                            // If directory creation failed, try to create parent directories
+                            if (!dirCreated) {
+                                File parentDir = uploadDir.getParentFile();
+                                if (parentDir != null && !parentDir.exists()) {
+                                    boolean parentDirCreated = parentDir.mkdirs();
+                                    LOGGER.log(Level.INFO, "Parent directory created: " + parentDirCreated);
+
+                                    // Try again to create the upload directory
+                                    dirCreated = uploadDir.mkdirs();
+                                    LOGGER.log(Level.INFO, "Second attempt to create upload directory: " + dirCreated);
+                                }
+                            }
                         }
+
+                        // Log directory information
+                        LOGGER.log(Level.INFO, "Upload directory exists: " + uploadDir.exists());
+                        LOGGER.log(Level.INFO, "Upload directory is directory: " + uploadDir.isDirectory());
+                        LOGGER.log(Level.INFO, "Upload directory can write: " + uploadDir.canWrite());
 
                         // Generate a unique file name to prevent overwriting
                         String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
@@ -212,10 +349,21 @@ public class PatientProfileServlet extends HttpServlet {
                             Files.copy(input, Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
                             LOGGER.log(Level.INFO, "File saved to: " + filePath);
 
-                            // Update the patient's profile image
+                            // Update the patient's profile image with correct path
                             String imageUrl = "/assets/images/patients/" + uniqueFileName;
                             patient.setProfileImage(imageUrl);
                             LOGGER.log(Level.INFO, "Profile image set to: " + imageUrl);
+
+                            // Log the file details for debugging
+                            File savedFile = new File(filePath);
+                            LOGGER.log(Level.INFO, "File exists: " + savedFile.exists());
+                            LOGGER.log(Level.INFO, "File size: " + savedFile.length() + " bytes");
+
+                            // Ensure the profile image is set in the patient object
+                            if (patient.getProfileImage() == null || !patient.getProfileImage().equals(imageUrl)) {
+                                LOGGER.log(Level.WARNING, "Profile image not set correctly, forcing it");
+                                patient.setProfileImage(imageUrl);
+                            }
                         }
                     }
                 }
@@ -238,12 +386,26 @@ public class PatientProfileServlet extends HttpServlet {
                 // Update session with new user data
                 session.setAttribute("user", user);
 
-                request.setAttribute("successMessage", "Profile updated successfully");
+                // Update the patient in the session
+                session.setAttribute("patient", patient);
+                LOGGER.log(Level.INFO, "Patient object refreshed in session after profile update");
+
+                // Use session attribute instead of request attribute for redirect
+                session.setAttribute("successMessage", "Profile updated successfully");
                 System.out.println("Profile updated successfully for user ID: " + user.getId());
+
+                // Redirect instead of forward to avoid form resubmission
+                response.sendRedirect(request.getContextPath() + "/patient/profile");
+                return;
             } else {
-                request.setAttribute("errorMessage", "Failed to update profile. Please try again.");
+                // Use session attribute instead of request attribute for redirect
+                session.setAttribute("errorMessage", "Failed to update profile. Please try again.");
                 System.err.println("Failed to update profile for user ID: " + user.getId() +
                                   ". User update: " + userUpdated + ", Patient update: " + patientUpdated);
+
+                // Redirect instead of forward to avoid form resubmission
+                response.sendRedirect(request.getContextPath() + "/patient/profile");
+                return;
             }
         } else {
             // Create a new patient record if it doesn't exist
@@ -280,8 +442,28 @@ public class PatientProfileServlet extends HttpServlet {
                                           File.separator + "images" + File.separator + "patients";
                         File uploadDir = new File(uploadPath);
                         if (!uploadDir.exists()) {
-                            uploadDir.mkdirs();
+                            boolean dirCreated = uploadDir.mkdirs();
+                            LOGGER.log(Level.INFO, "Upload directory created for new patient: " + dirCreated);
+                            LOGGER.log(Level.INFO, "Upload directory path: " + uploadDir.getAbsolutePath());
+
+                            // If directory creation failed, try to create parent directories
+                            if (!dirCreated) {
+                                File parentDir = uploadDir.getParentFile();
+                                if (parentDir != null && !parentDir.exists()) {
+                                    boolean parentDirCreated = parentDir.mkdirs();
+                                    LOGGER.log(Level.INFO, "Parent directory created: " + parentDirCreated);
+
+                                    // Try again to create the upload directory
+                                    dirCreated = uploadDir.mkdirs();
+                                    LOGGER.log(Level.INFO, "Second attempt to create upload directory: " + dirCreated);
+                                }
+                            }
                         }
+
+                        // Log directory information
+                        LOGGER.log(Level.INFO, "Upload directory exists: " + uploadDir.exists());
+                        LOGGER.log(Level.INFO, "Upload directory is directory: " + uploadDir.isDirectory());
+                        LOGGER.log(Level.INFO, "Upload directory can write: " + uploadDir.canWrite());
 
                         // Generate a unique file name to prevent overwriting
                         String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
@@ -310,24 +492,27 @@ public class PatientProfileServlet extends HttpServlet {
                 // Update session with new user data
                 session.setAttribute("user", user);
 
-                request.setAttribute("successMessage", "Profile created successfully");
+                // Update the patient in the session
+                session.setAttribute("patient", patient);
+                LOGGER.log(Level.INFO, "Patient object added to session after profile creation");
+
+                // Use session attribute instead of request attribute for redirect
+                session.setAttribute("successMessage", "Profile created successfully");
                 System.out.println("Profile created successfully for user ID: " + user.getId());
+
+                // Redirect instead of forward to avoid form resubmission
+                response.sendRedirect(request.getContextPath() + "/patient/profile");
+                return;
             } else {
-                request.setAttribute("errorMessage", "Failed to create profile. Please try again.");
+                // Use session attribute instead of request attribute for redirect
+                session.setAttribute("errorMessage", "Failed to create profile. Please try again.");
                 System.err.println("Failed to create profile for user ID: " + user.getId() +
                                   ". User update: " + userUpdated + ", Patient add: " + patientAdded);
+
+                // Redirect instead of forward to avoid form resubmission
+                response.sendRedirect(request.getContextPath() + "/patient/profile");
+                return;
             }
         }
-
-        // Refresh patient data
-        patient = patientService.getPatientById(patientId);
-        if (patient == null) {
-            // Try to get the newly created patient
-            patientId = patientService.getPatientIdByUserId(user.getId());
-            patient = patientService.getPatientById(patientId);
-        }
-
-        request.setAttribute("patient", patient);
-        request.getRequestDispatcher("/patient/profile.jsp").forward(request, response);
     }
 }

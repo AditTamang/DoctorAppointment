@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - HealthCare</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/images/logo.jpg" type="image/jpeg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
    <style>
@@ -43,7 +45,10 @@
 
         <!-- Right Side with Registration Form -->
         <div class="auth-right">
-            <a href="index.jsp" class="logo" style="display: inline-block; margin-bottom: 2rem; text-decoration: none; font-size: 1.8rem; font-weight: 700; color: var(--dark-color);">Health<span style="color: var(--primary-color);">Care</span></a>
+            <a href="index.jsp" class="logo" style="display: inline-block; margin-bottom: 2rem; text-decoration: none; font-size: 1.8rem; font-weight: 700; color: var(--dark-color);">
+                <img src="${pageContext.request.contextPath}/assets/images/logo.jpg" alt="HealthCare Logo" style="height: 40px; margin-right: 10px; vertical-align: middle;">
+                Health<span style="color: var(--primary-color);">Care</span>
+            </a>
 
             <h2>Create Account</h2>
             <p class="auth-subtitle">Please fill in your details to register</p>

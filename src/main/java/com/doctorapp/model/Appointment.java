@@ -13,10 +13,12 @@ public class Appointment {
     private String doctorName;
     private Date appointmentDate;
     private String appointmentTime;
-    private String status; // "PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"
+    // Status values: "PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"
+    private String status;
     private String symptoms;
     private String prescription;
     private String reason;
+    private String reschedulingReason;
     private String notes;
     private double fee;
     private String doctorSpecialization;
@@ -41,7 +43,7 @@ public class Appointment {
         this.prescription = prescription;
     }
 
-    // Getters and Setters
+    // Basic getters and setters
     public int getId() {
         return id;
     }
@@ -90,14 +92,14 @@ public class Appointment {
         this.appointmentDate = appointmentDate;
     }
 
-    // Method to handle LocalDate
+    // Convert LocalDate to Date for appointment date
     public void setAppointmentDate(LocalDate localDate) {
         if (localDate != null) {
             this.appointmentDate = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         }
     }
 
-    // Method to get LocalDate
+    // Get appointment date as LocalDate
     public LocalDate getAppointmentLocalDate() {
         if (appointmentDate != null) {
             return appointmentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -113,20 +115,20 @@ public class Appointment {
         this.appointmentTime = appointmentTime;
     }
 
-    // Method to handle LocalTime
+    // Convert LocalTime to String for appointment time
     public void setAppointmentTime(LocalTime localTime) {
         if (localTime != null) {
             this.appointmentTime = localTime.toString();
         }
     }
 
-    // Method to get LocalTime
+    // Get appointment time as LocalTime
     public LocalTime getAppointmentLocalTime() {
         if (appointmentTime != null && !appointmentTime.isEmpty()) {
             try {
                 return LocalTime.parse(appointmentTime);
             } catch (Exception e) {
-                // Handle time formats like "10:00 AM"
+                // Try parsing time format like "10:00 AM"
                 try {
                     return LocalTime.parse(appointmentTime, java.time.format.DateTimeFormatter.ofPattern("h:mm a"));
                 } catch (Exception ex) {
@@ -137,8 +139,8 @@ public class Appointment {
         return null;
     }
 
+    // Get status with UI-friendly conversion
     public String getStatus() {
-        // Convert database status to UI status if needed
         if ("CONFIRMED".equals(status)) {
             return "APPROVED";
         } else if ("CANCELLED".equals(status) && this.reason != null && !this.reason.isEmpty()) {
@@ -151,7 +153,7 @@ public class Appointment {
         this.status = status;
     }
 
-    // Get the raw database status
+    // Get original status without UI conversion
     public String getRawStatus() {
         return status;
     }
@@ -172,12 +174,40 @@ public class Appointment {
         this.prescription = prescription;
     }
 
+    /**
+     * Get the reason for the appointment or rescheduling
+     * @return The reason, prioritizing rescheduling reason if available
+     */
     public String getReason() {
+        // If reschedulingReason is available, return it instead
+        if (reschedulingReason != null && !reschedulingReason.isEmpty()) {
+            return reschedulingReason;
+        }
         return reason;
     }
 
+    /**
+     * Set the reason for the appointment
+     * @param reason The appointment reason
+     */
     public void setReason(String reason) {
         this.reason = reason;
+    }
+
+    /**
+     * Get the reason for rescheduling the appointment
+     * @return The rescheduling reason
+     */
+    public String getReschedulingReason() {
+        return reschedulingReason;
+    }
+
+    /**
+     * Set the reason for rescheduling the appointment
+     * @param reschedulingReason The reason for rescheduling
+     */
+    public void setReschedulingReason(String reschedulingReason) {
+        this.reschedulingReason = reschedulingReason;
     }
 
     public String getNotes() {
@@ -220,22 +250,20 @@ public class Appointment {
         this.patientImage = patientImage;
     }
 
-    // Helper method to format date and time
+    // Format date and time for display (e.g., "Jan 15, 2023 at 10:00 AM")
     public String getFormattedDateTime() {
         if (appointmentDate == null) {
             return "";
         }
-
         java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MMM dd, yyyy");
         return dateFormat.format(appointmentDate) + " at " + appointmentTime;
     }
 
-    // Helper method to format just the date
+    // Format date in ISO format (yyyy-MM-dd)
     public String getFormattedDate() {
         if (appointmentDate == null) {
             return "";
         }
-
         java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
         return dateFormat.format(appointmentDate);
     }

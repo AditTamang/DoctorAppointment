@@ -15,6 +15,21 @@ public class DBConnection {
     private static final String USERNAME = "root";
     private static final String PASSWORD = "";
 
+    static {
+        // Print connection details for debugging
+        System.out.println("Database URL: " + URL);
+        System.out.println("Database Username: " + USERNAME);
+        try {
+            // Test connection at class load time
+            Connection testConn = getConnection();
+            System.out.println("Database connection test successful");
+            testConn.close();
+        } catch (Exception e) {
+            System.err.println("Database connection test failed: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     public static Connection getConnection() throws SQLException, ClassNotFoundException {
         try {
             // Load the MySQL JDBC driver

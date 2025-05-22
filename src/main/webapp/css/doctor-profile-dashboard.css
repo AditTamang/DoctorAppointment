@@ -46,163 +46,18 @@ body {
     min-height: 100vh;
 }
 
-/* Sidebar Styles */
-.sidebar {
-    width: 250px;
-    background-color: var(--white);
-    border-right: 1px solid var(--gray-200);
-    height: 100vh;
-    position: fixed;
-    overflow-y: auto;
-    z-index: 100;
-    padding: 20px 0;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-}
+/* Sidebar Styles - Moved to doctor-sidebar-clean.css */
 
-.sidebar-header {
-    padding: 0 20px 20px;
-    display: flex;
-    align-items: center;
-}
-
-.sidebar-header img {
-    width: 32px;
-    height: 32px;
-    margin-right: 10px;
-}
-
-.sidebar-header h2 {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text-dark);
-}
-
-.profile-overview {
-    padding: 10px 20px;
-    margin: 0 10px 15px;
-    background-color: var(--gray-100);
-    border-radius: 8px;
-}
-
-.profile-overview h3 {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-dark);
-    display: flex;
-    align-items: center;
-}
-
-.profile-overview h3 i {
-    margin-right: 10px;
-    color: var(--primary-color);
-}
-
-.user-profile {
-    padding: 15px 20px;
-    margin: 0 10px 15px;
-    border-bottom: 1px solid var(--gray-200);
-    text-align: center;
-}
-
-.user-profile .profile-image {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin: 0 auto 10px;
-    border: 2px solid var(--primary-light);
-}
-
-.user-profile .profile-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.user-profile .profile-initials {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--primary-color);
-    color: var(--white);
-    font-size: 24px;
-    font-weight: 600;
-}
-
-.user-profile h3.user-name {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 5px;
-    color: var(--text-dark);
-}
-
-.user-profile p.user-email,
-.user-profile p.user-phone {
-    font-size: 13px;
-    color: var(--text-light);
-    margin-bottom: 3px;
-}
-
-.sidebar-menu {
-    padding: 0;
-}
-
-.sidebar-menu ul {
-    list-style: none;
-    padding: 0 10px;
-}
-
-.sidebar-menu li {
-    margin-bottom: 8px;
-}
-
-.sidebar-menu a {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    color: var(--text-dark);
-    text-decoration: none;
-    transition: all 0.3s ease;
-    border-radius: 8px;
-    font-weight: 500;
-    margin-right: 5px;
-}
-
-.sidebar-menu a i {
-    margin-right: 10px;
-    width: 20px;
-    text-align: center;
-    font-size: 16px;
-}
-
-.sidebar-menu a:hover {
-    background-color: var(--gray-100);
-    color: var(--primary-color);
-}
-
-.sidebar-menu li.active a {
-    background-color: var(--primary-light);
-    color: var(--primary-color);
-    font-weight: 600;
-    border-left: 3px solid var(--primary-color);
-}
-
-.sidebar-menu a span {
-    text-align: left;
-    width: 100%;
-}
-
-/* Main Content Styles */
+/* Main Content Styles - Base styles, overridden by doctor-layout-fix.css for specific pages */
 .main-content {
     flex: 1;
-    margin-left: 250px;
-    padding: 20px 30px;
-    background-color: var(--white);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    margin-left: 240px !important; /* Changed from 250px to match doctor-layout-fix.css */
+    padding: 20px 30px !important;
+    background-color: var(--white) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: calc(100% - 240px) !important;
 }
 
 .top-header {
@@ -603,7 +458,8 @@ body {
 
 /* Responsive Styles */
 @media (max-width: 992px) {
-    .sidebar {
+    /* These styles are for pages not using doctor-layout-fix.css */
+    body:not(.doctor-appointments-page):not(.doctor-patients-page) .sidebar {
         width: 80px;
     }
 
@@ -624,7 +480,8 @@ body {
         display: none;
     }
 
-    .main-content {
+    /* These styles are for pages not using doctor-layout-fix.css */
+    body:not(.doctor-appointments-page):not(.doctor-patients-page) .main-content {
         margin-left: 80px;
         width: calc(100% - 80px);
         padding: 15px;
@@ -664,11 +521,13 @@ body {
 }
 
 @media (max-width: 576px) {
-    .dashboard-container {
+    /* These styles are for pages not using doctor-layout-fix.css */
+    body:not(.doctor-appointments-page):not(.doctor-patients-page) .dashboard-container {
         flex-direction: column;
     }
 
-    .sidebar {
+    /* These styles are for pages not using doctor-layout-fix.css */
+    body:not(.doctor-appointments-page):not(.doctor-patients-page) .sidebar {
         width: 100%;
         height: auto;
         position: relative;
@@ -685,7 +544,8 @@ body {
         margin: 5px;
     }
 
-    .main-content {
+    /* These styles are for pages not using doctor-layout-fix.css */
+    body:not(.doctor-appointments-page):not(.doctor-patients-page) .main-content {
         margin-left: 0;
         width: 100%;
         padding: 10px;

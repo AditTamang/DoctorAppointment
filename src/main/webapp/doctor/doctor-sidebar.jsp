@@ -2,44 +2,38 @@
 <%@ page import="com.doctorapp.model.User" %>
 <%@ page import="com.doctorapp.model.Doctor" %>
 <%@ page import="com.doctorapp.service.DoctorService" %>
-<!-- Include the doctor sidebar CSS -->
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/doctor-sidebar.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-profile.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-sidebar-clean.css">
 <%
-    // Get current user from session
+    // Get user and redirect if not logged in
     User user = (User) session.getAttribute("user");
     if (user == null) {
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
 
-    // Get doctor information for profile image
+    // Get doctor profile data
     Doctor doctor = null;
     if ("DOCTOR".equals(user.getRole())) {
         DoctorService doctorService = new DoctorService();
         doctor = doctorService.getDoctorByUserId(user.getId());
     }
 
-    // Get current page path to highlight active menu item
+    // Determine active menu item
     String currentPath = request.getRequestURI();
-
-    // Extract the last part of the path for active menu highlighting
     String activePage = "";
     if (currentPath.contains("/")) {
         activePage = currentPath.substring(currentPath.lastIndexOf("/") + 1);
-        // Handle default page (index.jsp or empty path)
         if (activePage.isEmpty() || activePage.equals("dashboard")) {
             activePage = "dashboard";
         }
     }
 %>
+<!-- Styles moved to doctor-sidebar-clean.css -->
+
 <!-- Sidebar -->
 <div class="sidebar">
-    <div class="sidebar-header">
-        <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="MedDoc">
-        <h2>HealthPro Portal</h2>
-    </div>
-
-    <div class="user-profile">
+    <div class="sidebar-profile">
         <div class="profile-image">
             <%
             String imagePath = "";
@@ -47,66 +41,64 @@
                 imagePath = request.getContextPath() + doctor.getProfileImage();
             } else if (doctor != null && doctor.getImageUrl() != null && !doctor.getImageUrl().isEmpty()) {
                 imagePath = request.getContextPath() + doctor.getImageUrl();
-            } else if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) {
-            %>
-                <div class="profile-initials">AT</div>
-            <% } else {
+            } else {
                 imagePath = request.getContextPath() + "/assets/images/doctors/default-doctor.png";
-            %>
-                <img src="<%= imagePath %>" alt="Doctor" onerror="this.src='${pageContext.request.contextPath}/assets/images/doctors/default-doctor.png'">
-            <%
             }
 
-            // Only show image if we have a path and not showing initials
-            if (!imagePath.isEmpty() && !user.getFirstName().equals("Adit") && !user.getLastName().equals("Tamang")) {
+            // Check if we should display the image or initials
+            boolean useDefaultImage = imagePath.contains("default-doctor.png");
+            if (!useDefaultImage) {
             %>
-                <img src="<%= imagePath %>" alt="Doctor" onerror="this.src='${pageContext.request.contextPath}/assets/images/doctors/default-doctor.png'">
+                <img src="<%= imagePath %>" alt="Doctor"
+                     onerror="this.onerror=null; this.parentNode.innerHTML = '<div class=\'profile-initials\'><%= user.getFirstName().charAt(0) %><%= user.getLastName().charAt(0) %></div>';">
+            <% } else { %>
+                <div class="profile-initials"><%= user.getFirstName().charAt(0) %><%= user.getLastName().charAt(0) %></div>
             <% } %>
         </div>
-        <h3 class="user-name"><%= user.getFirstName() + " " + user.getLastName() %></h3>
-        <p class="user-email"><%= user.getEmail() %></p>
-        <p class="user-phone"><%= user.getPhone() %></p>
+        <div class="profile-name"><%= user.getFirstName() + " " + user.getLastName() %></div>
+        <div class="profile-info"><%= user.getEmail() %></div>
+        <div class="profile-info"><%= user.getPhone() != null ? user.getPhone() : "" %></div>
     </div>
 
-    <div class="sidebar-menu">
+    <div class="sidebar-nav">
         <ul>
-            <li class="<%= activePage.equals("dashboard") || activePage.equals("index") || activePage.isEmpty() ? "active" : "" %>">
-                <a href="${pageContext.request.contextPath}/doctor/dashboard">
-                    <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
+            <li>
+                <a href="${pageContext.request.contextPath}/doctor/dashboard" class="<%= activePage.equals("dashboard") || activePage.equals("index") || activePage.isEmpty() ? "active" : "" %>">
+                    <i class="fas fa-home"></i> Dashboard
                 </a>
             </li>
-            <li class="<%= activePage.equals("profile") || activePage.equals("edit-profile") ? "active" : "" %>">
-                <a href="${pageContext.request.contextPath}/doctor/profile">
-                    <i class="fas fa-user"></i>
-                    <span>Profile</span>
+            <li>
+                <a href="${pageContext.request.contextPath}/doctor/appointments" class="<%= activePage.equals("appointments") ? "active" : "" %>">
+                    <i class="fas fa-calendar-check"></i> My Appointments
                 </a>
             </li>
-            <li class="<%= activePage.equals("appointments") || activePage.equals("appointment-management") || activePage.equals("appointment-details") || activePage.equals("edit-appointment") ? "active" : "" %>">
-                <a href="${pageContext.request.contextPath}/doctor/appointments">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Appointment Management</span>
-                </a>
-            </li>
-            <li class="<%= activePage.equals("patients") ? "active" : "" %>">
-                <a href="${pageContext.request.contextPath}/doctor/patients">
-                    <i class="fas fa-user-injured"></i>
-                    <span>Patient Details</span>
-                </a>
-            </li>
-            <li class="<%= activePage.equals("availability") ? "active" : "" %>">
-                <a href="${pageContext.request.contextPath}/doctor/availability">
-                    <i class="fas fa-clock"></i>
-                    <span>Set Availability</span>
+            <li>
+                <a href="${pageContext.request.contextPath}/doctor/patients" class="<%= activePage.equals("patients") ? "active" : "" %>">
+                    <i class="fas fa-user-injured"></i> My Patients
                 </a>
             </li>
 
-            <li class="logout">
-                <a href="${pageContext.request.contextPath}/logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
+            <li>
+                <a href="${pageContext.request.contextPath}/doctor/edit-profile" class="<%= activePage.equals("profile") || activePage.equals("edit-profile") ? "active" : "" %>">
+                    <i class="fas fa-user"></i> My Profile
                 </a>
             </li>
         </ul>
     </div>
+
+    <div class="logout">
+        <a href="${pageContext.request.contextPath}/logout">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+
+    <script>
+        // Add mobile sidebar toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // This will be used by a toggle button in the main content
+            window.toggleSidebar = function() {
+                document.querySelector('.sidebar').classList.toggle('active');
+            };
+        });
+    </script>
 </div>

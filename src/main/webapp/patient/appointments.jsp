@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="com.doctorapp.model.User" %>
+<%@ page import="com.doctorapp.model.Patient" %>
 <%@ page import="com.doctorapp.model.Appointment" %>
+<%@ page import="com.doctorapp.service.PatientService" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -31,6 +33,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-pages.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-confirmation.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-confirm-fix.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-profile-image.css">
     <style>
         /* Fix for doctor initials */
         .doctor-small-avatar {
@@ -52,61 +55,12 @@
         }
     </style>
 </head>
-<body>
+<body data-context-path="${pageContext.request.contextPath}" class="patient-appointments">
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="user-profile">
-                <div class="profile-image">
-                    <% if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) { %>
-                        <div class="profile-initials">AT</div>
-                    <% } else { %>
-                        <div class="profile-initials"><%= user.getFirstName().charAt(0) %><%= user.getLastName().charAt(0) %></div>
-                    <% } %>
-                </div>
-                <h3 class="user-name"><%= user.getFirstName() + " " + user.getLastName() %></h3>
-                <p class="user-role">Patient</p>
-            </div>
-
-            <ul class="sidebar-menu">
-                <li>
-                    <a href="${pageContext.request.contextPath}/patient/dashboard">
-                        <i class="fas fa-home"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="active">
-                    <a href="${pageContext.request.contextPath}/appointments">
-                        <i class="fas fa-calendar-check"></i>
-                        <span>My Appointments</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="${pageContext.request.contextPath}/doctors">
-                        <i class="fas fa-user-md"></i>
-                        <span>Find Doctors</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="${pageContext.request.contextPath}/patient/medicalRecords.jsp">
-                        <i class="fas fa-file-medical"></i>
-                        <span>Medical Records</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="${pageContext.request.contextPath}/patient/profile">
-                        <i class="fas fa-user"></i>
-                        <span>My Profile</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="${pageContext.request.contextPath}/logout">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
+        <!-- Include the standardized sidebar -->
+        <jsp:include page="patient-sidebar.jsp">
+            <jsp:param name="activePage" value="appointments" />
+        </jsp:include>
 
         <!-- Main Content -->
         <div class="dashboard-main">
@@ -118,11 +72,18 @@
 
                 <div class="nav-right">
                     <div class="nav-user">
-                        <div class="user-image">
-                            <% if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) { %>
-                                <div class="user-initials">AT</div>
+                        <div class="user-image" data-default-image="/assets/images/patients/default.jpg" data-initials="<%= user.getFirstName().charAt(0) %><%= user.getLastName().charAt(0) %>">
+                            <%
+                            // Get patient information from session or request
+                            Patient patient = (Patient) session.getAttribute("patient");
+                            // If patient is not in session, we'll just use initials
+
+                            if (patient != null && patient.getProfileImage() != null && !patient.getProfileImage().isEmpty()) {
+                            %>
+                                <img src="${pageContext.request.contextPath}${patient.getProfileImage()}" alt="<%= user.getFirstName() %>"
+                                     onerror="this.src='${pageContext.request.contextPath}/assets/images/patients/default.jpg'">
                             <% } else { %>
-                                <div class="user-initials"><%= user.getFirstName().charAt(0) %><%= user.getLastName().charAt(0) %></div>
+                                <div class="profile-initials"><%= user.getFirstName().charAt(0) %><%= user.getLastName().charAt(0) %></div>
                             <% } %>
                         </div>
                         <div class="user-info">
@@ -141,6 +102,37 @@
                         <i class="fas fa-plus"></i> Book New Appointment
                     </a>
                 </div>
+
+                <%
+                // Display success message if present
+                String message = request.getParameter("message");
+                if (message != null) {
+                    String alertClass = "success";
+                    String alertMessage = "";
+
+                    if ("rescheduled".equals(message)) {
+                        alertMessage = "Your appointment has been successfully rescheduled.";
+                    } else if ("cancelled".equals(message)) {
+                        alertMessage = "Your appointment has been successfully cancelled.";
+                    }
+
+                    if (!alertMessage.isEmpty()) {
+                %>
+                <div class="alert alert-<%= alertClass %>" style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 5px solid #4CAF50;">
+                    <i class="fas fa-check-circle" style="margin-right: 10px;"></i> <%= alertMessage %>
+                </div>
+                <%
+                    }
+                }
+
+                // Display error message if present
+                String error = request.getParameter("error");
+                if (error != null && !error.isEmpty()) {
+                %>
+                <div class="alert alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 5px solid #dc3545;">
+                    <i class="fas fa-exclamation-circle" style="margin-right: 10px;"></i> <%= error %>
+                </div>
+                <% } %>
 
                 <div class="appointment-tabs">
                     <button class="tab-button active" data-tab="all">
@@ -179,8 +171,8 @@
                                 </div>
                                 <div class="appointment-card-body">
                                     <div class="appointment-doctor">
-                                        <div class="doctor-small-avatar">
-                                            <div class="initials"><%= appointment.getDoctorName() != null ? appointment.getDoctorName().charAt(0) : 'D' %></div>
+                                        <div class="doctor-small-avatar" data-default-image="/assets/images/doctors/default-doctor.png" data-initials="<%= appointment.getDoctorName() != null ? appointment.getDoctorName().charAt(0) : 'D' %>">
+                                            <div class="profile-initials"><%= appointment.getDoctorName() != null ? appointment.getDoctorName().charAt(0) : 'D' %></div>
                                         </div>
                                         <div class="appointment-doctor-info">
                                             <div class="appointment-doctor-name"><%= appointment.getDoctorName() != null ? appointment.getDoctorName() : "Doctor" %></div>
@@ -236,7 +228,13 @@
         </div>
     </div>
 
+    <script src="${pageContext.request.contextPath}/assets/js/profile-image-handler.js"></script>
     <script>
+        // Initialize profile image handling
+        document.addEventListener('DOMContentLoaded', function() {
+            handleImageLoadErrors();
+        });
+
         // Toggle sidebar on mobile
         document.getElementById('menuToggle').addEventListener('click', function() {
             document.querySelector('.sidebar').classList.toggle('active');

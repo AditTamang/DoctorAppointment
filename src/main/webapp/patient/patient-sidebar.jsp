@@ -33,13 +33,11 @@
 <!-- Sidebar -->
 <div class="sidebar">
     <div class="user-profile">
-        <div class="profile-image">
+        <div class="profile-image" data-default-image="/assets/images/patients/default.jpg" data-initials="<%= user.getFirstName().charAt(0) %><%= user.getLastName().charAt(0) %>">
             <% if (patient != null && patient.getProfileImage() != null && !patient.getProfileImage().isEmpty()) { %>
-                <img src="${pageContext.request.contextPath}${patient.getProfileImage()}" alt="Patient">
-            <% } else if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) { %>
-                <div class="profile-initials">AT</div>
+                <img src="${pageContext.request.contextPath}${patient.getProfileImage()}" alt="<%= user.getFirstName() %>" onerror="this.src='${pageContext.request.contextPath}/assets/images/patients/default.jpg'">
             <% } else { %>
-                <img src="${pageContext.request.contextPath}/assets/images/patients/default.jpg" alt="Patient">
+                <div class="profile-initials"><%= user.getFirstName().charAt(0) %><%= user.getLastName().charAt(0) %></div>
             <% } %>
         </div>
         <h3 class="user-name"><%= user.getFirstName() + " " + user.getLastName() %></h3>
@@ -90,4 +88,8 @@
 
 <!-- Include sidebar CSS and JavaScript -->
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-sidebar.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-profile-image.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/sidebar-button-fix.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-sidebar-fix.css">
 <script src="${pageContext.request.contextPath}/js/patient-sidebar.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/profile-image-handler.js"></script>

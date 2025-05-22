@@ -40,11 +40,14 @@
      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
      <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
      <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patientDashboard.css">
+     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-profile-image.css">
  </head>
- <body>
+ <body data-context-path="${pageContext.request.contextPath}">
      <div class="dashboard-container">
          <!-- Include the standardized sidebar -->
-         <jsp:include page="patient-sidebar.jsp" />
+         <jsp:include page="patient-sidebar.jsp">
+             <jsp:param name="activePage" value="dashboard" />
+         </jsp:include>
 
          <!-- Main Content -->
          <div class="main-content">
@@ -151,8 +154,8 @@
                                  </div>
                                  <div class="appointment-body">
                                      <div class="doctor-info">
-                                         <div class="doctor-image">
-                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
+                                         <div class="doctor-image" data-default-image="/assets/images/doctors/default.jpg">
+                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="<%= appointment.getDoctorName() %>" onerror="this.src='${pageContext.request.contextPath}/assets/images/doctors/default.jpg'">
                                          </div>
                                          <div class="doctor-details">
                                              <h4><%= appointment.getDoctorName() %></h4>
@@ -221,8 +224,8 @@
                                  </div>
                                  <div class="appointment-body">
                                      <div class="doctor-info">
-                                         <div class="doctor-image">
-                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
+                                         <div class="doctor-image" data-default-image="/assets/images/doctors/default.jpg">
+                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="<%= appointment.getDoctorName() %>" onerror="this.src='${pageContext.request.contextPath}/assets/images/doctors/default.jpg'">
                                          </div>
                                          <div class="doctor-details">
                                              <h4><%= appointment.getDoctorName() %></h4>
@@ -288,8 +291,8 @@
                                  </div>
                                  <div class="appointment-body">
                                      <div class="doctor-info">
-                                         <div class="doctor-image">
-                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="Doctor">
+                                         <div class="doctor-image" data-default-image="/assets/images/doctors/default.jpg">
+                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="<%= appointment.getDoctorName() %>" onerror="this.src='${pageContext.request.contextPath}/assets/images/doctors/default.jpg'">
                                          </div>
                                          <div class="doctor-details">
                                              <h4><%= appointment.getDoctorName() %></h4>
@@ -329,6 +332,7 @@
 
 
      <!-- JavaScript for Tab Switching -->
+     <script src="${pageContext.request.contextPath}/assets/js/profile-image-handler.js"></script>
      <script>
          document.addEventListener('DOMContentLoaded', function() {
              // Add hover effect to appointment cards
@@ -381,6 +385,9 @@
                      document.getElementById(tabId + '-appointments').style.display = 'block';
                  });
              });
+
+             // Initialize profile image handling
+             handleImageLoadErrors();
          });
 
          // Function to confirm appointment cancellation

@@ -21,30 +21,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Appointments | HealthPro Portal</title>
+    <title>Appointments | MedDoc</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-profile-dashboard.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-buttons.css">
+    <!-- Load doctor-layout-fix.css last to ensure it overrides other styles -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-layout-fix.css">
+    <!-- Load doctor-sidebar-clean.css to ensure sidebar is properly styled -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-sidebar-clean.css">
     <style>
-        /* Main Content Styling */
-        .main-content {
-            flex: 1;
-            padding: 20px;
+        /* Main Content Styling - Moved to doctor-layout-fix.css */
+
+        .top-header {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+        }
+
+        .top-header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .search-icon:hover {
+            background-color: #f5f5f5;
         }
 
         .appointment-section {
             background-color: #fff;
             border-radius: 10px;
             padding: 25px;
-            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
             margin-bottom: 30px;
             width: 100%;
-            max-width: 900px;
         }
 
         .appointment-header {
@@ -64,10 +91,10 @@
 
         .appointment-tabs {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             margin-bottom: 20px;
             border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 10px;
+            padding-bottom: 15px;
         }
 
         .appointment-tab {
@@ -309,9 +336,15 @@
 
         /* Responsive Design */
         @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
             .appointment-section {
                 padding: 15px;
                 margin-bottom: 20px;
+                border-radius: 8px;
             }
 
             .appointment-header {
@@ -341,12 +374,15 @@
                 overflow-x: auto;
                 padding-bottom: 5px;
                 gap: 5px;
+                display: flex;
+                flex-wrap: nowrap;
             }
 
             .appointment-tab {
                 padding: 8px 15px;
                 font-size: 14px;
                 white-space: nowrap;
+                flex: 0 0 auto;
             }
 
             .appointment-table th,
@@ -453,7 +489,7 @@
         }
     </style>
 </head>
-<body>
+<body class="doctor-appointments-page">
     <div class="dashboard-container">
         <!-- Include the standardized sidebar -->
         <jsp:include page="doctor-sidebar.jsp" />
@@ -462,8 +498,10 @@
         <div class="main-content">
             <!-- Top Header -->
             <div class="top-header">
-                <div class="top-header-left">
-                    <h2>Doctor Dashboard - Appointment Management</h2>
+                <div class="top-header-right">
+                    <div class="search-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
                 </div>
             </div>
 

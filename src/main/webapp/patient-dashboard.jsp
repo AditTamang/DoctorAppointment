@@ -99,7 +99,7 @@
                         <span class="badge">1</span>
                     </div>
                     <div class="user-profile">
-                        <img src="${pageContext.request.contextPath}/assets/images/patients/p1.png" alt="Patient">
+                        <img src="${pageContext.request.contextPath}/assets/images/patients/p1.jpg" alt="Patient">
                         <span>John Doe</span>
                         <i class="fas fa-chevron-down"></i>
                     </div>

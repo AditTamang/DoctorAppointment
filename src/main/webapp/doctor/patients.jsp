@@ -30,30 +30,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient Details | HealthPro Portal</title>
+    <title>Patient Details | MedDoc</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-profile-dashboard.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-buttons.css">
+    <!-- Load doctor-layout-fix.css last to ensure it overrides other styles -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-layout-fix.css">
+    <!-- Load doctor-sidebar-clean.css to ensure sidebar is properly styled -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-sidebar-clean.css">
     <style>
-        /* Main Content Styling */
-        .main-content {
-            flex: 1;
-            padding: 20px;
+        /* Main Content Styling - Moved to doctor-layout-fix.css */
+
+        .top-header {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+        }
+
+        .top-header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .search-icon:hover {
+            background-color: #f5f5f5;
+        }
+
+        .user-profile-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-profile-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .patients-container {
             background-color: #fff;
             border-radius: 10px;
             padding: 25px;
-            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
             margin-bottom: 30px;
             width: 100%;
-            max-width: 900px;
         }
 
         .patients-header {
@@ -384,9 +425,15 @@
 
         /* Responsive Design */
         @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
             .patients-container {
                 padding: 15px;
                 margin-bottom: 20px;
+                border-radius: 8px;
             }
 
             .patients-header {
@@ -414,11 +461,28 @@
             .patients-filter {
                 flex-direction: column;
                 gap: 10px;
+                padding: 12px;
             }
 
             .search-form {
                 flex-direction: column;
                 gap: 10px;
+                width: 100%;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .filter-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .patients-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
             }
 
             .patients-table th,
@@ -539,7 +603,7 @@
         }
     </style>
 </head>
-<body>
+<body class="doctor-patients-page">
     <div class="dashboard-container">
         <!-- Include the standardized sidebar -->
         <jsp:include page="doctor-sidebar.jsp" />
@@ -548,12 +612,6 @@
         <div class="main-content">
             <!-- Top Header -->
             <div class="top-header">
-                <div class="top-header-left">
-                    <a href="index.jsp">Profile</a>
-                    <a href="appointments.jsp">Appointment Management</a>
-                    <a href="patients.jsp" class="active">Patient Details</a>
-                </div>
-
                 <div class="top-header-right">
                     <div class="search-icon">
                         <i class="fas fa-search"></i>
@@ -610,7 +668,8 @@
                 </div>
 
                 <!-- Table will be shown when there are patients -->
-                <table class="patients-table">
+                <div class="patients-table-container">
+                    <table class="patients-table">
                     <thead>
                         <tr>
                             <th>Patient</th>
@@ -694,6 +753,7 @@
                         </tr>
                     </tbody>
                 </table>
+                </div>
 
                 <div class="pagination">
                     <div class="pagination-item"><i class="fas fa-chevron-left"></i></div>

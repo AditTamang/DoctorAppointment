@@ -23,13 +23,14 @@ public class Doctor {
     private int patientCount;
     private int successRate;
     private String status; // "ACTIVE", "INACTIVE", "PENDING"
+    private String licenseNumber;
 
     public Doctor() {
     }
 
     public Doctor(int id, String name, String specialization, String qualification, String experience,
                  String email, String phone, String address, String consultationFee,
-                 String availableDays, String availableTime, String imageUrl) {
+                 String availableDays, String availableTime, String imageUrl, String licenseNumber) {
         this.id = id;
         this.name = name;
         this.specialization = specialization;
@@ -42,6 +43,14 @@ public class Doctor {
         this.availableDays = availableDays;
         this.availableTime = availableTime;
         this.imageUrl = imageUrl;
+        this.licenseNumber = licenseNumber;
+    }
+
+    public Doctor(int id, String name, String specialization, String qualification, String experience,
+                 String email, String phone, String address, String consultationFee,
+                 String availableDays, String availableTime, String imageUrl) {
+        this(id, name, specialization, qualification, experience, email, phone, address,
+             consultationFee, availableDays, availableTime, imageUrl, null);
     }
 
     // Getters and Setters
@@ -213,6 +222,14 @@ public class Doctor {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getLicenseNumber() {
+        return licenseNumber;
+    }
+
+    public void setLicenseNumber(String licenseNumber) {
+        this.licenseNumber = licenseNumber;
     }
 
     // Helper method to get full name

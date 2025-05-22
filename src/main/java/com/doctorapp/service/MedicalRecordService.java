@@ -88,6 +88,35 @@ public class MedicalRecordService {
     }
 
     /**
+     * Check if a patient has access to a specific medical record
+     * @param patientId Patient ID
+     * @param recordId Medical record ID
+     * @return true if the patient has access, false otherwise
+     */
+    public boolean canPatientAccessRecord(int patientId, int recordId) {
+        try {
+            MedicalRecord record = getMedicalRecordById(recordId);
+            if (record == null) {
+                LOGGER.log(Level.WARNING, "Medical record not found: " + recordId);
+                return false;
+            }
+
+            // Check if the record belongs to the patient
+            boolean hasAccess = (record.getPatientId() == patientId);
+
+            if (!hasAccess) {
+                LOGGER.log(Level.WARNING, "Access denied: Patient ID {0} attempted to access record ID {1} belonging to patient ID {2}",
+                    new Object[]{patientId, recordId, record.getPatientId()});
+            }
+
+            return hasAccess;
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error checking patient access to medical record", e);
+            return false;
+        }
+    }
+
+    /**
      * Update a medical record
      * @param medicalRecord The medical record to update
      * @return true if update was successful, false otherwise

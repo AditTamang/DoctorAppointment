@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - HealthCare</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/images/logo.jpg" type="image/jpeg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -220,7 +222,10 @@
 </head>
 <body>
     <div class="login-container">
-        <div class="logo">Health<span>Care</span></div>
+        <div class="logo">
+            <img src="${pageContext.request.contextPath}/assets/images/logo.jpg" alt="HealthCare Logo" style="height: 40px; margin-right: 10px;">
+            Health<span>Care</span>
+        </div>
 
         <h2>Welcome Back</h2>
         <p class="subtitle">Please login to your account</p>

@@ -16,12 +16,6 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-dashboard.css">
     <style>
-        /* Main Content Styles */
-        .main-content {
-            padding: 20px;
-            margin-left: 250px;
-            transition: margin-left 0.3s;
-        }
 
         /* Page Header Styles */
         .page-header {
@@ -189,7 +183,12 @@
     <div class="main-content">
         <!-- Page Header -->
         <div class="page-header">
-            <h1 class="page-title">Manage Doctors</h1>
+            <div class="header-left">
+                <button id="menuToggle" class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">Manage Doctors</h1>
+            </div>
             <a href="add-doctor.jsp" class="add-new-btn">
                 <i class="fas fa-plus"></i> Add New Doctor
             </a>
@@ -229,10 +228,10 @@
                     <td><%= doctor.getSpecialization() %></td>
                     <td>
                         <div class="action-buttons">
-                            <a href="${pageContext.request.contextPath}/admin/doctor/view?id=<%= doctor.getId() %>" class="action-btn view-btn" title="View Doctor">
+                            <a href="${pageContext.request.contextPath}/admin/doctors/view?id=<%= doctor.getId() %>" class="action-btn view-btn" title="View Doctor">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a href="${pageContext.request.contextPath}/admin/doctor/edit?id=<%= doctor.getId() %>" class="action-btn edit-btn" title="Edit Doctor">
+                            <a href="${pageContext.request.contextPath}/admin/doctors/edit?id=<%= doctor.getId() %>" class="action-btn edit-btn" title="Edit Doctor">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <a href="#" onclick="confirmDelete(<%= doctor.getId() %>)" class="action-btn delete-btn" title="Delete Doctor">
@@ -257,9 +256,21 @@
         // Confirm delete function
         function confirmDelete(doctorId) {
             if (confirm('Are you sure you want to delete this doctor?')) {
-                window.location.href = '${pageContext.request.contextPath}/admin/doctor/delete?id=' + doctorId;
+                window.location.href = '${pageContext.request.contextPath}/admin/doctors/delete?id=' + doctorId;
             }
         }
+
+        // Toggle sidebar on mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.querySelector('.sidebar');
+
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                });
+            }
+        });
     </script>
 </body>
 </html>

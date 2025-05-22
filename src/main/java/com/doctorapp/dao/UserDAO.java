@@ -274,7 +274,7 @@ public class UserDAO {
     public boolean updateUser(User user) {
         // Check if password is being updated
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            String query = "UPDATE users SET username = ?, email = ?, password = ?, phone = ?, role = ?, first_name = ?, last_name = ? WHERE id = ?";
+            String query = "UPDATE users SET username = ?, email = ?, password = ?, phone = ?, role = ?, first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, address = ? WHERE id = ?";
 
             try (Connection conn = DBConnection.getConnection();
                  PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -289,7 +289,24 @@ public class UserDAO {
                 pstmt.setString(5, user.getRole());
                 pstmt.setString(6, user.getFirstName());
                 pstmt.setString(7, user.getLastName());
-                pstmt.setInt(8, user.getId());
+
+                // Handle date of birth
+                if (user.getDateOfBirth() != null && !user.getDateOfBirth().isEmpty()) {
+                    try {
+                        java.sql.Date sqlDate = java.sql.Date.valueOf(user.getDateOfBirth());
+                        pstmt.setDate(8, sqlDate);
+                    } catch (IllegalArgumentException e) {
+                        // If date format is invalid, set it to null
+                        pstmt.setNull(8, java.sql.Types.DATE);
+                    }
+                } else {
+                    pstmt.setNull(8, java.sql.Types.DATE);
+                }
+
+                // Handle gender and address
+                pstmt.setString(9, user.getGender());
+                pstmt.setString(10, user.getAddress());
+                pstmt.setInt(11, user.getId());
 
                 int rowsAffected = pstmt.executeUpdate();
                 return rowsAffected > 0;
@@ -300,7 +317,7 @@ public class UserDAO {
             }
         } else {
             // Update without changing password
-            String query = "UPDATE users SET username = ?, email = ?, phone = ?, role = ?, first_name = ?, last_name = ? WHERE id = ?";
+            String query = "UPDATE users SET username = ?, email = ?, phone = ?, role = ?, first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, address = ? WHERE id = ?";
 
             try (Connection conn = DBConnection.getConnection();
                  PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -311,7 +328,24 @@ public class UserDAO {
                 pstmt.setString(4, user.getRole());
                 pstmt.setString(5, user.getFirstName());
                 pstmt.setString(6, user.getLastName());
-                pstmt.setInt(7, user.getId());
+
+                // Handle date of birth
+                if (user.getDateOfBirth() != null && !user.getDateOfBirth().isEmpty()) {
+                    try {
+                        java.sql.Date sqlDate = java.sql.Date.valueOf(user.getDateOfBirth());
+                        pstmt.setDate(7, sqlDate);
+                    } catch (IllegalArgumentException e) {
+                        // If date format is invalid, set it to null
+                        pstmt.setNull(7, java.sql.Types.DATE);
+                    }
+                } else {
+                    pstmt.setNull(7, java.sql.Types.DATE);
+                }
+
+                // Handle gender and address
+                pstmt.setString(8, user.getGender());
+                pstmt.setString(9, user.getAddress());
+                pstmt.setInt(10, user.getId());
 
                 int rowsAffected = pstmt.executeUpdate();
                 return rowsAffected > 0;

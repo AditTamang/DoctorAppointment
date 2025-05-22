@@ -28,12 +28,24 @@
     overflow: hidden;
     margin: 0 auto 15px;
     border: 5px solid #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .profile-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
+}
+
+/* Error handling for images */
+.profile-image img[src=""],
+.profile-image img:not([src]) {
+    display: none;
 }
 
 .profile-initials {
@@ -111,6 +123,14 @@
     flex: 1;
     margin-left: 280px;
     padding: 30px;
+}
+
+/* Dashboard Main Container */
+.dashboard-main {
+    flex: 1;
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    position: relative;
 }
 
 .dashboard-header {
@@ -414,6 +434,11 @@
     .main-content {
         margin-left: 240px;
     }
+
+    .dashboard-main {
+        margin-left: 240px;
+        width: calc(100% - 240px);
+    }
 }
 
 @media (max-width: 768px) {
@@ -435,6 +460,7 @@
     .profile-image {
         width: 80px;
         height: 80px;
+        border-width: 4px;
     }
 
     .sidebar-menu {
@@ -458,6 +484,11 @@
     .main-content {
         margin-left: 0;
         padding: 20px;
+    }
+
+    .dashboard-main {
+        margin-left: 0;
+        width: 100%;
     }
 
     .stats-container, .appointment-cards {

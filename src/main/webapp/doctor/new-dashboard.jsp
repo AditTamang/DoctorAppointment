@@ -46,10 +46,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctor Dashboard - HealthPro Portal</title>
+    <title>Doctor Dashboard - MedDoc</title>
 
     <!-- Favicon -->
-    <link rel="icon" href="${pageContext.request.contextPath}/assets/images/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/images/logo.jpg" type="image/jpeg">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -69,10 +69,10 @@
         <div class="main-content">
             <!-- Top Header -->
             <header class="top-header">
-                <div class="header-nav">
-                    <a href="${pageContext.request.contextPath}/doctor/dashboard" class="active">Profile</a>
-                    <a href="${pageContext.request.contextPath}/doctor/appointments">Appointment Management</a>
-                    <a href="${pageContext.request.contextPath}/doctor/patients">Patient Details</a>
+                <div class="header-right">
+                    <div class="search-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
                 </div>
 
                 <div class="header-actions">
@@ -393,6 +393,26 @@
         // Set context path for JavaScript
         const contextPath = '${pageContext.request.contextPath}';
 
+        /**
+         * Update the doctor status UI without reloading the page
+         * @param {string} status - The new status (ACTIVE or INACTIVE)
+         */
+        function updateDoctorStatusUI(status) {
+            const statusBadge = document.querySelector('.status-badge');
+            const toggleStatusBtn = document.getElementById('toggle-status-btn');
+
+            if (statusBadge) {
+                // Update status badge
+                statusBadge.className = 'status-badge ' + status.toLowerCase();
+                statusBadge.textContent = status;
+            }
+
+            if (toggleStatusBtn) {
+                // Update toggle button text
+                toggleStatusBtn.textContent = 'Set Active ' + (status === 'ACTIVE' ? 'Off' : 'On');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // Toggle status button functionality
             const toggleStatusBtn = document.getElementById('toggle-status-btn');
@@ -423,8 +443,8 @@
                                 // Show success message
                                 alert(data.message || 'Status updated successfully!');
 
-                                // Reload the page to reflect changes
-                                window.location.reload();
+                                // Update UI without reloading
+                                updateDoctorStatusUI(data.status);
                             } else {
                                 // Show error message
                                 alert(data.message || 'Failed to update status. Please try again.');
