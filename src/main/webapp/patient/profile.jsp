@@ -3,12 +3,8 @@
 <%@ page import="com.doctorapp.model.Patient" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
-    // Check if user is logged in and is a patient
+    // Get user from session - authentication is handled by servlet
     User user = (User) session.getAttribute("user");
-    if (user == null || !"PATIENT".equals(user.getRole())) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
-        return;
-    }
 
     // Get patient data from request attributes if available
     Patient patient = (Patient) request.getAttribute("patient");

@@ -1,0 +1,98 @@
+/* Image Loading Fix CSS - Prevents continuous loading and layout issues */
+
+/* Prevent image loading loops and layout shifts */
+.profile-image img,
+.patient-avatar img,
+.user-avatar img,
+.doctor-image img,
+.profile-avatar img {
+    transition: opacity 0.3s ease;
+    opacity: 1;
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+/* Loading state for images */
+.profile-image img[data-error-handled],
+.patient-avatar img[data-error-handled],
+.user-avatar img[data-error-handled],
+.doctor-image img[data-error-handled],
+.profile-avatar img[data-error-handled] {
+    opacity: 0.8;
+}
+
+/* Ensure containers have proper dimensions */
+.profile-image,
+.patient-avatar,
+.user-avatar,
+.doctor-image,
+.profile-avatar {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f5;
+    border-radius: 50%;
+}
+
+/* Profile initials styling */
+.profile-initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 1.2em;
+    text-transform: uppercase;
+    border-radius: 50%;
+}
+
+/* Prevent layout shift during image loading */
+.appointment-card .doctor-image {
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    min-height: 50px;
+    flex-shrink: 0;
+}
+
+.sidebar .profile-image {
+    width: 80px;
+    height: 80px;
+    min-width: 80px;
+    min-height: 80px;
+    margin: 0 auto 15px;
+}
+
+/* Loading animation for images */
+@keyframes imageLoad {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.profile-image img:not([data-error-handled]),
+.patient-avatar img:not([data-error-handled]),
+.user-avatar img:not([data-error-handled]),
+.doctor-image img:not([data-error-handled]),
+.profile-avatar img:not([data-error-handled]) {
+    animation: imageLoad 0.3s ease-in-out;
+}
+
+/* Prevent continuous reloading by hiding broken images */
+img[data-error-handled="true"] {
+    display: none !important;
+}
+
+/* Ensure proper fallback display */
+.profile-image:has(img[data-error-handled="true"]) .profile-initials,
+.patient-avatar:has(img[data-error-handled="true"]) .profile-initials,
+.user-avatar:has(img[data-error-handled="true"]) .profile-initials,
+.doctor-image:has(img[data-error-handled="true"]) .profile-initials,
+.profile-avatar:has(img[data-error-handled="true"]) .profile-initials {
+    display: flex !important;
+}

@@ -15,6 +15,12 @@
     overflow-y: auto;
 }
 
+/* Hide any malformed content that might appear as equals symbol */
+.sidebar *::before,
+.sidebar *::after {
+    content: none !important;
+}
+
 .user-profile {
     padding: 20px;
     text-align: center;
@@ -24,12 +30,12 @@
 }
 
 .profile-image {
-    width: 100px;
-    height: 100px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     overflow: hidden;
     margin: 0 auto 15px;
-    border: 5px solid #f0f0f0;
+    border: 3px solid #f0f0f0;
     display: flex;
     justify-content: center;
     align-items: center;

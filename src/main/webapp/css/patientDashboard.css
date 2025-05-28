@@ -22,12 +22,12 @@
 }
 
 .profile-image {
-    width: 100px;
-    height: 100px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     overflow: hidden;
     margin: 0 auto 15px;
-    border: 5px solid #f0f0f0;
+    border: 3px solid #f0f0f0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -56,7 +56,7 @@
     justify-content: center;
     background-color: #4CAF50;
     color: white;
-    font-size: 2rem;
+    font-size: 1.4rem;
     font-weight: 600;
 }
 

@@ -45,14 +45,14 @@
         <div class="profile-info">
             <c:if test="${not empty user}">
                 <div class="profile-image">
-                    <img src="${pageContext.request.contextPath}/assets/images/default-avatar.svg" alt="${user.firstName} ${user.lastName}" />
+                    <img src="${pageContext.request.contextPath}/assets/images/admin/adit.jpg" alt="${user.firstName} ${user.lastName}" />
                 </div>
                 <div class="user-name">${user.firstName} ${user.lastName}</div>
                 <div class="user-role">Administrator</div>
             </c:if>
             <c:if test="${empty user}">
                 <div class="profile-image">
-                    <img src="${pageContext.request.contextPath}/assets/images/default-avatar.svg" alt="Default Avatar" />
+                    <img src="${pageContext.request.contextPath}/assets/images/admin/adit.jpg" alt="Default Avatar" />
                 </div>
                 <div class="user-name">Admin</div>
                 <div class="user-role">Administrator</div>

@@ -6,12 +6,8 @@
  <%@ page import="com.doctorapp.model.Appointment" %>
  <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
  <%
-     // Check if user is logged in and is a patient
+     // Get user from session - authentication is handled by servlet
      User user = (User) session.getAttribute("user");
-     if (user == null || !"PATIENT".equals(user.getRole())) {
-         response.sendRedirect(request.getContextPath() + "/login.jsp");
-         return;
-     }
 
      // Get patient data from request attributes
      Patient patient = (Patient) request.getAttribute("patient");
@@ -36,11 +32,14 @@
      <meta charset="UTF-8">
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <title>Patient Dashboard | Doctor Appointment System</title>
+     <!-- Favicon -->
+     <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/images/logo.jpg" type="image/jpeg">
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
      <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
      <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patientDashboard.css">
      <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-profile-image.css">
+     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/image-loading-fix.css">
  </head>
  <body data-context-path="${pageContext.request.contextPath}">
      <div class="dashboard-container">
@@ -155,7 +154,7 @@
                                  <div class="appointment-body">
                                      <div class="doctor-info">
                                          <div class="doctor-image" data-default-image="/assets/images/doctors/default.jpg">
-                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="<%= appointment.getDoctorName() %>" onerror="this.src='${pageContext.request.contextPath}/assets/images/doctors/default.jpg'">
+                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="<%= appointment.getDoctorName() %>">
                                          </div>
                                          <div class="doctor-details">
                                              <h4><%= appointment.getDoctorName() %></h4>
@@ -225,7 +224,7 @@
                                  <div class="appointment-body">
                                      <div class="doctor-info">
                                          <div class="doctor-image" data-default-image="/assets/images/doctors/default.jpg">
-                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="<%= appointment.getDoctorName() %>" onerror="this.src='${pageContext.request.contextPath}/assets/images/doctors/default.jpg'">
+                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="<%= appointment.getDoctorName() %>">
                                          </div>
                                          <div class="doctor-details">
                                              <h4><%= appointment.getDoctorName() %></h4>
@@ -292,7 +291,7 @@
                                  <div class="appointment-body">
                                      <div class="doctor-info">
                                          <div class="doctor-image" data-default-image="/assets/images/doctors/default.jpg">
-                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="<%= appointment.getDoctorName() %>" onerror="this.src='${pageContext.request.contextPath}/assets/images/doctors/default.jpg'">
+                                             <img src="${pageContext.request.contextPath}/assets/images/doctors/default.jpg" alt="<%= appointment.getDoctorName() %>">
                                          </div>
                                          <div class="doctor-details">
                                              <h4><%= appointment.getDoctorName() %></h4>
@@ -332,9 +331,26 @@
 
 
      <!-- JavaScript for Tab Switching -->
+     <!-- <script src="${pageContext.request.contextPath}/assets/js/dashboard-debug.js"></script> -->
      <script src="${pageContext.request.contextPath}/assets/js/profile-image-handler.js"></script>
      <script>
+         // Prevent multiple rapid page loads
+         if (window.dashboardLoaded) {
+             console.warn('Dashboard already loaded, preventing duplicate initialization');
+             return;
+         }
+         window.dashboardLoaded = true;
+
          document.addEventListener('DOMContentLoaded', function() {
+             console.log('Patient Dashboard: DOMContentLoaded fired');
+
+             // Initialize profile image handling FIRST to prevent loading issues
+             try {
+                 handleImageLoadErrors();
+             } catch (e) {
+                 console.warn('Profile image handler error:', e);
+             }
+
              // Add hover effect to appointment cards
              const appointmentCards = document.querySelectorAll('.appointment-card');
              appointmentCards.forEach(card => {
@@ -382,12 +398,12 @@
 
                      // Show the selected appointment list
                      const tabId = this.getAttribute('data-tab');
-                     document.getElementById(tabId + '-appointments').style.display = 'block';
+                     const targetList = document.getElementById(tabId + '-appointments');
+                     if (targetList) {
+                         targetList.style.display = 'block';
+                     }
                  });
              });
-
-             // Initialize profile image handling
-             handleImageLoadErrors();
          });
 
          // Function to confirm appointment cancellation

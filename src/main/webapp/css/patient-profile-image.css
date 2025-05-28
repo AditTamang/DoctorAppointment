@@ -1,4 +1,4 @@
-/* 
+/*
  * Patient Profile Image Styles
  * This file contains unified styling for patient profile images across the application
  */
@@ -27,8 +27,8 @@
 .sidebar .profile-image,
 .sidebar .patient-avatar,
 .sidebar .user-avatar {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     margin-bottom: 15px;
 }
 
@@ -130,7 +130,7 @@
         margin-right: 0;
         margin-bottom: 15px;
     }
-    
+
     .profile-initials,
     .user-initials {
         font-size: 1.8rem;
@@ -144,7 +144,7 @@
         width: 80px;
         height: 80px;
     }
-    
+
     .appointment-card .doctor-image,
     .doctor-info .doctor-image,
     .appointment-body .patient-avatar {
@@ -152,12 +152,12 @@
         height: 50px;
         margin-right: 10px;
     }
-    
+
     .profile-initials,
     .user-initials {
         font-size: 1.5rem;
     }
-    
+
     .appointment-card .profile-initials,
     .doctor-info .profile-initials,
     .appointment-body .profile-initials,

@@ -46,7 +46,7 @@ body {
     min-height: 100vh;
 }
 
-/* Sidebar Styles - Moved to doctor-sidebar-clean.css */
+/* Sidebar Styles - Consolidated in doctor-sidebar-clean.css */
 
 /* Main Content Styles - Base styles, overridden by doctor-layout-fix.css for specific pages */
 .main-content {

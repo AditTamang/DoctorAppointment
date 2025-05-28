@@ -1,11 +1,14 @@
 /*
- * Admin Sidebar Fix
+ * Admin Sidebar Fix - Targeted CSS for Admin Interface Only
  * This CSS file specifically fixes the admin sidebar layout and button styling
- * without affecting other parts of the application
+ * without affecting other parts of the application (doctor, patient interfaces)
  */
 
-/* Reset and fix sidebar container */
-body .sidebar {
+/* Target only admin pages by checking for admin-specific elements */
+body:has([href*="/admin/"]) .sidebar,
+body:has([action*="/admin/"]) .sidebar,
+.admin-layout .sidebar,
+[data-admin="true"] .sidebar {
     width: 250px !important;
     height: 100vh !important;
     position: fixed !important;
@@ -13,7 +16,7 @@ body .sidebar {
     left: 0 !important;
     z-index: 1000 !important;
     background-color: #fff !important;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1) !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     transition: all 0.3s ease !important;
@@ -21,6 +24,8 @@ body .sidebar {
     margin: 0 !important;
     border-right: 1px solid #e0e0e0 !important;
     float: none !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 /* Fix sidebar header */
@@ -107,6 +112,41 @@ body .dashboard-content {
     float: none !important;
     clear: none !important;
     position: relative !important;
+    min-height: 100vh !important;
+    background-color: #f8f9fc !important;
+    box-sizing: border-box !important;
+    display: block !important;
+}
+
+/* Fix for admin pages specifically */
+body .main-content .page-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 20px !important;
+    padding-bottom: 10px !important;
+    border-bottom: 1px solid #e0e0e0 !important;
+}
+
+body .main-content .header-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
+}
+
+body .main-content .menu-toggle {
+    display: none !important;
+    background: none !important;
+    border: none !important;
+    font-size: 18px !important;
+    color: #333 !important;
+    cursor: pointer !important;
+    padding: 5px !important;
+    border-radius: 4px !important;
+}
+
+body .main-content .menu-toggle:hover {
+    background-color: #f5f5f5 !important;
 }
 
 /* Responsive styles */
@@ -136,16 +176,22 @@ body .dashboard-content {
         margin-left: 70px !important;
         width: calc(100% - 70px) !important;
     }
+
+    body .main-content .menu-toggle {
+        display: block !important;
+    }
 }
 
 @media (max-width: 768px) {
     body .sidebar {
         width: 0 !important;
         overflow: hidden !important;
+        transform: translateX(-100%) !important;
     }
 
     body .sidebar.active {
         width: 250px !important;
+        transform: translateX(0) !important;
     }
 
     body .sidebar.active .sidebar-header h3,
@@ -165,6 +211,65 @@ body .dashboard-content {
 
     body .main-content,
     body .dashboard-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 15px !important;
+    }
+
+    body .main-content .menu-toggle {
+        display: block !important;
+    }
+
+    body .main-content .page-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+    }
+}
+
+/* Additional fixes for admin pages with different layout structures */
+body .dashboard-main {
+    margin-left: 250px !important;
+    width: calc(100% - 250px) !important;
+    padding: 0 !important;
+    background-color: #f8f9fc !important;
+    min-height: 100vh !important;
+    box-sizing: border-box !important;
+}
+
+body .dashboard-content {
+    padding: 20px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+body .dashboard-nav {
+    padding: 15px 20px !important;
+    background-color: #fff !important;
+    border-bottom: 1px solid #e0e0e0 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+/* Fix for pages using dashboard-container layout */
+body .dashboard-container {
+    display: flex !important;
+    min-height: 100vh !important;
+    width: 100% !important;
+    position: relative !important;
+}
+
+/* Responsive adjustments for dashboard-main layout */
+@media (max-width: 992px) {
+    body .dashboard-main {
+        margin-left: 70px !important;
+        width: calc(100% - 70px) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    body .dashboard-main {
         margin-left: 0 !important;
         width: 100% !important;
     }

@@ -71,6 +71,7 @@ public class MedicalRecordDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
+            pstmt.setQueryTimeout(2); // Fast timeout for medical records
             pstmt.setInt(1, patientId);
             pstmt.setInt(2, limit);
 
@@ -111,6 +112,7 @@ public class MedicalRecordDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
+            pstmt.setQueryTimeout(2); // Fast timeout for single record lookup
             pstmt.setInt(1, id);
 
             try (ResultSet rs = pstmt.executeQuery()) {

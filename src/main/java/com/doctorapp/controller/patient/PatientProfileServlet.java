@@ -129,9 +129,18 @@ public class PatientProfileServlet extends HttpServlet {
             Patient patient = patientService.getPatientById(patientId);
 
             if (patient == null) {
-                session.setAttribute("errorMessage", "Patient record not found. Please complete your profile first.");
-                response.sendRedirect(request.getContextPath() + "/patient/profile");
-                return;
+                // Create a new patient record instead of redirecting to avoid loops
+                patient = new Patient();
+                patient.setUserId(user.getId());
+                patient.setFirstName(user.getFirstName());
+                patient.setLastName(user.getLastName());
+                patient.setEmail(user.getEmail());
+                patient.setPhone(user.getPhone());
+                patient.setAddress(user.getAddress());
+                patient.setGender(user.getGender());
+                patient.setDateOfBirth(user.getDateOfBirth());
+                // Set default profile image
+                patient.setProfileImage("/assets/images/patients/default.jpg");
             }
 
             // Check if image should be removed

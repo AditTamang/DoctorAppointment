@@ -7,12 +7,8 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
-    // Check if user is logged in and is a patient
+    // Get user from session - authentication is handled by servlet
     User user = (User) session.getAttribute("user");
-    if (user == null || !"PATIENT".equals(user.getRole())) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
-        return;
-    }
 
     // Get appointments from request
     List<Appointment> appointments = (List<Appointment>) request.getAttribute("appointments");
@@ -26,13 +22,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Appointments | Doctor Appointment System</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/images/logo.jpg" type="image/jpeg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <!-- Consolidated CSS for better performance -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patientDashboard.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-pages.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-confirmation.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-confirm-fix.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-profile-image.css">
     <style>
         /* Fix for doctor initials */
@@ -52,6 +47,52 @@
             font-size: 1.2rem;
             font-weight: 600;
             text-transform: uppercase;
+        }
+
+        /* Fix for patient profile image in navigation */
+        .user-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #4CAF50;
+            margin-right: 15px;
+        }
+
+        .user-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .user-image .profile-initials {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Ensure nav-user container is properly sized */
+        .nav-user {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .user-info h4 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            margin: 0;
+            font-size: 0.875rem;
+            color: #666;
         }
     </style>
 </head>
@@ -230,48 +271,46 @@
 
     <script src="${pageContext.request.contextPath}/assets/js/profile-image-handler.js"></script>
     <script>
-        // Initialize profile image handling
+        // Optimized JavaScript for better performance
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize profile image handling
             handleImageLoadErrors();
-        });
 
-        // Toggle sidebar on mobile
-        document.getElementById('menuToggle').addEventListener('click', function() {
-            document.querySelector('.sidebar').classList.toggle('active');
-        });
+            // Cache DOM elements for better performance
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.querySelector('.sidebar');
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const appointmentCards = document.querySelectorAll('.appointment-card');
 
-        // Tab switching
-        document.querySelectorAll('.tab-button').forEach(button => {
-            button.addEventListener('click', function() {
-                // Remove active class from all buttons
-                document.querySelectorAll('.tab-button').forEach(btn => {
-                    btn.classList.remove('active');
+            // Toggle sidebar on mobile
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
                 });
+            }
 
-                // Add active class to clicked button
-                this.classList.add('active');
+            // Tab switching with optimized DOM manipulation
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
 
-                // Get the tab value
-                const tab = this.getAttribute('data-tab');
+                    // Add active class to clicked button
+                    this.classList.add('active');
 
-                // Show all cards if "all" tab is selected
-                if (tab === 'all') {
-                    document.querySelectorAll('.appointment-card').forEach(card => {
-                        card.style.display = 'block';
+                    // Get the tab value
+                    const tab = this.getAttribute('data-tab');
+
+                    // Show/hide cards based on tab selection
+                    appointmentCards.forEach(card => {
+                        if (tab === 'all' || card.getAttribute('data-status') === tab) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
                     });
-                } else {
-                    // Hide all cards
-                    document.querySelectorAll('.appointment-card').forEach(card => {
-                        card.style.display = 'none';
-                    });
-
-                    // Show only cards with matching status
-                    document.querySelectorAll(`.appointment-card[data-status="${tab}"]`).forEach(card => {
-                        card.style.display = 'block';
-                    });
-                }
+                });
             });
-        });
 
         // Cancel appointment functionality
         const modal = document.getElementById('confirmationModal');

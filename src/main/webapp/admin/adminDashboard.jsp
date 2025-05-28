@@ -6,6 +6,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Doctor Appointment System</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/images/logo.jpg" type="image/jpeg">
     <!-- Include CSS files -->
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -15,6 +17,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin-custom.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-layout-fix.css">
     <style>
         * {
             margin: 0;
@@ -322,16 +325,19 @@
         .edit-btn { background-color: #4e73df; }
         .delete-btn { background-color: #e74a3b; }
 </head>
-<body>
+<body class="admin-interface">
     <!-- Include admin sidebar -->
     <jsp:include page="admin-sidebar.jsp" />
 
     <div class="main-content">
         <div class="container-fluid p-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-                    <p class="mb-0">Welcome to the admin dashboard!</p>
+                <div class="d-flex align-items-center">
+                    <img src="${pageContext.request.contextPath}/assets/images/logo.jpg" alt="MedDoc Logo" style="height: 40px; margin-right: 15px; border-radius: 8px;">
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800">Admin Dashboard</h1>
+                        <p class="mb-0">Welcome to the admin dashboard!</p>
+                    </div>
                 </div>
             </div>
 

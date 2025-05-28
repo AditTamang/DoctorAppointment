@@ -6,12 +6,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Doctor Appointment System</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/images/logo.jpg" type="image/jpeg">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Google Fonts - Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Custom CSS (Bootstrap Replacement) -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin-custom.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-layout-fix.css">
     <style>
         * {
             margin: 0;
@@ -267,15 +270,20 @@
         }
     </style>
 </head>
-<body>
+<body class="admin-interface">
     <!-- Include the standardized sidebar -->
     <jsp:include page="admin-sidebar.jsp" />
 
     <!-- Main Content -->
     <div class="main-content">
         <div class="container-fluid">
-            <h1 class="h3 mb-4">Dashboard</h1>
-            <p class="mb-4">Welcome to the admin dashboard!</p>
+            <div class="d-flex align-items-center mb-4">
+                <img src="${pageContext.request.contextPath}/assets/images/logo.jpg" alt="MedDoc Logo" style="height: 40px; margin-right: 15px; border-radius: 8px;">
+                <div>
+                    <h1 class="h3 mb-0">Admin Dashboard</h1>
+                    <p class="mb-0">Welcome to the admin dashboard!</p>
+                </div>
+            </div>
 
             <!-- Error Message -->
             <c:if test="${not empty error}">

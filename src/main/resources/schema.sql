@@ -1,4 +1,7 @@
--- Database Schema for Doctor Appointment System
+-- Consolidated Database Schema for Doctor Appointment System
+-- This file combines all SQL scripts into a single comprehensive schema
+
+-- Create database if it doesn't exist
 CREATE DATABASE IF NOT EXISTS doctor_appointment;
 USE doctor_appointment;
 
@@ -21,7 +24,6 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
 
 -- Create doctor_registration_requests table
 CREATE TABLE IF NOT EXISTS doctor_registration_requests (
@@ -59,7 +61,7 @@ CREATE TABLE IF NOT EXISTS doctors (
     profile_image VARCHAR(255),
     image_url VARCHAR(255),
     bio TEXT,
-
+    license_number VARCHAR(100) DEFAULT NULL,
     rating DECIMAL(3, 1) DEFAULT 0.0,
     patient_count INT DEFAULT 0,
     success_rate INT DEFAULT 0,
@@ -75,6 +77,7 @@ CREATE TABLE IF NOT EXISTS patients (
     blood_group VARCHAR(10),
     allergies TEXT,
     medical_history TEXT,
+    profile_image VARCHAR(255) DEFAULT '/assets/images/patients/default.jpg',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -167,6 +170,28 @@ CREATE TABLE IF NOT EXISTS prescriptions (
     FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE
 );
 
+-- Create prescriptions table
+CREATE TABLE IF NOT EXISTS prescriptions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    medical_record_id INT,
+    appointment_id INT,
+    patient_id INT NOT NULL,
+    doctor_id INT NOT NULL,
+    prescription_date DATE NOT NULL,
+    medication_name VARCHAR(255) NOT NULL,
+    dosage VARCHAR(100) NOT NULL,
+    frequency VARCHAR(100) NOT NULL,
+    duration VARCHAR(100) NOT NULL,
+    instructions TEXT,
+    status ENUM('ACTIVE', 'COMPLETED', 'CANCELLED') DEFAULT 'ACTIVE',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (medical_record_id) REFERENCES medical_records(id) ON DELETE SET NULL,
+    FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE SET NULL,
+    FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE,
+    FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE
+);
+
 -- Create announcements table
 CREATE TABLE IF NOT EXISTS announcements (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -180,4 +205,8 @@ CREATE TABLE IF NOT EXISTS announcements (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
+
+-- Insert default admin user (password: admin123)
+INSERT IGNORE INTO users (id, username, email, password, first_name, last_name, role)
+VALUES (1, 'admin', 'admin@doctorapp.com', '$bcrypt$YWRtaW4xMjM=$YWRtaW4xMjM=', 'System', 'Administrator', 'ADMIN');
 

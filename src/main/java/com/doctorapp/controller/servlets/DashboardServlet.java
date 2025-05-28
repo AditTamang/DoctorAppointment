@@ -259,9 +259,14 @@ package com.doctorapp.controller.servlets;
      }
 
      private void loadPatientDashboard(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+         System.out.println("=== DashboardServlet: loadPatientDashboard called ===");
+         System.out.println("Request URI: " + request.getRequestURI());
+         System.out.println("Referer: " + request.getHeader("Referer"));
+
          // Always redirect to the patient dashboard servlet which will handle all the logic
          // Using the controller.patient.PatientDashboardServlet
          response.sendRedirect(request.getContextPath() + "/patient/dashboard");
+         System.out.println("DashboardServlet: Redirected to /patient/dashboard");
      }
 
      protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

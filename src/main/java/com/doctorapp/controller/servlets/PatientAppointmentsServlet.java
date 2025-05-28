@@ -1,9 +1,6 @@
 package com.doctorapp.controller.servlets;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import com.doctorapp.dao.AppointmentDAO;
 import com.doctorapp.dao.PatientDAO;
@@ -29,6 +26,8 @@ public class PatientAppointmentsServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        long startTime = System.currentTimeMillis();
+
         try {
             System.out.println("PatientAppointmentsServlet: doGet method called");
 
@@ -47,31 +46,22 @@ public class PatientAppointmentsServlet extends HttpServlet {
                 return;
             }
 
-            // Get patient ID
+            // ULTRA-FAST patient record lookup - minimal processing
             int patientId = patientDAO.getPatientIdByUserId(user.getId());
             if (patientId == 0) {
-                // Patient profile not found, redirect to complete profile
-                response.sendRedirect(request.getContextPath() + "/complete-profile.jsp");
-                return;
-            }
-
-            // Get filter date if provided
-            String dateParam = request.getParameter("date");
-            Date filterDate = null;
-            if (dateParam != null && !dateParam.isEmpty()) {
+                request.setAttribute("appointments", new java.util.ArrayList<>());
+            } else {
+                // ULTRA-FAST appointments query
                 try {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    filterDate = dateFormat.parse(dateParam);
-                } catch (ParseException e) {
-                    System.out.println("PatientAppointmentsServlet: Invalid date format: " + dateParam);
+                    request.setAttribute("appointments", appointmentDAO.getAppointmentsByPatientId(patientId));
+                } catch (Exception e) {
+                    request.setAttribute("appointments", new java.util.ArrayList<>());
                 }
             }
 
-            // Get appointments for the patient
-            request.setAttribute("appointments", appointmentDAO.getAppointmentsByPatientId(patientId));
-
             // Forward to the appointments page
             request.getRequestDispatcher("/patient/appointments.jsp").forward(request, response);
+
         } catch (Exception e) {
             System.err.println("Error loading patient appointments: " + e.getMessage());
             e.printStackTrace();

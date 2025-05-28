@@ -1,14 +1,13 @@
 package com.doctorapp.service;
 
-import com.doctorapp.dao.MedicalRecordDAO;
-import com.doctorapp.dao.PatientDAO;
-import com.doctorapp.model.MedicalRecord;
-
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.doctorapp.dao.MedicalRecordDAO;
+import com.doctorapp.dao.PatientDAO;
+import com.doctorapp.model.MedicalRecord;
 
 /**
  * Service layer for MedicalRecord-related operations.
@@ -25,36 +24,22 @@ public class MedicalRecordService {
     }
 
     /**
-     * Get medical records by patient ID
+     * Get medical records by patient ID - OPTIMIZED FOR SPEED
      * @param patientId Patient ID
      * @return List of medical records
      */
     public List<MedicalRecord> getMedicalRecordsByPatientId(int patientId) {
         try {
-            List<MedicalRecord> records = new ArrayList<>();
-
-            // Try both methods and combine the results
-            try {
-                // First try the new method from MedicalRecordDAO
-                records.addAll(medicalRecordDAO.getMedicalRecordsByPatientId(patientId, 100));
-                LOGGER.log(Level.INFO, "Retrieved " + records.size() + " records from MedicalRecordDAO");
-            } catch (Exception e) {
-                LOGGER.log(Level.WARNING, "Error using MedicalRecordDAO: " + e.getMessage());
+            // Fast path - try primary DAO first with limit for performance
+            List<MedicalRecord> records = medicalRecordDAO.getMedicalRecordsByPatientId(patientId, 15);
+            if (!records.isEmpty()) {
+                return records;
             }
 
-            // If we didn't get any records from MedicalRecordDAO, try PatientDAO
-            if (records.isEmpty()) {
-                try {
-                    records.addAll(patientDAO.getRecentMedicalRecords(patientId, 100));
-                    LOGGER.log(Level.INFO, "Retrieved " + records.size() + " records from PatientDAO");
-                } catch (Exception e) {
-                    LOGGER.log(Level.WARNING, "Error using PatientDAO: " + e.getMessage());
-                }
-            }
-
-            return records;
+            // Fallback only if needed - no logging for performance
+            return patientDAO.getRecentMedicalRecords(patientId, 15);
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error getting medical records for patient ID: " + patientId, e);
+            // Minimal error handling for performance
             return Collections.emptyList();
         }
     }

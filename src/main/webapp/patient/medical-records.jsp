@@ -25,12 +25,14 @@
             background-color: #f8f9fa;
         }
 
-        /* Content Area Styles */
-        .dashboard-content {
+        /* Content Area Styles - Match dashboard layout */
+        .main-content {
             flex: 1;
             padding: 25px;
-            margin-left: 250px;
+            margin-left: 280px;
             transition: margin-left 0.3s ease;
+            background-color: #f8f9fa;
+            min-height: 100vh;
         }
 
         /* Header Styles */
@@ -58,6 +60,7 @@
             padding: 25px;
             margin-bottom: 30px;
             transition: all 0.3s ease;
+            overflow-x: auto;
         }
 
         .medical-records-container:hover {
@@ -72,6 +75,7 @@
             margin-top: 20px;
             border-radius: 8px;
             overflow: hidden;
+            min-width: 800px;
         }
 
         .medical-records-table th,
@@ -172,7 +176,7 @@
 
         /* Responsive Styles */
         @media (max-width: 992px) {
-            .dashboard-content {
+            .main-content {
                 margin-left: 0;
                 padding: 20px;
             }
@@ -183,14 +187,24 @@
         }
 
         @media (max-width: 768px) {
-            .medical-records-table {
-                display: block;
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .medical-records-container {
+                padding: 15px;
                 overflow-x: auto;
+            }
+
+            .medical-records-table {
+                font-size: 14px;
             }
 
             .medical-records-table th,
             .medical-records-table td {
                 padding: 12px 15px;
+                white-space: nowrap;
             }
 
             .dashboard-header {
@@ -200,12 +214,19 @@
         }
 
         @media (max-width: 576px) {
-            .dashboard-content {
-                padding: 15px;
+            .main-content {
+                padding: 10px;
             }
 
             .medical-records-container {
                 padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .medical-records-table th,
+            .medical-records-table td {
+                padding: 10px 12px;
+                font-size: 13px;
             }
         }
     </style>
@@ -228,7 +249,7 @@
         <jsp:include page="patient-sidebar.jsp" />
 
         <!-- Main Content -->
-        <div class="dashboard-content">
+        <div class="main-content">
             <div class="dashboard-header">
                 <h1>My Medical Records</h1>
             </div>

@@ -74,7 +74,7 @@ public class PatientDAO {
         }
     }
 
-    // Get patient by user ID
+    // Get patient by user ID - OPTIMIZED FOR SPEED
     public Patient getPatientByUserId(int userId) {
         String query = "SELECT p.*, u.first_name, u.last_name, u.email, u.date_of_birth, u.gender, u.phone, u.address " +
                       "FROM patients p JOIN users u ON p.user_id = u.id WHERE p.user_id = ?";
@@ -82,6 +82,7 @@ public class PatientDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
+            pstmt.setQueryTimeout(1); // 1 second timeout for fastest response
             pstmt.setInt(1, userId);
 
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -100,28 +101,18 @@ public class PatientDAO {
                     patient.setMedicalHistory(rs.getString("medical_history"));
                     patient.setEmail(rs.getString("email"));
 
-                    // Get profile image if it exists
-                    try {
-                        String profileImage = rs.getString("profile_image");
-                        if (profileImage != null && !profileImage.isEmpty()) {
-                            patient.setProfileImage(profileImage);
-                            LOGGER.log(Level.INFO, "Retrieved profile image: " + profileImage);
-                        } else {
-                            patient.setProfileImage("/assets/images/patients/default.jpg");
-                            LOGGER.log(Level.INFO, "No profile image found, using default");
-                        }
-                    } catch (Exception e) {
-                        // Ignore if profile_image is not available
-                        patient.setProfileImage("/assets/images/patients/default.jpg");
-                        LOGGER.log(Level.INFO, "Error getting profile image, using default: " + e.getMessage());
-                    }
+                    // Fast profile image handling - no logging for performance
+                    String profileImage = rs.getString("profile_image");
+                    patient.setProfileImage((profileImage != null && !profileImage.isEmpty()) ?
+                        profileImage : "/assets/images/patients/default.jpg");
 
                     return patient;
                 }
             }
 
         } catch (SQLException | ClassNotFoundException e) {
-            LOGGER.log(Level.SEVERE, "Error getting patient by user ID: " + userId, e);
+            // Minimal logging for performance
+            System.err.println("Error getting patient by user ID: " + userId);
         }
 
         return null;
@@ -659,7 +650,8 @@ public class PatientDAO {
                       "u.date_of_birth " +
                       "FROM patients p " +
                       "JOIN users u ON p.user_id = u.id " +
-                      "WHERE u.first_name LIKE ? OR u.last_name LIKE ? OR u.email LIKE ?";
+                      "WHERE (u.first_name LIKE ? OR u.last_name LIKE ? OR u.email LIKE ?) " +
+                      "AND u.role = 'PATIENT'";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -768,13 +760,14 @@ public class PatientDAO {
         return patients;
     }
 
-    // Get patient ID by user ID
+    // Get patient ID by user ID - OPTIMIZED FOR SPEED
     public int getPatientIdByUserId(int userId) {
         String query = "SELECT id FROM patients WHERE user_id = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
+            pstmt.setQueryTimeout(1); // 1 second timeout for fastest response
             pstmt.setInt(1, userId);
 
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -784,7 +777,8 @@ public class PatientDAO {
             }
 
         } catch (SQLException | ClassNotFoundException e) {
-            LOGGER.log(Level.SEVERE, "Error getting patient ID by user ID: " + userId, e);
+            // Minimal error handling for speed
+            System.err.println("Error getting patient ID by user ID: " + userId);
         }
 
         return 0;
@@ -808,7 +802,7 @@ public class PatientDAO {
         }
     }
 
-    // Get patient by ID with join query (for schema with separate users and patients tables)
+    // Get patient by ID with join query (for schema with separate users and patients tables) - OPTIMIZED
     private Patient getPatientByIdWithJoin(int patientId) {
         String query = "SELECT p.*, u.first_name, u.last_name, u.email, u.date_of_birth, u.gender, u.phone, u.address " +
                       "FROM patients p JOIN users u ON p.user_id = u.id WHERE p.id = ?";
@@ -816,6 +810,7 @@ public class PatientDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
+            pstmt.setQueryTimeout(1); // 1 second timeout for fastest response
             pstmt.setInt(1, patientId);
 
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -869,13 +864,14 @@ public class PatientDAO {
         return null;
     }
 
-    // Get patient by ID with simple query (for schema with patients table only)
+    // Get patient by ID with simple query (for schema with patients table only) - OPTIMIZED
     private Patient getPatientByIdSimple(int patientId) {
         String query = "SELECT * FROM patients WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
+            pstmt.setQueryTimeout(1); // 1 second timeout for fastest response
             pstmt.setInt(1, patientId);
 
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -883,14 +879,8 @@ public class PatientDAO {
                     Patient patient = new Patient();
                     patient.setId(rs.getInt("id"));
 
-                    // Try to get user_id if it exists
-                    try {
-                        patient.setUserId(rs.getInt("user_id"));
-                    } catch (Exception e) {
-                        // Ignore if user_id doesn't exist
-                    }
-
-                    // Try to get other fields if they exist
+                    // Fast field assignment - no logging for performance
+                    try { patient.setUserId(rs.getInt("user_id")); } catch (Exception e) {}
                     try { patient.setFirstName(rs.getString("first_name")); } catch (Exception e) {}
                     try { patient.setLastName(rs.getString("last_name")); } catch (Exception e) {}
                     try { patient.setEmail(rs.getString("email")); } catch (Exception e) {}
@@ -901,18 +891,14 @@ public class PatientDAO {
                     try { patient.setBloodGroup(rs.getString("blood_group")); } catch (Exception e) {}
                     try { patient.setAllergies(rs.getString("allergies")); } catch (Exception e) {}
                     try { patient.setMedicalHistory(rs.getString("medical_history")); } catch (Exception e) {}
+
+                    // Fast profile image handling - no logging
                     try {
                         String profileImage = rs.getString("profile_image");
-                        if (profileImage != null && !profileImage.isEmpty()) {
-                            patient.setProfileImage(profileImage);
-                            LOGGER.log(Level.INFO, "Retrieved profile image in simple method: " + profileImage);
-                        } else {
-                            patient.setProfileImage("/assets/images/patients/default.jpg");
-                            LOGGER.log(Level.INFO, "No profile image found in simple method, using default");
-                        }
+                        patient.setProfileImage((profileImage != null && !profileImage.isEmpty()) ?
+                            profileImage : "/assets/images/patients/default.jpg");
                     } catch (Exception e) {
                         patient.setProfileImage("/assets/images/patients/default.jpg");
-                        LOGGER.log(Level.INFO, "Error getting profile image in simple method, using default: " + e.getMessage());
                     }
 
                     // Set default values for missing fields
@@ -924,7 +910,8 @@ public class PatientDAO {
             }
 
         } catch (SQLException | ClassNotFoundException e) {
-            LOGGER.log(Level.SEVERE, "Error getting patient by ID with simple query: " + e.getMessage(), e);
+            // Minimal error handling for speed
+            System.err.println("Error getting patient by ID with simple query: " + e.getMessage());
             throw new RuntimeException("Failed to get patient by ID with simple query", e);
         }
 
@@ -939,7 +926,7 @@ public class PatientDAO {
                       "FROM patients p " +
                       "JOIN appointments a ON p.id = a.patient_id " +
                       "JOIN users u ON p.user_id = u.id " +
-                      "WHERE a.doctor_id = ? " +
+                      "WHERE a.doctor_id = ? AND u.role = 'PATIENT' " +
                       "GROUP BY p.id, u.first_name, u.last_name, u.email, u.date_of_birth, u.gender, u.phone, u.address " +
                       "ORDER BY last_visit DESC " +
                       "LIMIT ?";
@@ -1004,6 +991,7 @@ public class PatientDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
+            pstmt.setQueryTimeout(2); // Fast timeout for medical records
             pstmt.setInt(1, patientId);
             pstmt.setInt(2, limit);
 
@@ -1059,6 +1047,7 @@ public class PatientDAO {
                       "WHERE a.patient_id = p.id) as last_visit " +
                       "FROM patients p " +
                       "JOIN users u ON p.user_id = u.id " +
+                      "WHERE u.role = 'PATIENT' " +
                       "ORDER BY p.id";
 
         try (Connection conn = DBConnection.getConnection();
@@ -1318,6 +1307,7 @@ public class PatientDAO {
                       "(SELECT MAX(a.appointment_date) FROM appointments a WHERE a.patient_id = p.id) as last_visit " +
                       "FROM patients p " +
                       "JOIN users u ON p.user_id = u.id " +
+                      "WHERE u.role = 'PATIENT' " +
                       "ORDER BY p.id DESC " +
                       "LIMIT ?";
 

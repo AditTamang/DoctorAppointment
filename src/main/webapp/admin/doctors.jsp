@@ -15,6 +15,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-layout-fix.css">
     <style>
 
         /* Page Header Styles */
@@ -175,7 +176,7 @@
         }
     </style>
 </head>
-<body>
+<body class="admin-interface">
     <!-- Include the standardized sidebar -->
     <jsp:include page="admin-sidebar.jsp" />
 

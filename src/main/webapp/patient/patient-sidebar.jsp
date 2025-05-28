@@ -3,18 +3,13 @@
 <%@ page import="com.doctorapp.model.Patient" %>
 <%@ page import="com.doctorapp.service.PatientService" %>
 <%
-    // Get current user from session
+    // Get current user from session - authentication is handled by servlet
     User user = (User) session.getAttribute("user");
-    if (user == null) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
-        return;
-    }
 
-    // Get patient information including profile image
-    Patient patient = null;
-    if ("PATIENT".equals(user.getRole())) {
-        PatientService patientService = new PatientService();
-        patient = patientService.getPatientByUserId(user.getId());
+    // Get patient information from session or request attributes (avoid database call)
+    Patient patient = (Patient) session.getAttribute("patient");
+    if (patient == null) {
+        patient = (Patient) request.getAttribute("patient");
     }
 
     // Get current page path to highlight active menu item
@@ -33,11 +28,20 @@
 <!-- Sidebar -->
 <div class="sidebar">
     <div class="user-profile">
-        <div class="profile-image" data-default-image="/assets/images/patients/default.jpg" data-initials="<%= user.getFirstName().charAt(0) %><%= user.getLastName().charAt(0) %>">
+        <div class="profile-image" data-default-image="/assets/images/patients/default.jpg" data-initials="<%
+            String firstName = user.getFirstName() != null ? user.getFirstName() : "U";
+            String lastName = user.getLastName() != null ? user.getLastName() : "U";
+            String initials = firstName.charAt(0) + "" + lastName.charAt(0);
+            out.print(initials);
+        %>">
             <% if (patient != null && patient.getProfileImage() != null && !patient.getProfileImage().isEmpty()) { %>
-                <img src="${pageContext.request.contextPath}${patient.getProfileImage()}" alt="<%= user.getFirstName() %>" onerror="this.src='${pageContext.request.contextPath}/assets/images/patients/default.jpg'">
+                <img src="${pageContext.request.contextPath}${patient.getProfileImage()}" alt="<%= user.getFirstName() %>">
             <% } else { %>
-                <div class="profile-initials"><%= user.getFirstName().charAt(0) %><%= user.getLastName().charAt(0) %></div>
+                <div class="profile-initials"><%
+                    String firstNameInit = user.getFirstName() != null ? user.getFirstName() : "U";
+                    String lastNameInit = user.getLastName() != null ? user.getLastName() : "U";
+                    out.print(firstNameInit.charAt(0) + "" + lastNameInit.charAt(0));
+                %></div>
             <% } %>
         </div>
         <h3 class="user-name"><%= user.getFirstName() + " " + user.getLastName() %></h3>
@@ -91,5 +95,5 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-profile-image.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sidebar-button-fix.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/patient-sidebar-fix.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/image-loading-fix.css">
 <script src="${pageContext.request.contextPath}/js/patient-sidebar.js"></script>
-<script src="${pageContext.request.contextPath}/assets/js/profile-image-handler.js"></script>

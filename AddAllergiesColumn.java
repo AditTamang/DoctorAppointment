@@ -3,10 +3,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-/**
- * Simple utility to add the allergies column to the patients table.
- * Run this once to fix the missing column issue.
- */
 public class AddAllergiesColumn {
     private static final String URL = "jdbc:mysql://localhost:3306/doctor_appointment?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     private static final String USERNAME = "root";

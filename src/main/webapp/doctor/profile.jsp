@@ -34,6 +34,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-buttons.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctorDashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/doctor-sidebar-clean.css">
     <style>
         /* Base Styles */
         body {

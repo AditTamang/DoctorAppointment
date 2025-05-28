@@ -149,7 +149,7 @@ function updateAllProfileImages(imageSrc, isPath = false) {
 }
 
 /**
- * Handle image loading errors
+ * Handle image loading errors - FIXED to prevent infinite loops
  */
 function handleImageLoadErrors() {
     // Get all profile images
@@ -160,22 +160,26 @@ function handleImageLoadErrors() {
         if (!img.hasAttribute('data-error-handler-added')) {
             img.setAttribute('data-error-handler-added', 'true');
 
-            img.addEventListener('error', function() {
+            img.addEventListener('error', function(event) {
+                // Prevent infinite loops by checking if we've already tried to fix this image
+                if (this.hasAttribute('data-error-handled')) {
+                    return;
+                }
+                this.setAttribute('data-error-handled', 'true');
+
                 // Get the container
                 const container = this.parentNode;
 
                 // Get the default image path from the data attribute or use a fallback
                 const defaultImagePath = container.getAttribute('data-default-image') || '/assets/images/patients/default.jpg';
-
-                // Try to load the default image
                 const contextPath = document.body.getAttribute('data-context-path') || '';
-                this.src = contextPath + defaultImagePath;
+                const fullDefaultPath = contextPath + defaultImagePath;
 
-                // If the container has a data-initials attribute, prepare for fallback to initials
-                const initials = container.getAttribute('data-initials');
-                if (initials) {
-                    // Add a second error handler for the default image
-                    this.addEventListener('error', function() {
+                // Check if we're already trying to load the default image
+                if (this.src === fullDefaultPath || this.src.endsWith(defaultImagePath)) {
+                    // Default image also failed, fall back to initials
+                    const initials = container.getAttribute('data-initials');
+                    if (initials) {
                         // Remove the image
                         this.remove();
 
@@ -188,19 +192,25 @@ function handleImageLoadErrors() {
                             initialsElement.textContent = initials;
                             container.appendChild(initialsElement);
                         }
-                    }, { once: true });
+                    }
+                } else {
+                    // Try to load the default image
+                    this.src = fullDefaultPath;
                 }
-            });
+            }, { once: true }); // Use once: true to prevent multiple handlers
         }
     });
 
     // Also handle containers that should display initials but don't have an image yet
-    const containers = document.querySelectorAll('.profile-image:not(:has(img)), .patient-avatar:not(:has(img)), .user-avatar:not(:has(img)), .doctor-image:not(:has(img)), .profile-avatar:not(:has(img))');
+    const containers = document.querySelectorAll('.profile-image, .patient-avatar, .user-avatar, .doctor-image, .profile-avatar');
 
     containers.forEach(container => {
-        // Check if container has initials data but no initials element
+        // Check if container has initials data but no image and no initials element
         const initials = container.getAttribute('data-initials');
-        if (initials && !container.querySelector('.profile-initials')) {
+        const hasImage = container.querySelector('img');
+        const hasInitials = container.querySelector('.profile-initials');
+
+        if (initials && !hasImage && !hasInitials) {
             // Create and add initials element
             const initialsElement = document.createElement('div');
             initialsElement.className = 'profile-initials';

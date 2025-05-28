@@ -62,7 +62,11 @@ public class SessionFilter implements Filter {
 
         // Always create a session if it doesn't exist
         HttpSession session = httpRequest.getSession(true);
-        System.out.println("SessionFilter: Path: " + path + ", Session ID: " + session.getId());
+
+        // Only log for patient dashboard to avoid spam
+        if (path.contains("/patient/dashboard")) {
+            System.out.println("SessionFilter: Path: " + path + ", Session ID: " + session.getId() + ", URI: " + requestURI);
+        }
 
         // Check if user is authenticated
         boolean isLoggedIn = SessionUtil.isLoggedIn(httpRequest);
@@ -83,8 +87,14 @@ public class SessionFilter implements Filter {
             // Role-based access control
             if (requestURI.contains("/admin/") || requestURI.startsWith(contextPath + "/admin/")) {
                 if (!"ADMIN".equals(user.getRole())) {
-                    // Redirect to dashboard if not an admin
-                    httpResponse.sendRedirect(contextPath + "/dashboard");
+                    // Redirect to appropriate dashboard if not an admin
+                    if ("PATIENT".equals(user.getRole())) {
+                        httpResponse.sendRedirect(contextPath + "/patient/dashboard");
+                    } else if ("DOCTOR".equals(user.getRole())) {
+                        httpResponse.sendRedirect(contextPath + "/doctor/dashboard");
+                    } else {
+                        httpResponse.sendRedirect(contextPath + "/login");
+                    }
                     return;
                 }
             }
@@ -101,8 +111,12 @@ public class SessionFilter implements Filter {
                     chain.doFilter(request, response);
                     return;
                 } else {
-                    // Redirect to dashboard if not a doctor or admin
-                    httpResponse.sendRedirect(contextPath + "/dashboard");
+                    // Redirect to appropriate dashboard if not a doctor or admin
+                    if ("PATIENT".equals(user.getRole())) {
+                        httpResponse.sendRedirect(contextPath + "/patient/dashboard");
+                    } else {
+                        httpResponse.sendRedirect(contextPath + "/login");
+                    }
                     return;
                 }
             }
@@ -110,8 +124,12 @@ public class SessionFilter implements Filter {
             // Patient area protection
             if (requestURI.contains("/patient/") || requestURI.startsWith(contextPath + "/patient/")) {
                 if (!"PATIENT".equals(user.getRole()) && !"ADMIN".equals(user.getRole())) {
-                    // Redirect to dashboard if not a patient or admin
-                    httpResponse.sendRedirect(contextPath + "/dashboard");
+                    // Redirect to appropriate dashboard if not a patient or admin
+                    if ("DOCTOR".equals(user.getRole())) {
+                        httpResponse.sendRedirect(contextPath + "/doctor/dashboard");
+                    } else {
+                        httpResponse.sendRedirect(contextPath + "/login");
+                    }
                     return;
                 }
             }

@@ -55,7 +55,7 @@
     min-height: 100vh !important;
 }
 
-/* Sidebar styles moved to doctor-sidebar-clean.css */
+/* Sidebar styles consolidated in doctor-sidebar-clean.css */
 
 /* Ensure tables are properly contained */
 .doctor-appointments-page .appointment-content,

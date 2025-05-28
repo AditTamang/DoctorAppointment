@@ -28,6 +28,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/adminDashboard.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-doctor.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-layout-fix.css">
     <style>
         .doctor-profile {
             background-color: #fff;
@@ -223,7 +224,7 @@
         }
     </style>
 </head>
-<body>
+<body class="admin-interface">
     <div class="dashboard-container">
         <!-- Sidebar -->
         <div class="sidebar">
@@ -232,7 +233,7 @@
                     <% if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) { %>
                         <div class="profile-initials">AT</div>
                     <% } else { %>
-                        <img src="${pageContext.request.contextPath}/assets/images/admin/default.jpg" alt="Admin">
+                        <img src="${pageContext.request.contextPath}/assets/images/admin/adit.jpg" alt="Admin">
                     <% } %>
                 </div>
                 <h3 class="user-name"><%= user.getFirstName() + " " + user.getLastName() %></h3>
@@ -301,7 +302,7 @@
                             <% if (user.getFirstName().equals("Adit") && user.getLastName().equals("Tamang")) { %>
                                 <div class="user-initials">AT</div>
                             <% } else { %>
-                                <img src="${pageContext.request.contextPath}/assets/images/admin/default.jpg" alt="Admin">
+                                <img src="${pageContext.request.contextPath}/assets/images/admin/adit.jpg" alt="Admin">
                             <% } %>
                         </div>
                         <div class="user-info">
