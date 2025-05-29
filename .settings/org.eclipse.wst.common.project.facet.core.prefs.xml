@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<root>
+  <facet id="jst.web">
+    <node name="libprov">
+      <attribute name="provider-id" value="maven-lib-provider"/>
+    </node>
+  </facet>
+  <facet id="jst.jaxrs">
+    <node name="libprov">
+      <attribute name="provider-id" value="maven-lib-provider"/>
+    </node>
+  </facet>
+</root>

@@ -1,12 +1,5 @@
--- Consolidated Database Schema for Doctor Appointment System
--- This file combines all SQL scripts into a single comprehensive schema
-
--- Create database if it doesn't exist
 CREATE DATABASE IF NOT EXISTS doctor_appointment;
 USE doctor_appointment;
-
--- Tables will be created only if they don't exist
--- This preserves existing data in the database
 
 -- Create users table
 CREATE TABLE IF NOT EXISTS users (
@@ -170,43 +163,5 @@ CREATE TABLE IF NOT EXISTS prescriptions (
     FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE
 );
 
--- Create prescriptions table
-CREATE TABLE IF NOT EXISTS prescriptions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    medical_record_id INT,
-    appointment_id INT,
-    patient_id INT NOT NULL,
-    doctor_id INT NOT NULL,
-    prescription_date DATE NOT NULL,
-    medication_name VARCHAR(255) NOT NULL,
-    dosage VARCHAR(100) NOT NULL,
-    frequency VARCHAR(100) NOT NULL,
-    duration VARCHAR(100) NOT NULL,
-    instructions TEXT,
-    status ENUM('ACTIVE', 'COMPLETED', 'CANCELLED') DEFAULT 'ACTIVE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (medical_record_id) REFERENCES medical_records(id) ON DELETE SET NULL,
-    FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE SET NULL,
-    FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE,
-    FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE
-);
 
--- Create announcements table
-CREATE TABLE IF NOT EXISTS announcements (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    content TEXT NOT NULL,
-    start_date DATE,
-    end_date DATE,
-    created_by INT,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
-);
-
--- Insert default admin user (password: admin123)
-INSERT IGNORE INTO users (id, username, email, password, first_name, last_name, role)
-VALUES (1, 'admin', 'admin@doctorapp.com', '$bcrypt$YWRtaW4xMjM=$YWRtaW4xMjM=', 'System', 'Administrator', 'ADMIN');
 

@@ -185,7 +185,7 @@
         </div>
     </footer>
 
-    <script src="../js/script.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/script.js"></script>
     <script>
         // Set minimum date to today for the date picker
         document.addEventListener('DOMContentLoaded', function() {
